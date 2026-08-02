@@ -1,0 +1,5 @@
+7767517
+3 2
+pnnx.Input               pnnx_input_0             0 1 0 #0=(64,512)f32
+nn.Linear                projection               1 1 0 1 bias=True in_features=512 out_features=512 @bias=(512)f32 @weight=(512,512)f32 #0=(64,512)f32 #1=(64,512)f32
+pnnx.Output              pnnx_output_0            1 0 1 #1=(64,512)f32

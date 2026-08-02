@@ -13,7 +13,7 @@ struct ArtifactReferenceMaskConfig { std::filesystem::path path; };
 struct PaddingValidityMaskConfig { float invalid_key_value = -10000.f; };
 using MaskConfig = std::variant<ArtifactReferenceMaskConfig, PaddingValidityMaskConfig>;
 struct ArtifactReferenceRopeConfig { std::filesystem::path cos_path, sin_path; };
-struct DynamicMMRoPE3DConfig { int rope_dim = 0; double theta = 0.; std::array<int,3> axis_dims{}; std::array<double,3> axis_scales{}; };
+struct DynamicMMRoPE3DConfig { int rope_dim = 0; double theta = 0.; std::array<int,3> axis_dims{}; std::array<double,3> axis_scales{}; std::string freq_mode = "global_pairs"; };
 using RopeConfig = std::variant<ArtifactReferenceRopeConfig, DynamicMMRoPE3DConfig>;
 struct AuxiliaryInputConfig { MaskMode mask_mode = MaskMode::ArtifactReference; MaskConfig mask; RopeMode rope_mode = RopeMode::ArtifactReference; RopeConfig rope; };
 struct NcnnModelFiles { std::string name; std::filesystem::path param_path,bin_path; };

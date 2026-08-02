@@ -1,0 +1,52 @@
+{
+"phase":"10.1",
+"scope":"real SeedVR2 MM-RoPE3D contract fixture (rotary-embedding-torch==0.5.3, SeedVR2 e4de8c2)",
+"real_seedvr2_weights":false,
+"configuration":{"heads":4,"head_dim":128,"channels":512,"configured_rope_dim":128,"rope_dim":126,"identity_tail_dim":2,"window":[4,4,4],"tokens_per_window":64,"dtype":"fp32","pnnx_fp16":false},
+"rope_contract":{"mode":"dynamic_mmrope3d","freq_mode":"lang_rope","rope_dim":126,"theta":10000,"axis_dims":[42,42,42],"axis_scales":[1,1,1],"source":"exact upstream contract: RotaryEmbedding(dim=128//3=42, freqs_for=lang, theta=10000); per-axis local pair inv_freq=theta^(-k/21); T,H,W axis-major concat; identity tail 2 dims"},
+"cases":[
+{
+"name":"hd128_single",
+"request":{"input_shape":[1,4,4,4,512],"variant":"seedvr2_hd128_mmrope3d_hybrid","window":[4,4,4],"grid":[1,1,1],"padding":[0,0,0],"num_windows":1},
+"selected_core":{"key":"window=[4,4,4],grid=[1,1,1],variant=seedvr2_hd128_mmrope3d_hybrid","artifact":"hybrid_seedvr2_hd128_mmrope444_grid_1x1x1"},
+"validity":{"valid_tokens_total":64,"invalid_tokens":0,"valid_tokens_min":64,"valid_tokens_max":64,"total_window_tokens":64},
+"mask":{"masked_key_entries":0},
+"rope":{"logical_shape":"[64,64]","ncnn_mat":"Mat(w=64,h=64)","cos_max_abs_error":5.960464478e-08,"sin_max_abs_error":5.960464478e-08},
+"accuracy":{"validity":{"logical_shape":"uint8 per window token","element_count":64,"max_abs_error":0,"mean_abs_error":0,"nan_count":0,"inf_count":0},"mask":{"logical_shape":"[W,64,64]","element_count":4096,"max_abs_error":0,"mean_abs_error":0,"nan_count":0,"inf_count":0},"rope_cos":{"logical_shape":"[64,64]","element_count":4096,"max_abs_error":5.960464478e-08,"mean_abs_error":2.095475793e-09,"nan_count":0,"inf_count":0},"rope_sin":{"logical_shape":"[64,64]","element_count":4096,"max_abs_error":5.960464478e-08,"mean_abs_error":6.98491931e-10,"nan_count":0,"inf_count":0},"head0":{"logical_shape":"[W,64,128]","element_count":8192,"max_abs_error":6.407499313e-07,"mean_abs_error":7.234386434e-08,"nan_count":0,"inf_count":0},"head1":{"logical_shape":"[W,64,128]","element_count":8192,"max_abs_error":5.662441254e-07,"mean_abs_error":7.022016704e-08,"nan_count":0,"inf_count":0},"head2":{"logical_shape":"[W,64,128]","element_count":8192,"max_abs_error":6.854534149e-07,"mean_abs_error":7.141749414e-08,"nan_count":0,"inf_count":0},"head3":{"logical_shape":"[W,64,128]","element_count":8192,"max_abs_error":5.36441803e-07,"mean_abs_error":6.826097199e-08,"nan_count":0,"inf_count":0},"merged":{"logical_shape":"[W,64,512]","element_count":32768,"max_abs_error":6.854534149e-07,"mean_abs_error":7.056062438e-08,"nan_count":0,"inf_count":0},"projection":{"logical_shape":"[W,64,512]","element_count":32768,"max_abs_error":3.427267075e-07,"mean_abs_error":5.020894934e-08,"nan_count":0,"inf_count":0},"windows":{"logical_shape":"[W,64,512]","element_count":32768,"max_abs_error":4.172325134e-07,"mean_abs_error":4.98677063e-08,"nan_count":0,"inf_count":0},"bthwc":{"logical_shape":"[1,T,H,W,512]","element_count":32768,"max_abs_error":4.172325134e-07,"mean_abs_error":4.98677063e-08,"nan_count":0,"inf_count":0}},
+"cache":{"size_before":0,"size_after":5,"all_cache_hits":false},
+"latency_ms":{"total":14.2513},
+"status":"PASS"
+},
+{
+"name":"hd128_multi",
+"request":{"input_shape":[1,4,8,8,512],"variant":"seedvr2_hd128_mmrope3d_hybrid","window":[4,4,4],"grid":[1,2,2],"padding":[0,0,0],"num_windows":4},
+"selected_core":{"key":"window=[4,4,4],grid=[1,2,2],variant=seedvr2_hd128_mmrope3d_hybrid","artifact":"hybrid_seedvr2_hd128_mmrope444_grid_1x2x2"},
+"validity":{"valid_tokens_total":256,"invalid_tokens":0,"valid_tokens_min":64,"valid_tokens_max":64,"total_window_tokens":256},
+"mask":{"masked_key_entries":0},
+"rope":{"logical_shape":"[64,64]","ncnn_mat":"Mat(w=64,h=64)","cos_max_abs_error":5.960464478e-08,"sin_max_abs_error":5.960464478e-08},
+"accuracy":{"validity":{"logical_shape":"uint8 per window token","element_count":256,"max_abs_error":0,"mean_abs_error":0,"nan_count":0,"inf_count":0},"mask":{"logical_shape":"[W,64,64]","element_count":16384,"max_abs_error":0,"mean_abs_error":0,"nan_count":0,"inf_count":0},"rope_cos":{"logical_shape":"[64,64]","element_count":4096,"max_abs_error":5.960464478e-08,"mean_abs_error":2.095475793e-09,"nan_count":0,"inf_count":0},"rope_sin":{"logical_shape":"[64,64]","element_count":4096,"max_abs_error":5.960464478e-08,"mean_abs_error":6.98491931e-10,"nan_count":0,"inf_count":0},"head0":{"logical_shape":"[W,64,128]","element_count":32768,"max_abs_error":1.192092896e-06,"mean_abs_error":7.21434361e-08,"nan_count":0,"inf_count":0},"head1":{"logical_shape":"[W,64,128]","element_count":32768,"max_abs_error":7.748603821e-07,"mean_abs_error":6.904854546e-08,"nan_count":0,"inf_count":0},"head2":{"logical_shape":"[W,64,128]","element_count":32768,"max_abs_error":8.940696716e-07,"mean_abs_error":7.021313561e-08,"nan_count":0,"inf_count":0},"head3":{"logical_shape":"[W,64,128]","element_count":32768,"max_abs_error":5.960464478e-07,"mean_abs_error":7.096870171e-08,"nan_count":0,"inf_count":0},"merged":{"logical_shape":"[W,64,512]","element_count":131072,"max_abs_error":1.192092896e-06,"mean_abs_error":7.059345472e-08,"nan_count":0,"inf_count":0},"projection":{"logical_shape":"[W,64,512]","element_count":131072,"max_abs_error":4.321336746e-07,"mean_abs_error":5.008593358e-08,"nan_count":0,"inf_count":0},"windows":{"logical_shape":"[W,64,512]","element_count":131072,"max_abs_error":4.321336746e-07,"mean_abs_error":4.967381128e-08,"nan_count":0,"inf_count":0},"bthwc":{"logical_shape":"[1,T,H,W,512]","element_count":131072,"max_abs_error":4.321336746e-07,"mean_abs_error":4.967381128e-08,"nan_count":0,"inf_count":0}},
+"cache":{"size_before":5,"size_after":10,"all_cache_hits":false},
+"latency_ms":{"total":50.3321},
+"status":"PASS"
+},
+{
+"name":"hd128_padded",
+"request":{"input_shape":[1,5,9,10,512],"variant":"seedvr2_hd128_mmrope3d_hybrid","window":[4,4,4],"grid":[2,3,3],"padding":[3,3,2],"num_windows":18},
+"selected_core":{"key":"window=[4,4,4],grid=[2,3,3],variant=seedvr2_hd128_mmrope3d_hybrid","artifact":"hybrid_seedvr2_hd128_mmrope444_grid_2x3x3"},
+"validity":{"valid_tokens_total":450,"invalid_tokens":702,"valid_tokens_min":2,"valid_tokens_max":64,"total_window_tokens":1152},
+"mask":{"masked_key_entries":44928},
+"rope":{"logical_shape":"[64,64]","ncnn_mat":"Mat(w=64,h=64)","cos_max_abs_error":5.960464478e-08,"sin_max_abs_error":5.960464478e-08},
+"accuracy":{"validity":{"logical_shape":"uint8 per window token","element_count":1152,"max_abs_error":0,"mean_abs_error":0,"nan_count":0,"inf_count":0},"mask":{"logical_shape":"[W,64,64]","element_count":73728,"max_abs_error":0,"mean_abs_error":0,"nan_count":0,"inf_count":0},"rope_cos":{"logical_shape":"[64,64]","element_count":4096,"max_abs_error":5.960464478e-08,"mean_abs_error":2.095475793e-09,"nan_count":0,"inf_count":0},"rope_sin":{"logical_shape":"[64,64]","element_count":4096,"max_abs_error":5.960464478e-08,"mean_abs_error":6.98491931e-10,"nan_count":0,"inf_count":0},"head0":{"logical_shape":"[W,64,128]","element_count":147456,"max_abs_error":1.788139343e-06,"mean_abs_error":9.904482256e-08,"nan_count":0,"inf_count":0},"head1":{"logical_shape":"[W,64,128]","element_count":147456,"max_abs_error":1.668930054e-06,"mean_abs_error":1.111273024e-07,"nan_count":0,"inf_count":0},"head2":{"logical_shape":"[W,64,128]","element_count":147456,"max_abs_error":1.348555088e-06,"mean_abs_error":1.057692263e-07,"nan_count":0,"inf_count":0},"head3":{"logical_shape":"[W,64,128]","element_count":147456,"max_abs_error":1.549720764e-06,"mean_abs_error":1.006966946e-07,"nan_count":0,"inf_count":0},"merged":{"logical_shape":"[W,64,512]","element_count":589824,"max_abs_error":1.788139343e-06,"mean_abs_error":1.041595115e-07,"nan_count":0,"inf_count":0},"projection":{"logical_shape":"[W,64,512]","element_count":589824,"max_abs_error":1.311302185e-06,"mean_abs_error":7.960374855e-08,"nan_count":0,"inf_count":0},"windows":{"logical_shape":"[W,64,512]","element_count":589824,"max_abs_error":1.430511475e-06,"mean_abs_error":7.897535222e-08,"nan_count":0,"inf_count":0},"bthwc":{"logical_shape":"[1,T,H,W,512]","element_count":230400,"max_abs_error":8.49366188e-07,"mean_abs_error":6.32807005e-08,"nan_count":0,"inf_count":0}},
+"cache":{"size_before":10,"size_after":15,"all_cache_hits":false},
+"latency_ms":{"total":81.7201},
+"status":"PASS"
+}
+],
+"determinism":{"s_m_p_s_bit_identical":true,"second_s_run_all_cache_hits":true},
+"negative_tests":{"total":22,"passed":22,"failures":[]},
+"latency":{"warmups":3,"cached_iterations":10,"profiles":[{"name":"hd128_single","total_ms_mean":5.44429,"total_ms_min":4.5511,"total_ms_max":7.2191,"window_pack_ms":0.12856,"validity_mask_ms":0.00319,"rope_ms":0.03654,"heads_total_ms":3.76556,"host_merge_ms":0.12024,"projection_ms":0.31232,"window_unpack_ms":0.17111},{"name":"hd128_multi","total_ms_mean":15.84872,"total_ms_min":14.4557,"total_ms_max":18.1981,"window_pack_ms":0.67485,"validity_mask_ms":0.00918,"rope_ms":0.03955,"heads_total_ms":11.31713,"host_merge_ms":0.48906,"projection_ms":0.89739,"window_unpack_ms":0.60731},{"name":"hd128_padded","total_ms_mean":52.84032,"total_ms_min":47.9909,"total_ms_max":63.4052,"window_pack_ms":1.42974,"validity_mask_ms":0.0312,"rope_ms":0.03802,"heads_total_ms":42.59421,"host_merge_ms":1.77006,"projection_ms":3.28553,"window_unpack_ms":1.33289}]},
+"memory":{"ncnn_model_files_bytes":13681985,"runtime_main_buffers_bytes":14110720,"process_working_set_bytes":148066304,"process_peak_working_set_bytes":307863552},
+"cache_size_after":15,
+"regressions":{"artifact_registry_tests":"PASS","dispatcher_tests":"PASS","dynamic_multi_shape_validation":"PASS","dynamic_padding_mask_tests":"PASS","dynamic_rope3d_tests":"PASS","hybrid_runtime_validation":"PASS","hybrid_window_adapter_tests":"PASS","model_cache_tests":"PASS","ncnn_mat_contract_tests":"PASS","runtime_validation":"PASS"},
+"overall_status":"PASS"
+}

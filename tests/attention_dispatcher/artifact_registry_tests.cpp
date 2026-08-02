@@ -22,12 +22,18 @@ int main() {
     assert(baseline.scan(real,e)&&baseline.size()==5);
     for(const auto& c:baseline.list()) assert(c.key.variant=="baseline"&&c.execution_type==ExecutionType::SingleModel&&c.single_model()&&!c.staged_head_merge());
     const fs::path fidelity=fs::path(__FILE__).parent_path().parent_path()/"seedvr2_attention_fidelity/artifacts/attention_core_fidelity";
-    ArtifactRegistry hybrids; assert(hybrids.scan(fidelity,e)); assert(hybrids.size()==10);
+    ArtifactRegistry hybrids; assert(hybrids.scan(fidelity,e)); assert(hybrids.size()==13);
     const CoreInfo* hd128=hybrids.lookup({4,4,4,1,1,1,"synthetic_hd128_dynamic_rms_rope3d_hybrid"});
     assert(hd128&&hd128->auxiliary()&&hd128->auxiliary()->rope_mode==RopeMode::DynamicMMRoPE3D);
     assert(std::get<DynamicMMRoPE3DConfig>(hd128->auxiliary()->rope).rope_dim==128);
     assert(hybrids.lookup({4,4,4,1,2,2,"synthetic_hd128_dynamic_rms_rope3d_hybrid"}));
     assert(hybrids.lookup({4,4,4,2,3,3,"synthetic_hd128_dynamic_rms_rope3d_hybrid"}));
+    const CoreInfo* hd128_real=hybrids.lookup({4,4,4,1,1,1,"seedvr2_hd128_mmrope3d_hybrid"});
+    assert(hd128_real&&hd128_real->auxiliary()&&hd128_real->auxiliary()->rope_mode==RopeMode::DynamicMMRoPE3D);
+    assert(std::get<DynamicMMRoPE3DConfig>(hd128_real->auxiliary()->rope).rope_dim==126);
+    assert(std::get<DynamicMMRoPE3DConfig>(hd128_real->auxiliary()->rope).freq_mode=="lang_rope");
+    assert(hybrids.lookup({4,4,4,1,2,2,"seedvr2_hd128_mmrope3d_hybrid"}));
+    assert(hybrids.lookup({4,4,4,2,3,3,"seedvr2_hd128_mmrope3d_hybrid"}));
     const CoreInfo* h=hybrids.lookup({4,4,4,1,2,2,"fidelity_ln_rope3d_hybrid"}); assert(h&&h->staged_head_merge()&&!h->single_model());
     const CoreInfo* rms=hybrids.lookup({4,4,4,1,2,2,"fidelity_rms_rope3d_hybrid"}); assert(rms&&rms->staged_head_merge()&&!rms->single_model());
     assert(rms->name=="hybrid_fidelity_rms_rope444_grid_1x2x2");
@@ -77,6 +83,11 @@ int main() {
     assert(rejects(tmp,replace(b,"\"axis_dims\":[2,2,2]","\"axis_dims\":[2,2]")));
     assert(rejects(tmp,replace(b,"\"axis_scales\":[1,0.01,0.0001]","\"axis_scales\":[1,0.01]")));
     assert(rejects(tmp,replace(b,"\"theta\":10000","\"theta\":10000,\"typo_field\":1")));
+    assert(accepts(tmp,replace(b,R"("rope_dim":6,"theta":10000,"axis_dims":[2,2,2])",R"("rope_dim":126,"theta":10000,"axis_dims":[42,42,42],"freq_mode":"lang_rope")")));
+    assert(accepts(tmp,replace(b,R"("rope_dim":6,"theta":10000,"axis_dims":[2,2,2])",R"("rope_dim":6,"theta":10000,"axis_dims":[2,2,2],"freq_mode":"global_pairs")")));
+    assert(rejects(tmp,replace(b,R"("rope_dim":6,"theta":10000,"axis_dims":[2,2,2])",R"("rope_dim":6,"theta":10000,"axis_dims":[2,2,2],"freq_mode":"bogus")")));
+    assert(rejects(tmp,replace(b,R"("rope_dim":6,"theta":10000,"axis_dims":[2,2,2])",R"("rope_dim":126,"theta":10000,"axis_dims":[42,42,40],"freq_mode":"lang_rope")")));
+    assert(rejects(tmp,replace(b,R"("rope_dim":6,"theta":10000,"axis_dims":[2,2,2])",R"("rope_dim":126,"theta":10000,"axis_dims":[41,43,42],"freq_mode":"lang_rope")")));
 
     ArtifactRegistry atomic; assert(atomic.scan(real,e)); const auto before=atomic.list();
     fs::remove_all(tmp); fs::create_directories(tmp/"broken"); std::ofstream(tmp/"broken"/"metadata.json")<<replace(b,"\"theta\":10000","\"theta\":-");

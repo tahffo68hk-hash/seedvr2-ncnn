@@ -1,6 +1,6 @@
 # SeedVR2 ncnn fixture guidance
 
-Goal: validate a SeedVR2-style adaptive-window attention subsystem on ncnn CPU FP32. Current phase: Phase 9.5 READY. Build with `D:\DevTools\VisualStudio\BuildTools\Common7\Tools\VsDevCmd.bat`, ncnn at `build/ncnn-cpu/install`, and clean validation build `build/phase95-dynamic-multishape-release`.
+Goal: validate a SeedVR2-style adaptive-window attention subsystem on ncnn CPU FP32. Current phase: Phase 10 READY (real SeedVR2 MM-RoPE3D contract confirmed from rotary-embedding-torch==0.5.3; synthetic fixture kept as historical regression). Build with `D:\DevTools\VisualStudio\BuildTools\Common7\Tools\VsDevCmd.bat`, ncnn at `build/ncnn-cpu/install`, and clean validation build `build/phase10_1-real-mmrope-release`.
 
 Do not modify `D:\AIProjects\penguin-vl-ncnn-6788`, `D:\AIProjects\third_party\ncnn`, or `D:\AIProjects\third_party\SeedVR2` unless explicitly requested. Do not download dependencies/weights, alter model binaries, or claim PASS without execution. Do not silently fall back between variants or auxiliary modes. FP32 parity artifacts require `pnnx fp16=0`.
 

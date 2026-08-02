@@ -2,7 +2,16 @@
 
 ## Status
 
-`Phase 10 = PARTIAL` (synthetic contract is self-consistent and fully validated on CPU FP32; the real SeedVR2 MM-RoPE3D axis split is not uniquely resolvable from local sources, so no real-SeedVR2 RoPE contract claim is made).
+`Phase 10 (historical synthetic record) = PARTIAL` (synthetic contract is self-consistent and fully validated on CPU FP32; the real SeedVR2 MM-RoPE3D axis split was not uniquely resolvable from local sources at the time, so no real-SeedVR2 RoPE contract claim was made).
+
+Historical regression record for the Phase 10 synthetic contract. Phase 10.1
+subsequently confirmed the real SeedVR2 MM-RoPE3D contract
+(`rotary-embedding-torch==0.5.3`, effective rotary dim 126 of configured 128,
+axis_dims=[42,42,42], identity tail 2) and Phase 10 is READY; this synthetic
+fixture is kept unchanged as an independent regression. See
+[real-seedvr2-mmrope-contract-report.md](real-seedvr2-mmrope-contract-report.md).
+The original status line ("PARTIAL ... not uniquely resolvable from local
+sources") is retained below as the historical record.
 
 This is a shape-only synthetic fixture. It is not real SeedVR2 weights, not a complete SeedVR2 DiT block, and not a mobile-performance conclusion.
 

@@ -222,7 +222,7 @@ bool run_hd128_case(const Case& c, const fs::path& ref_root, const ArtifactRegis
 
     timer = Clock::now();
     Rope3DOutput rope;
-    const Rope3DConfig rc{rope_config.theta, rope_config.axis_dims, rope_config.axis_scales};
+    const Rope3DConfig rc{rope_config.theta, rope_config.axis_dims, rope_config.axis_scales, rope_config.freq_mode};
     if (!generate_dynamic_rope3d(dc, rc, rope, e)) { out.error = "rope: " + e; return false; }
     out.rope_cos = rope.cos;
     out.rope_sin = rope.sin;
@@ -351,11 +351,11 @@ bool run_negative_tests(const ArtifactRegistry& registry, NcnnModelCache& cache,
     bad = base; bad.rope_dim = 64;
     {
         Rope3DOutput out;
-        const Rope3DConfig rc{rope_config.theta, rope_config.axis_dims, rope_config.axis_scales};
+        const Rope3DConfig rc{rope_config.theta, rope_config.axis_dims, rope_config.axis_scales, rope_config.freq_mode};
         check(!generate_dynamic_rope3d(bad, rc, out, e) && out.cos.empty(), e, "rope_dim != metadata");
     }
     {
-        Rope3DConfig rc{rope_config.theta, {{43, 42, 43}}, rope_config.axis_scales};
+        Rope3DConfig rc{rope_config.theta, {{43, 42, 43}}, rope_config.axis_scales, rope_config.freq_mode};
         Rope3DOutput out;
         check(!generate_dynamic_rope3d(base, rc, out, e), e, "odd axis_dims");
     }

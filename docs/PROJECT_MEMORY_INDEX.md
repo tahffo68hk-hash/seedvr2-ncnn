@@ -7,4 +7,5 @@
 - `TEST_MATRIX.md`: commands and acceptance gates.
 - `CODEX_HANDOFF.md`: entry point for a new agent.
 - `NEXT_TASK.md`: copyable next-task prompt (real DiT block contract extraction).
-- `synthetic-hd128-runtime-report.md`: Phase 10 synthetic head_dim=128 report (PARTIAL).
+- `synthetic-hd128-runtime-report.md`: Phase 10 synthetic head_dim=128 report (historical regression, READY superseded).
+- `real-seedvr2-mmrope-contract-report.md`: Phase 10.1 real SeedVR2 MM-RoPE3D contract report (Phase 10 READY).

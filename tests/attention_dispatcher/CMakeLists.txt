@@ -94,3 +94,7 @@ target_compile_options(dynamic_multi_shape_validation PRIVATE /EHsc /UNDEBUG)
 add_executable(synthetic_hd128_validation EXCLUDE_FROM_ALL synthetic_hd128_validation.cpp)
 target_link_libraries(synthetic_hd128_validation PRIVATE hybrid_attention_runtime_lib)
 target_compile_options(synthetic_hd128_validation PRIVATE /EHsc /UNDEBUG)
+
+add_executable(real_mmrope_contract_validation EXCLUDE_FROM_ALL real_mmrope_contract_validation.cpp)
+target_link_libraries(real_mmrope_contract_validation PRIVATE hybrid_attention_runtime_lib)
+target_compile_options(real_mmrope_contract_validation PRIVATE /EHsc /UNDEBUG)

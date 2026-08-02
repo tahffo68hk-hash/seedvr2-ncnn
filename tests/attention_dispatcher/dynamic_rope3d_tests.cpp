@@ -124,6 +124,98 @@ int main()
     hd_bad_config = hd_config; hd_bad_config.axis_scales[2] = 0.0;
     assert(!generate_dynamic_rope3d(hd, hd_bad_config, output, error) && output.cos.empty());
 
+    // Phase 10.1: exact upstream rotary-embedding-torch 0.5.3 MM-RoPE3D oracle parity.
+    // SeedVR2 commit e4de8c24441a67e1b7df56abea10645059bb1185 configures rope_dim=128 and
+    // builds RotaryEmbedding(dim=128 // 3 = 42, freqs_for="lang", theta=10000); three axial
+    // 42-dim blocks concatenate to effective_rotary_dim=126 with identity_tail_dim=2.
+    struct OracleCase
+    {
+        const char* name;
+        int wt, wh, ww;
+    };
+    const OracleCase oracle_cases[] = {{"a", 1, 1, 1}, {"b", 4, 4, 4}, {"c", 2, 3, 5}};
+    const fs::path oracle_root = fs::path(__FILE__).parent_path().parent_path() / "seedvr2_attention_fidelity/artifacts/mmrope_oracle";
+    float oracle_cos_max = 0.f, oracle_sin_max = 0.f, oracle_q_max = 0.f, oracle_k_max = 0.f;
+    bool oracle_identity_ok = true;
+    for (const OracleCase& c : oracle_cases)
+    {
+        const int tokens = c.wt * c.wh * c.ww;
+        DynamicAttentionContract real{};
+        real.batch = 1; real.time = c.wt; real.height = c.wh; real.width = c.ww; real.channels = 512;
+        real.window_t = c.wt; real.window_h = c.wh; real.window_w = c.ww;
+        real.grid_t = real.grid_h = real.grid_w = 1;
+        real.num_windows = 1; real.tokens_per_window = tokens;
+        real.heads = 4; real.head_dim = 128; real.rope_dim = 126;
+        Rope3DConfig real_config{};
+        real_config.theta = 10000.0;
+        real_config.axis_dims = {42, 42, 42};
+        real_config.axis_scales = {1.0, 1.0, 1.0};
+        real_config.freq_mode = "lang_rope";
+        Rope3DOutput real_output{};
+        assert(generate_dynamic_rope3d(real, real_config, real_output, error));
+        assert(real_output.tokens == tokens && real_output.pairs == 64 && real_output.cos.size() == size_t(tokens) * 64);
+
+        const fs::path case_dir = oracle_root / c.name;
+        const auto expected_cos = read_floats(case_dir / "cos.bin", size_t(tokens) * 64);
+        const auto expected_sin = read_floats(case_dir / "sin.bin", size_t(tokens) * 64);
+        for (size_t i = 0; i < real_output.cos.size(); ++i)
+        {
+            oracle_cos_max = std::max(oracle_cos_max, std::fabs(real_output.cos[i] - expected_cos[i]));
+            oracle_sin_max = std::max(oracle_sin_max, std::fabs(real_output.sin[i] - expected_sin[i]));
+        }
+        // Identity tail: the last pair (dims 126..127) must be exactly cos=1/sin=0.
+        for (int t = 0; t < tokens; ++t)
+            oracle_identity_ok = oracle_identity_ok && real_output.cos[static_cast<size_t>(t) * 64 + 63] == 1.f &&
+                                 real_output.sin[static_cast<size_t>(t) * 64 + 63] == 0.f;
+
+        // Rotated Q/K parity: host interleaved-pair rotation with the generated cos/sin must
+        // reproduce the upstream apply_rotary_emb output (partial rotary, identity tail).
+        const auto q_in = read_floats(case_dir / "q_input.bin", size_t(tokens) * 4 * 128);
+        const auto k_in = read_floats(case_dir / "k_input.bin", size_t(tokens) * 4 * 128);
+        const auto q_ref = read_floats(case_dir / "q_rotated.bin", size_t(tokens) * 4 * 128);
+        const auto k_ref = read_floats(case_dir / "k_rotated.bin", size_t(tokens) * 4 * 128);
+        for (int token = 0; token < tokens; ++token)
+        {
+            for (int head = 0; head < 4; ++head)
+            {
+                const size_t row = (static_cast<size_t>(token) * 4 + head) * 128;
+            for (int pair = 0; pair < 64; ++pair)
+            {
+                const size_t base = row + 2 * pair;
+                const float c = real_output.cos[static_cast<size_t>(token) * 64 + pair];
+                const float s = real_output.sin[static_cast<size_t>(token) * 64 + pair];
+                const float qr0 = q_in[base] * c - q_in[base + 1] * s;
+                const float qr1 = q_in[base] * s + q_in[base + 1] * c;
+                const float kr0 = k_in[base] * c - k_in[base + 1] * s;
+                const float kr1 = k_in[base] * s + k_in[base + 1] * c;
+                oracle_q_max = std::max(oracle_q_max, std::fabs(qr0 - q_ref[base]));
+                oracle_q_max = std::max(oracle_q_max, std::fabs(qr1 - q_ref[base + 1]));
+                oracle_k_max = std::max(oracle_k_max, std::fabs(kr0 - k_ref[base]));
+                oracle_k_max = std::max(oracle_k_max, std::fabs(kr1 - k_ref[base + 1]));
+            }
+            }
+        }
+        // Effective rope_dim / axis sums / odd pairs / freq_mode negative checks.
+        Rope3DOutput bad_output{};
+        DynamicAttentionContract bad_real = real; bad_real.rope_dim = 130;
+        assert(!generate_dynamic_rope3d(bad_real, real_config, bad_output, error) && bad_output.cos.empty());
+        bad_real = real; bad_real.rope_dim = 124;
+        assert(!generate_dynamic_rope3d(bad_real, real_config, bad_output, error) && bad_output.sin.empty());
+        Rope3DConfig bad_real_config = real_config; bad_real_config.axis_dims = {42, 42, 40};
+        assert(!generate_dynamic_rope3d(real, bad_real_config, bad_output, error) && bad_output.cos.empty());
+        bad_real_config = real_config; bad_real_config.axis_dims = {41, 43, 42};
+        assert(!generate_dynamic_rope3d(real, bad_real_config, bad_output, error) && bad_output.sin.empty());
+        bad_real_config = real_config; bad_real_config.freq_mode = "bogus";
+        assert(!generate_dynamic_rope3d(real, bad_real_config, bad_output, error) && bad_output.cos.empty());
+        bad_real_config = real_config; bad_real_config.freq_mode = "lang_rope"; bad_real_config.theta = 0.0;
+        assert(!generate_dynamic_rope3d(real, bad_real_config, bad_output, error) && bad_output.sin.empty());
+    }
+    assert(oracle_cos_max < 1e-6f && oracle_sin_max < 1e-6f);
+    assert(oracle_q_max < 1e-6f && oracle_k_max < 1e-6f);
+    assert(oracle_identity_ok);
+
     std::cout << "dynamic_rope3d_tests=PASS cos_max=" << cos_max << " sin_max=" << sin_max
-              << " hd128_cos_max=" << hd_cos_max << " hd128_sin_max=" << hd_sin_max << '\n';
+              << " hd128_cos_max=" << hd_cos_max << " hd128_sin_max=" << hd_sin_max
+              << " oracle_cos_max=" << oracle_cos_max << " oracle_sin_max=" << oracle_sin_max
+              << " oracle_q_max=" << oracle_q_max << " oracle_k_max=" << oracle_k_max << '\n';
 }

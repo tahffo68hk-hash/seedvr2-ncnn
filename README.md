@@ -7,10 +7,12 @@ Metadata-driven Adaptive Window Attention runtime prototype for ncnn.
 Phase 7.5-B remains READY for five manifest-backed baseline FP32 CPU profiles
 and the LayerNorm staged-hybrid fixture. Phase 8 mathematical RMSNorm is READY
 for this fixture's complete ncnn attention-head accuracy gate. Phase 9.5
-dynamic multi-shape RMS hybrid runtime is READY. Phase 10 synthetic
-head_dim=128 / rope_dim=128 is PARTIAL (shape-only synthetic fixture validated;
-real SeedVR2 MM-RoPE3D axis split not resolvable locally). This is not
-a complete SeedVR2 port.
+dynamic multi-shape RMS hybrid runtime is READY. Phase 10 head_dim=128 is READY:
+the exact SeedVR2 MM-RoPE3D contract (rotary-embedding-torch==0.5.3, effective
+rotary dim 126 of configured 128, 2-dim identity tail, axis_dims=[42,42,42])
+was pinned, oracle-verified, and validated end-to-end (real-contract S/M/P),
+with the Phase 10 synthetic fixture kept as an independent historical
+regression. This is not a complete SeedVR2 port.
 
 ```mermaid
 flowchart LR
@@ -25,7 +27,7 @@ flowchart LR
 
 Supported profiles: `[1,4,16,16,32]`, `[1,3,16,16,32]`, `[1,4,17,17,32]`,
 `[1,8,32,32,32]`, `[1,5,19,21,32]`, Dynamic A/B/C `[1,4,8,8,32]` /
-`[1,4,9,10,32]` / `[1,5,9,10,32]`, and synthetic HD128 S/M/P `[1,4,4,4,512]` /
+`[1,4,9,10,32]` / `[1,5,9,10,32]`, and synthetic/real-contract HD128 S/M/P `[1,4,4,4,512]` /
 `[1,4,8,8,512]` / `[1,5,9,10,512]`.
 
 ## Build and validate
@@ -49,6 +51,15 @@ synthetic_hd128_validation tests/seedvr2_attention_fidelity/artifacts/attention_
 It writes [synthetic_hd128_runtime_validation.json](D:\AIProjects\seedvr2-ncnn\reports\synthetic_hd128_runtime_validation.json) and is documented in
 [synthetic-hd128-runtime-report.md](D:\AIProjects\seedvr2-ncnn\docs\synthetic-hd128-runtime-report.md).
 
+Phase 10.1 real SeedVR2 MM-RoPE3D contract validation (new clean build `build/phase10_1-real-mmrope-release`):
+
+```text
+real_mmrope_contract_validation tests/seedvr2_attention_fidelity/artifacts/attention_core_fidelity reports/phase10_regression_inputs.txt
+```
+
+It writes [real_seedvr2_mmrope_contract_validation.json](D:\AIProjects\seedvr2-ncnn\reports\real_seedvr2_mmrope_contract_validation.json) and is documented in
+[real-seedvr2-mmrope-contract-report.md](D:\AIProjects\seedvr2-ncnn\docs\real-seedvr2-mmrope-contract-report.md).
+
 ## Limits
 
 Only the registered profiles are supported; arbitrary resolutions require a
@@ -70,10 +81,10 @@ PARTIAL` until Dynamic B/C are implemented.
 
 ## Current result
 
-This is a metadata-driven, SeedVR2-style adaptive-window attention subsystem for ncnn, not complete SeedVR2 inference. It includes baseline single-model execution; staged four-head Hybrid execution; Q/K LayerNorm and mathematical RMSNorm; local-window 3D RoPE; dynamic padding-validity masks; host head merge; ncnn projection; process-level model cache; variant-aware artifacts; Dynamic A/B/C FP32 CPU parity around `1e-7`; and a synthetic head_dim=128 / rope_dim=128 fixture (S/M/P) with sub-`1e-6` parity and exact validity/mask agreement.
+This is a metadata-driven, SeedVR2-style adaptive-window attention subsystem for ncnn, not complete SeedVR2 inference. It includes baseline single-model execution; staged four-head Hybrid execution; Q/K LayerNorm and mathematical RMSNorm; local-window 3D RoPE; dynamic padding-validity masks; host head merge; ncnn projection; process-level model cache; variant-aware artifacts; Dynamic A/B/C FP32 CPU parity around `1e-7`; and a head_dim=128 fixture (S/M/P) under both the documented synthetic contract and the real SeedVR2 MM-RoPE3D contract (rotary-embedding-torch 0.5.3) with sub-`1e-6` RoPE parity, sub-`1e-4` stage parity, and exact validity/mask agreement.
 
 All FP32 parity/reference artifacts must use `pnnx fp16=0`. After public C++ type-layout changes (for example `CoreInfo` or `std::variant` payloads), use a new clean build directory and rebuild all dependent targets.
 
-Phase 7.5-B LayerNorm Hybrid Runtime = READY; Phase 8 RMSNorm Hybrid Runtime = READY; Phase 8.1 FP32 conversion precision fix = READY; Phase 9.1 DynamicAttentionContract = READY; Phase 9.2 Dynamic padding mask = READY; Phase 9.3 Dynamic MM-RoPE3D = READY; Phase 9.4 Typed auxiliary metadata/runtime routing = READY; Phase 9.5 Dynamic multi-shape RMS Hybrid Runtime = READY; Phase 10 synthetic head_dim=128 = PARTIAL (synthetic contract validated; real SeedVR2 RoPE split unresolved).
+Phase 7.5-B LayerNorm Hybrid Runtime = READY; Phase 8 RMSNorm Hybrid Runtime = READY; Phase 8.1 FP32 conversion precision fix = READY; Phase 9.1 DynamicAttentionContract = READY; Phase 9.2 Dynamic padding mask = READY; Phase 9.3 Dynamic MM-RoPE3D = READY; Phase 9.4 Typed auxiliary metadata/runtime routing = READY; Phase 9.5 Dynamic multi-shape RMS Hybrid Runtime = READY; Phase 10 head_dim=128 = READY (real SeedVR2 MM-RoPE3D contract confirmed from rotary-embedding-torch==0.5.3 and validated; synthetic contract kept as historical regression).
 
-TODO: confirm the real SeedVR2 MM-RoPE3D axis split, complete SeedVR2 DiT block, real SeedVR2 weights, profiles beyond A/B/C/HD128, Vulkan, VAE/full video restoration, and direct Apex fused-RMSNorm parity.
+TODO: integrate the real DiT block (video T-axis text-length offset l, text token RoPE), real SeedVR2 weights, profiles beyond A/B/C/HD128, Vulkan, VAE/full video restoration, and direct Apex fused-RMSNorm parity.

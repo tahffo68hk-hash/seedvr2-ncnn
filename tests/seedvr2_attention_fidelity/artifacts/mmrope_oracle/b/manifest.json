@@ -1,0 +1,67 @@
+{
+  "package_version": "0.5.3",
+  "package_archive_sha256": "7c0297a21301fbd0d20cfdcba33be5d1ad0a46e33454168af08413dbf3e07457",
+  "source_file_sha256": "80a45656e8d6aa8540c96a3fe97faae643da88182e5ae61d0e71c64c9ef61c1a",
+  "SeedVR2_commit": "e4de8c24441a67e1b7df56abea10645059bb1185",
+  "configured_rope_dim": 128,
+  "effective_rotary_dim": 126,
+  "identity_tail_dim": 2,
+  "head_dim": 128,
+  "heads": 4,
+  "theta": 10000.0,
+  "per_axis_dim": 42,
+  "axis_order": [
+    "T",
+    "H",
+    "W"
+  ],
+  "axis_dims": [
+    42,
+    42,
+    42
+  ],
+  "freq_formula": "1 / (theta ** (arange(0, dim, 2)[:dim // 2] / dim)) with dim=42, theta=10000, each frequency duplicated r=2",
+  "window": [
+    4,
+    4,
+    4
+  ],
+  "tensor_shapes": {
+    "freqs": [
+      64,
+      126
+    ],
+    "cos": [
+      64,
+      64
+    ],
+    "sin": [
+      64,
+      64
+    ],
+    "q_input": [
+      64,
+      4,
+      128
+    ],
+    "k_input": [
+      64,
+      4,
+      128
+    ],
+    "q_rotated": [
+      64,
+      4,
+      128
+    ],
+    "k_rotated": [
+      64,
+      4,
+      128
+    ]
+  },
+  "dtype": "float32",
+  "random_seed": 22,
+  "token_order": "T-major W-fastest: (lt * window_h + lh) * window_w + lw",
+  "window_coordinates": "per-axis arange(0..L-1); real SeedVR2 applies text-length T offset l via vid_freqs[l:l+f, :h, :w] (l=0 in this standalone window fixture)"
+}

@@ -38,6 +38,8 @@ bool generate_dynamic_rope3d(const DynamicAttentionContract& c, const Rope3DConf
     if (axis_total != c.rope_dim) { error = "axis_dims sum must equal rope_dim"; return false; }
     for (double axis_scale : config.axis_scales)
         if (!std::isfinite(axis_scale) || axis_scale <= 0.0) { error = "axis_scales must be finite and > 0"; return false; }
+    const bool lang_rope = config.freq_mode == "lang_rope";
+    if (config.freq_mode != "global_pairs" && !lang_rope) { error = "freq_mode must be global_pairs or lang_rope"; return false; }
     const int pairs = c.head_dim / 2;
     const int active_pairs = c.rope_dim / 2;
     std::size_t element_count = 0;
@@ -54,7 +56,9 @@ bool generate_dynamic_rope3d(const DynamicAttentionContract& c, const Rope3DConf
         for (int local_pair = 0; local_pair < axis_pairs; ++local_pair)
         {
             const int pair = pair_offset + local_pair;
-            const float inv_freq = std::exp(-std::log(static_cast<float>(config.theta)) * static_cast<float>(pair) / static_cast<float>(active_pairs));
+            const float inv_freq = lang_rope
+                ? std::exp(-std::log(static_cast<float>(config.theta)) * static_cast<float>(local_pair) / static_cast<float>(axis_pairs))
+                : std::exp(-std::log(static_cast<float>(config.theta)) * static_cast<float>(pair) / static_cast<float>(active_pairs));
             for (int lt = 0; lt < c.window_t; ++lt) for (int lh = 0; lh < c.window_h; ++lh) for (int lw = 0; lw < c.window_w; ++lw)
             {
                 const int coordinate = axis == 0 ? lt : (axis == 1 ? lh : lw);
