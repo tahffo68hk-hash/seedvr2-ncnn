@@ -174,7 +174,7 @@ Release ncnn CPU FP32, per-profile latency (median of 5 reps): A ~3.1 ms, B ~19.
 
 ## 28. Commit
 
-`<commit-hash>` (filled after commit): `feat: validate synthetic SeedVR2 DiT block ncnn runtime`.
+`685768f` (`feat: validate synthetic SeedVR2 DiT block ncnn runtime`).
 
 ## 29. Remaining risks
 
@@ -185,4 +185,4 @@ Release ncnn CPU FP32, per-profile latency (median of 5 reps): A ~3.1 ms, B ~19.
 
 ## 30. Final statement
 
-No push, no tag created, no PR opened; Phase 13 not started. Branch is local with the single Phase 12 commit; worktree clean after commit.
+No push, no tag created, no PR opened; Phase 13 not started. Branch is local with the Phase 12 feature commit 685768f; worktree clean after commit.
