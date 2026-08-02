@@ -1,0 +1,153 @@
+{
+  "name": "synthetic_seedvr2_dit_block_c512_h4_hd128",
+  "variant": "synthetic_seedvr2_dit_block_c512_h4_hd128",
+  "execution": "staged_dit_block",
+  "window": [
+    4,
+    3,
+    3
+  ],
+  "grid": [
+    1,
+    1,
+    1
+  ],
+  "dtype": "fp32",
+  "block": {
+    "hidden_dim": 512,
+    "txt_dim": 512,
+    "heads": 4,
+    "head_dim": 128,
+    "configured_rope_dim": 128,
+    "effective_rotary_dim": 126,
+    "identity_tail_dim": 2,
+    "norm_eps": 1e-05,
+    "mlp_hidden_dim": 1536,
+    "mlp_type": "swiglu",
+    "is_last_layer": false,
+    "weight_seed": 20260802,
+    "real_seedvr2_weights": false,
+    "q_max": 128,
+    "head_pairs": 64
+  },
+  "params_dir": "params",
+  "models": {
+    "attn_norm": {
+      "name": "attn_norm",
+      "ncnn_param": "models/attn_norm/model.ncnn.param",
+      "ncnn_bin": "models/attn_norm/model.ncnn.bin"
+    },
+    "qkv_vid": {
+      "name": "qkv_vid",
+      "ncnn_param": "models/qkv_vid/model.ncnn.param",
+      "ncnn_bin": "models/qkv_vid/model.ncnn.bin"
+    },
+    "qkv_txt": {
+      "name": "qkv_txt",
+      "ncnn_param": "models/qkv_txt/model.ncnn.param",
+      "ncnn_bin": "models/qkv_txt/model.ncnn.bin"
+    },
+    "q_norm_vid": {
+      "name": "q_norm_vid",
+      "ncnn_param": "models/q_norm_vid/model.ncnn.param",
+      "ncnn_bin": "models/q_norm_vid/model.ncnn.bin"
+    },
+    "q_norm_txt": {
+      "name": "q_norm_txt",
+      "ncnn_param": "models/q_norm_txt/model.ncnn.param",
+      "ncnn_bin": "models/q_norm_txt/model.ncnn.bin"
+    },
+    "k_norm_vid": {
+      "name": "k_norm_vid",
+      "ncnn_param": "models/k_norm_vid/model.ncnn.param",
+      "ncnn_bin": "models/k_norm_vid/model.ncnn.bin"
+    },
+    "k_norm_txt": {
+      "name": "k_norm_txt",
+      "ncnn_param": "models/k_norm_txt/model.ncnn.param",
+      "ncnn_bin": "models/k_norm_txt/model.ncnn.bin"
+    },
+    "rope_apply": {
+      "name": "rope_apply",
+      "ncnn_param": "models/rope_apply/model.ncnn.param",
+      "ncnn_bin": "models/rope_apply/model.ncnn.bin"
+    },
+    "heads": [
+      {
+        "name": "head0",
+        "ncnn_param": "models/head/model.ncnn.param",
+        "ncnn_bin": "models/head/model.ncnn.bin"
+      },
+      {
+        "name": "head1",
+        "ncnn_param": "models/head/model.ncnn.param",
+        "ncnn_bin": "models/head/model.ncnn.bin"
+      },
+      {
+        "name": "head2",
+        "ncnn_param": "models/head/model.ncnn.param",
+        "ncnn_bin": "models/head/model.ncnn.bin"
+      },
+      {
+        "name": "head3",
+        "ncnn_param": "models/head/model.ncnn.param",
+        "ncnn_bin": "models/head/model.ncnn.bin"
+      }
+    ],
+    "attn_proj_vid": {
+      "name": "attn_proj_vid",
+      "ncnn_param": "models/attn_proj_vid/model.ncnn.param",
+      "ncnn_bin": "models/attn_proj_vid/model.ncnn.bin"
+    },
+    "attn_proj_txt": {
+      "name": "attn_proj_txt",
+      "ncnn_param": "models/attn_proj_txt/model.ncnn.param",
+      "ncnn_bin": "models/attn_proj_txt/model.ncnn.bin"
+    },
+    "mlp_norm": {
+      "name": "mlp_norm",
+      "ncnn_param": "models/mlp_norm/model.ncnn.param",
+      "ncnn_bin": "models/mlp_norm/model.ncnn.bin"
+    },
+    "swiglu_gate_vid": {
+      "name": "swiglu_gate_vid",
+      "ncnn_param": "models/swiglu_gate_vid/model.ncnn.param",
+      "ncnn_bin": "models/swiglu_gate_vid/model.ncnn.bin"
+    },
+    "swiglu_gate_txt": {
+      "name": "swiglu_gate_txt",
+      "ncnn_param": "models/swiglu_gate_txt/model.ncnn.param",
+      "ncnn_bin": "models/swiglu_gate_txt/model.ncnn.bin"
+    },
+    "swiglu_up_vid": {
+      "name": "swiglu_up_vid",
+      "ncnn_param": "models/swiglu_up_vid/model.ncnn.param",
+      "ncnn_bin": "models/swiglu_up_vid/model.ncnn.bin"
+    },
+    "swiglu_up_txt": {
+      "name": "swiglu_up_txt",
+      "ncnn_param": "models/swiglu_up_txt/model.ncnn.param",
+      "ncnn_bin": "models/swiglu_up_txt/model.ncnn.bin"
+    },
+    "swiglu_act": {
+      "name": "swiglu_act",
+      "ncnn_param": "models/swiglu_act/model.ncnn.param",
+      "ncnn_bin": "models/swiglu_act/model.ncnn.bin"
+    },
+    "swiglu_out_vid": {
+      "name": "swiglu_out_vid",
+      "ncnn_param": "models/swiglu_out_vid/model.ncnn.param",
+      "ncnn_bin": "models/swiglu_out_vid/model.ncnn.bin"
+    },
+    "swiglu_out_txt": {
+      "name": "swiglu_out_txt",
+      "ncnn_param": "models/swiglu_out_txt/model.ncnn.param",
+      "ncnn_bin": "models/swiglu_out_txt/model.ncnn.bin"
+    }
+  },
+  "pnnx": {
+    "command": "pnnx model.pt inputshape=[...] fp16=0",
+    "version": "Usage: pnnx [model.pt] [(key=value)...]\n  pnnxparam=model.pnnx.param\n  pnnxbin=model.pnnx.bin\n  pnnxpy=model_pnnx.py\n  pnnxonnx=model.pnnx.onnx\n  ncnnparam=model.ncnn.param\n  ncnnbin=model.ncnn.bin\n  ncnnpy=model_ncnn.py\n  fp16=1\n  optlevel=2\n  device=cpu/gpu\n  inputshape=[1,3,224,224],...\n  inputshape2=[1,3,320,320],...\n  input=in0.npy,...\n  input2=in0.npy,...\n  customop=C:\\Users\\nihui\\AppData\\Local\\torch_extensions\\torch_extensions\\Cache\\fused\\fused.dll,...\n  moduleop=models.common.Focus,models.yolo.Detect,...\nSample usage: pnnx mobilenet_v2.pt inputshape=[1,3,224,224]\n              pnnx yolov5s.pt inputshape=[1,3,640,640]f32 inputshape2=[1,3,320,320]f32 device=gpu moduleop=models.common.Focus,models.yolo.Detect",
+    "fp16": 0
+  }
+}

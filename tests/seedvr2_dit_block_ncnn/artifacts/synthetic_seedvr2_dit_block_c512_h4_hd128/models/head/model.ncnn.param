@@ -1,0 +1,10 @@
+7767517
+8 8
+Input                    in0                      0 1 in0
+Input                    in1                      0 1 in1
+Input                    in2                      0 1 in2
+Input                    in3                      0 1 in3
+MatMul                   matmultransb_0           2 1 in0 in1 4 0=1
+Eltwise                  weighted_sum_0           2 1 4 in3 5 0=1 -23301=2,8.83883461e-2,1.0
+Softmax                  softmax_0                1 1 5 6 0=1 1=1
+MatMul                   matmul_2                 2 1 6 in2 out0

@@ -13,7 +13,7 @@ rotary dim 126 of configured 128, 2-dim identity tail, axis_dims=[42,42,42])
 was pinned, oracle-verified, and validated end-to-end (real-contract S/M/P),
 with the Phase 10 synthetic fixture kept as an independent historical
 regression. Phase 11 real single DiT block interface/shape/execution contract is
-READY: `NaMMSRTransformerBlock` (SeedVR2 `e4de8c2`) was executed with the real
+READY (superseded by Phase 12 staged ncnn fidelity): `NaMMSRTransformerBlock` (SeedVR2 `e4de8c2`) was executed with the real
 random-weight forward in the isolated conda env `seedvr2-block-probe` (torch
 2.4.0+cpu, einops 0.7.0, diffusers 0.33.1, rotary-embedding-torch 0.5.3) at full
 2560 width (profiles A/B/C/D) with runtime-hook evidence for `[vid_win; txt]`
@@ -22,6 +22,14 @@ SwiGLU, residual order, last-layer vid_only, window reassembly, negatives 17/17;
 only flash_attn/apex fused-CUDA libs are replaced by test-harness CPU compat
 (parity < 1e-6; CUDA fidelity not validated). See
 [seedvr2-single-dit-block-contract-report.md](D:/AIProjects/seedvr2-ncnn/docs/seedvr2-single-dit-block-contract-report.md).
+Phase 12 synthetic single DiT block staged ncnn fidelity is READY: the real
+`NaMMSRTransformerBlock` topology runs at scaled C=512/H=4/HD=128 through a
+staged ncnn + host hybrid runtime (`HybridDiTBlockRuntime`, seed 20260802, MLP
+hidden 1536 from the real SwiGLUMLP formula); profiles A/B/C/D all PASS with
+final vid/txt < 1e-4, A->B->C->D->A bit-identical, last-layer vid_only PASS,
+registry/cache 19, negatives 24+7+registry, and Phase 9.5/10/11 regressions
+PASS (batch>1 txt indexing quirk of the real `repeat_concat_idx` reproduced
+exactly). See [synthetic-seedvr2-dit-block-ncnn-report.md](D:/AIProjects/seedvr2-ncnn/docs/synthetic-seedvr2-dit-block-ncnn-report.md).
 This is not a complete SeedVR2 port.
 
 ```mermaid

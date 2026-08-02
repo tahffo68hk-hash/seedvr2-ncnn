@@ -1,0 +1,6 @@
+7767517
+4 4
+Input                    in0                      0 1 in0
+Input                    in1                      0 1 in1
+Swish                    silu_0                   1 1 in0 2
+BinaryOp                 mul_0                    2 1 2 in1 out0 0=2

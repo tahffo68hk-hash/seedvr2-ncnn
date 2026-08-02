@@ -1,0 +1,4 @@
+7767517
+2 2
+Input                    in0                      0 1 in0
+RMSNorm                  rmsn_0                   1 1 in0 out0 0=512 1=1.000000e-5 2=0

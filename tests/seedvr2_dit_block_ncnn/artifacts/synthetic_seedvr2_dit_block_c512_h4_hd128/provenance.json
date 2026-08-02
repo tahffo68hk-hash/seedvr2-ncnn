@@ -1,0 +1,17 @@
+{
+  "seedvr2_commit": "D:\\AIProjects\\third_party\\SeedVR2",
+  "seedvr2_head": "e4de8c24441a67e1b7df56abea10645059bb1185",
+  "block_class": "NaMMSRTransformerBlock",
+  "block_module": "models.dit_v2.nablocks.mmsr_block",
+  "block_source": "D:\\AIProjects\\third_party\\SeedVR2\\models\\dit_v2\\nablocks\\mmsr_block.py",
+  "torch_version": "2.4.0+cpu",
+  "seed": 20260802,
+  "real_seedvr2_weights": false,
+  "real_flash_attn_cuda_kernel": false,
+  "real_apex_cuda_kernel": false,
+  "attention_dtype_mode": "fp32 (torch.Tensor.bfloat16 patched to identity in test harness)",
+  "flash_attn": "cpu_compat (math-equivalent FP32 varlen)",
+  "apex": "cpu_compat (FusedRMSNorm FP32)",
+  "pnnx": "fp16=0 (see export_synthetic_dit_block.py)",
+  "a_deterministic_bit_identical": true
+}

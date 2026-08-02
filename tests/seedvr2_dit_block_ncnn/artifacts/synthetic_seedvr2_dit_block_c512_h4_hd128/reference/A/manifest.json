@@ -1,0 +1,1046 @@
+{
+  "profile": "A",
+  "stages": {
+    "input_vid": {
+      "logical_shape": [
+        16,
+        512
+      ],
+      "dtype": "float32",
+      "numel": 8192,
+      "finite": true,
+      "mean": 0.002294347155839205,
+      "std": 1.0080058574676514,
+      "min": -3.626314163208008,
+      "max": 3.7010812759399414,
+      "file": "input_vid.bin",
+      "producer": "external",
+      "consumer": "runtime input"
+    },
+    "input_txt": {
+      "logical_shape": [
+        2,
+        512
+      ],
+      "dtype": "float32",
+      "numel": 1024,
+      "finite": true,
+      "mean": 0.02531368099153042,
+      "std": 0.9674068093299866,
+      "min": -3.324375629425049,
+      "max": 2.7843098640441895,
+      "file": "input_txt.bin",
+      "producer": "external",
+      "consumer": "runtime input"
+    },
+    "vid_shape": {
+      "logical_shape": [
+        1,
+        3
+      ],
+      "dtype": "float32",
+      "numel": 3,
+      "finite": true,
+      "mean": 3.0,
+      "std": 1.7320507764816284,
+      "min": 1.0,
+      "max": 4.0,
+      "file": "vid_shape.bin",
+      "producer": "external",
+      "consumer": "runtime input"
+    },
+    "txt_shape": {
+      "logical_shape": [
+        1,
+        1
+      ],
+      "dtype": "float32",
+      "numel": 1,
+      "finite": true,
+      "mean": 2.0,
+      "std": NaN,
+      "min": 2.0,
+      "max": 2.0,
+      "file": "txt_shape.bin",
+      "producer": "external",
+      "consumer": "runtime input"
+    },
+    "emb": {
+      "logical_shape": [
+        1,
+        3072
+      ],
+      "dtype": "float32",
+      "numel": 3072,
+      "finite": true,
+      "mean": -0.005301503464579582,
+      "std": 0.9945181608200073,
+      "min": -3.544729232788086,
+      "max": 3.263540744781494,
+      "file": "emb.bin",
+      "producer": "external",
+      "consumer": "runtime input"
+    },
+    "attn_norm_vid": {
+      "logical_shape": [
+        16,
+        512
+      ],
+      "dtype": "float32",
+      "numel": 8192,
+      "finite": true,
+      "mean": 0.0017618881538510323,
+      "std": 1.0000545978546143,
+      "min": -3.674656867980957,
+      "max": 3.6501619815826416,
+      "file": "attn_norm_vid.bin",
+      "producer": "attn_norm.vid",
+      "consumer": "ncnn stage parity"
+    },
+    "attn_norm_txt": {
+      "logical_shape": [
+        2,
+        512
+      ],
+      "dtype": "float32",
+      "numel": 1024,
+      "finite": true,
+      "mean": 0.02642480656504631,
+      "std": 1.0001338720321655,
+      "min": -3.4635941982269287,
+      "max": 2.8736770153045654,
+      "file": "attn_norm_txt.bin",
+      "producer": "attn_norm.txt",
+      "consumer": "ncnn stage parity"
+    },
+    "ada_attn_in_vid": {
+      "logical_shape": [
+        16,
+        512
+      ],
+      "dtype": "float32",
+      "numel": 8192,
+      "finite": true,
+      "mean": -0.05232911556959152,
+      "std": 1.7045243978500366,
+      "min": -9.75703239440918,
+      "max": 9.311944961547852,
+      "file": "ada_attn_in_vid.bin",
+      "producer": "AdaSingle.vid attn in (modulated)",
+      "consumer": "ncnn stage parity"
+    },
+    "ada_attn_in_txt": {
+      "logical_shape": [
+        2,
+        512
+      ],
+      "dtype": "float32",
+      "numel": 1024,
+      "finite": true,
+      "mean": 0.020521504804491997,
+      "std": 1.6704752445220947,
+      "min": -7.861496925354004,
+      "max": 7.047057151794434,
+      "file": "ada_attn_in_txt.bin",
+      "producer": "AdaSingle.txt attn in (modulated)",
+      "consumer": "ncnn stage parity"
+    },
+    "qkv_vid": {
+      "logical_shape": [
+        16,
+        1536
+      ],
+      "dtype": "float32",
+      "numel": 24576,
+      "finite": true,
+      "mean": -0.00852974597364664,
+      "std": 0.9794926047325134,
+      "min": -6.308703899383545,
+      "max": 4.182817459106445,
+      "file": "qkv_vid.bin",
+      "producer": "attn.proj_qkv.vid",
+      "consumer": "ncnn stage parity"
+    },
+    "qkv_txt": {
+      "logical_shape": [
+        2,
+        1536
+      ],
+      "dtype": "float32",
+      "numel": 3072,
+      "finite": true,
+      "mean": 0.002243395894765854,
+      "std": 0.9506821036338806,
+      "min": -3.4062063694000244,
+      "max": 3.6403565406799316,
+      "file": "qkv_txt.bin",
+      "producer": "attn.proj_qkv.txt",
+      "consumer": "ncnn stage parity"
+    },
+    "q_vid": {
+      "logical_shape": [
+        16,
+        512
+      ],
+      "dtype": "float32",
+      "numel": 8192,
+      "finite": true,
+      "mean": 0.012946554459631443,
+      "std": 1.0134172439575195,
+      "min": -6.308703899383545,
+      "max": 4.182817459106445,
+      "file": "q_vid.bin",
+      "producer": "derive qkv_vid[:,0:512]",
+      "consumer": "ncnn stage parity"
+    },
+    "k_vid": {
+      "logical_shape": [
+        16,
+        512
+      ],
+      "dtype": "float32",
+      "numel": 8192,
+      "finite": true,
+      "mean": -0.013643808662891388,
+      "std": 0.9722453355789185,
+      "min": -3.7678780555725098,
+      "max": 3.6251730918884277,
+      "file": "k_vid.bin",
+      "producer": "derive qkv_vid[:,512:1024]",
+      "consumer": "ncnn stage parity"
+    },
+    "v_vid": {
+      "logical_shape": [
+        16,
+        512
+      ],
+      "dtype": "float32",
+      "numel": 8192,
+      "finite": true,
+      "mean": -0.024891985580325127,
+      "std": 0.9515360593795776,
+      "min": -3.3623173236846924,
+      "max": 3.4913108348846436,
+      "file": "v_vid.bin",
+      "producer": "derive qkv_vid[:,1024:1536]",
+      "consumer": "ncnn stage parity"
+    },
+    "q_txt": {
+      "logical_shape": [
+        2,
+        512
+      ],
+      "dtype": "float32",
+      "numel": 1024,
+      "finite": true,
+      "mean": -0.015933696180582047,
+      "std": 0.9585778713226318,
+      "min": -3.4062063694000244,
+      "max": 3.6403565406799316,
+      "file": "q_txt.bin",
+      "producer": "derive qkv_txt[:,0:512]",
+      "consumer": "ncnn stage parity"
+    },
+    "k_txt": {
+      "logical_shape": [
+        2,
+        512
+      ],
+      "dtype": "float32",
+      "numel": 1024,
+      "finite": true,
+      "mean": -0.002093563787639141,
+      "std": 0.9259877800941467,
+      "min": -3.301677942276001,
+      "max": 3.230423927307129,
+      "file": "k_txt.bin",
+      "producer": "derive qkv_txt[:,512:1024]",
+      "consumer": "ncnn stage parity"
+    },
+    "v_txt": {
+      "logical_shape": [
+        2,
+        512
+      ],
+      "dtype": "float32",
+      "numel": 1024,
+      "finite": true,
+      "mean": 0.024757452309131622,
+      "std": 0.9674578309059143,
+      "min": -3.345831871032715,
+      "max": 3.2840943336486816,
+      "file": "v_txt.bin",
+      "producer": "derive qkv_txt[:,1024:1536]",
+      "consumer": "ncnn stage parity"
+    },
+    "q_norm_vid": {
+      "logical_shape": [
+        16,
+        4,
+        128
+      ],
+      "dtype": "float32",
+      "numel": 8192,
+      "finite": true,
+      "mean": 0.014480970799922943,
+      "std": 0.999951183795929,
+      "min": -5.483680248260498,
+      "max": 4.063274383544922,
+      "file": "q_norm_vid.bin",
+      "producer": "attn.norm_q.vid",
+      "consumer": "ncnn stage parity"
+    },
+    "k_norm_vid": {
+      "logical_shape": [
+        16,
+        4,
+        128
+      ],
+      "dtype": "float32",
+      "numel": 8192,
+      "finite": true,
+      "mean": -0.01469692774116993,
+      "std": 0.9999476075172424,
+      "min": -4.061240196228027,
+      "max": 3.671001672744751,
+      "file": "k_norm_vid.bin",
+      "producer": "attn.norm_k.vid",
+      "consumer": "ncnn stage parity"
+    },
+    "q_norm_txt": {
+      "logical_shape": [
+        2,
+        4,
+        128
+      ],
+      "dtype": "float32",
+      "numel": 1024,
+      "finite": true,
+      "mean": -0.015335158444941044,
+      "std": 1.0003653764724731,
+      "min": -3.2553322315216064,
+      "max": 3.663804531097412,
+      "file": "q_norm_txt.bin",
+      "producer": "attn.norm_q.txt",
+      "consumer": "ncnn stage parity"
+    },
+    "k_norm_txt": {
+      "logical_shape": [
+        2,
+        4,
+        128
+      ],
+      "dtype": "float32",
+      "numel": 1024,
+      "finite": true,
+      "mean": -0.0006682658568024635,
+      "std": 1.0004825592041016,
+      "min": -3.7500669956207275,
+      "max": 3.5244274139404297,
+      "file": "k_norm_txt.bin",
+      "producer": "attn.norm_k.txt",
+      "consumer": "ncnn stage parity"
+    },
+    "rope_before_q_vid": {
+      "logical_shape": [
+        16,
+        4,
+        128
+      ],
+      "dtype": "float32",
+      "numel": 8192,
+      "finite": true,
+      "mean": 0.014480970799922943,
+      "std": 0.999951183795929,
+      "min": -5.483680248260498,
+      "max": 4.063274383544922,
+      "file": "rope_before_q_vid.bin",
+      "producer": "rope input vid_q",
+      "consumer": "ncnn stage parity"
+    },
+    "rope_before_k_vid": {
+      "logical_shape": [
+        16,
+        4,
+        128
+      ],
+      "dtype": "float32",
+      "numel": 8192,
+      "finite": true,
+      "mean": -0.01469692774116993,
+      "std": 0.9999476075172424,
+      "min": -4.061240196228027,
+      "max": 3.671001672744751,
+      "file": "rope_before_k_vid.bin",
+      "producer": "rope input vid_k",
+      "consumer": "ncnn stage parity"
+    },
+    "rope_after_q_vid": {
+      "logical_shape": [
+        16,
+        4,
+        128
+      ],
+      "dtype": "float32",
+      "numel": 8192,
+      "finite": true,
+      "mean": 0.028885385021567345,
+      "std": 0.9996387362480164,
+      "min": -4.914347171783447,
+      "max": 4.543540954589844,
+      "file": "rope_after_q_vid.bin",
+      "producer": "NaMMRotaryEmbedding3d vid_q",
+      "consumer": "ncnn stage parity"
+    },
+    "rope_after_k_vid": {
+      "logical_shape": [
+        16,
+        4,
+        128
+      ],
+      "dtype": "float32",
+      "numel": 8192,
+      "finite": true,
+      "mean": -0.012805857695639133,
+      "std": 0.9999736547470093,
+      "min": -3.6787192821502686,
+      "max": 3.671088695526123,
+      "file": "rope_after_k_vid.bin",
+      "producer": "NaMMRotaryEmbedding3d vid_k",
+      "consumer": "ncnn stage parity"
+    },
+    "rope_after_q_txt": {
+      "logical_shape": [
+        2,
+        4,
+        128
+      ],
+      "dtype": "float32",
+      "numel": 1024,
+      "finite": true,
+      "mean": -0.012999788857996464,
+      "std": 1.0003985166549683,
+      "min": -3.2553322315216064,
+      "max": 3.6634600162506104,
+      "file": "rope_after_q_txt.bin",
+      "producer": "NaMMRotaryEmbedding3d txt_q",
+      "consumer": "ncnn stage parity"
+    },
+    "rope_after_k_txt": {
+      "logical_shape": [
+        2,
+        4,
+        128
+      ],
+      "dtype": "float32",
+      "numel": 1024,
+      "finite": true,
+      "mean": -0.0006379345431923866,
+      "std": 1.0004825592041016,
+      "min": -3.7500669956207275,
+      "max": 3.1023600101470947,
+      "file": "rope_after_k_txt.bin",
+      "producer": "NaMMRotaryEmbedding3d txt_k",
+      "consumer": "ncnn stage parity"
+    },
+    "rope_freqs_vid": {
+      "logical_shape": [
+        16,
+        126
+      ],
+      "dtype": "float32",
+      "numel": 2016,
+      "finite": true,
+      "mean": 0.22350767254829407,
+      "std": 0.4991227388381958,
+      "min": 0.0,
+      "max": 3.0,
+      "file": "rope_freqs_vid.bin",
+      "producer": "get_freqs vid_freqs",
+      "consumer": "ncnn stage parity"
+    },
+    "rope_freqs_txt": {
+      "logical_shape": [
+        2,
+        126
+      ],
+      "dtype": "float32",
+      "numel": 252,
+      "finite": true,
+      "mean": 0.06705229729413986,
+      "std": 0.19082759320735931,
+      "min": 0.0,
+      "max": 1.0,
+      "file": "rope_freqs_txt.bin",
+      "producer": "get_freqs txt_freqs",
+      "consumer": "ncnn stage parity"
+    },
+    "attention_vid_merged": {
+      "logical_shape": [
+        16,
+        512
+      ],
+      "dtype": "float32",
+      "numel": 8192,
+      "finite": true,
+      "mean": -0.021025924012064934,
+      "std": 0.5398496389389038,
+      "min": -1.9502220153808594,
+      "max": 1.8413468599319458,
+      "file": "attention_vid_merged.bin",
+      "producer": "window_reverse + head merge",
+      "consumer": "ncnn stage parity"
+    },
+    "attention_txt_mean_merged": {
+      "logical_shape": [
+        2,
+        512
+      ],
+      "dtype": "float32",
+      "numel": 1024,
+      "finite": true,
+      "mean": -0.01554947067052126,
+      "std": 0.528232753276825,
+      "min": -1.558361291885376,
+      "max": 1.5864979028701782,
+      "file": "attention_txt_mean_merged.bin",
+      "producer": "txt mean coalesce",
+      "consumer": "ncnn stage parity"
+    },
+    "packed_q": {
+      "logical_shape": [
+        18,
+        4,
+        128
+      ],
+      "dtype": "float32",
+      "numel": 9216,
+      "finite": true,
+      "mean": 0.024231476709246635,
+      "std": 0.9997555613517761,
+      "min": -4.914347171783447,
+      "max": 4.543540954589844,
+      "file": "packed_q.bin",
+      "producer": "repeat_concat_idx concat (flash input q)",
+      "consumer": "ncnn stage parity"
+    },
+    "packed_k": {
+      "logical_shape": [
+        18,
+        4,
+        128
+      ],
+      "dtype": "float32",
+      "numel": 9216,
+      "finite": true,
+      "mean": -0.011453867889940739,
+      "std": 0.9999831914901733,
+      "min": -3.7500669956207275,
+      "max": 3.671088695526123,
+      "file": "packed_k.bin",
+      "producer": "repeat_concat_idx concat (flash input k)",
+      "consumer": "ncnn stage parity"
+    },
+    "packed_v": {
+      "logical_shape": [
+        18,
+        4,
+        128
+      ],
+      "dtype": "float32",
+      "numel": 9216,
+      "finite": true,
+      "mean": -0.019375380128622055,
+      "std": 0.9533929228782654,
+      "min": -3.3623173236846924,
+      "max": 3.4913108348846436,
+      "file": "packed_v.bin",
+      "producer": "repeat_concat_idx concat (flash input v)",
+      "consumer": "ncnn stage parity"
+    },
+    "attention_packed_output": {
+      "logical_shape": [
+        18,
+        4,
+        128
+      ],
+      "dtype": "float32",
+      "numel": 9216,
+      "finite": true,
+      "mean": -0.020417429506778717,
+      "std": 0.5385457277297974,
+      "min": -1.9502220153808594,
+      "max": 1.8413468599319458,
+      "file": "attention_packed_output.bin",
+      "producer": "FlashAttentionVarlen (FP32 compat)",
+      "consumer": "ncnn stage parity"
+    },
+    "attention_vid_windows": {
+      "logical_shape": [
+        16,
+        4,
+        128
+      ],
+      "dtype": "float32",
+      "numel": 8192,
+      "finite": true,
+      "mean": -0.021025924012064934,
+      "std": 0.5398496389389038,
+      "min": -1.9502220153808594,
+      "max": 1.8413468599319458,
+      "file": "attention_vid_windows.bin",
+      "producer": "derive packed per-window vid rows",
+      "consumer": "ncnn stage parity"
+    },
+    "attention_txt_windows": {
+      "logical_shape": [
+        2,
+        4,
+        128
+      ],
+      "dtype": "float32",
+      "numel": 1024,
+      "finite": true,
+      "mean": -0.01554947067052126,
+      "std": 0.528232753276825,
+      "min": -1.558361291885376,
+      "max": 1.5864979028701782,
+      "file": "attention_txt_windows.bin",
+      "producer": "derive packed per-window txt rows",
+      "consumer": "ncnn stage parity"
+    },
+    "attention_proj_vid": {
+      "logical_shape": [
+        16,
+        512
+      ],
+      "dtype": "float32",
+      "numel": 8192,
+      "finite": true,
+      "mean": -0.026779290288686752,
+      "std": 0.3156622350215912,
+      "min": -1.0808159112930298,
+      "max": 1.0689369440078735,
+      "file": "attention_proj_vid.bin",
+      "producer": "attn.proj_out.vid",
+      "consumer": "ncnn stage parity"
+    },
+    "attention_proj_txt": {
+      "logical_shape": [
+        2,
+        512
+      ],
+      "dtype": "float32",
+      "numel": 1024,
+      "finite": true,
+      "mean": 0.006853451021015644,
+      "std": 0.3107012212276459,
+      "min": -0.9192075133323669,
+      "max": 1.1898994445800781,
+      "file": "attention_proj_txt.bin",
+      "producer": "attn.proj_out.txt",
+      "consumer": "ncnn stage parity"
+    },
+    "ada_attn_gate_vid": {
+      "logical_shape": [
+        16,
+        512
+      ],
+      "dtype": "float32",
+      "numel": 8192,
+      "finite": true,
+      "mean": 0.011210808530449867,
+      "std": 0.3371979296207428,
+      "min": -2.0927577018737793,
+      "max": 2.017394781112671,
+      "file": "ada_attn_gate_vid.bin",
+      "producer": "AdaSingle.vid attn out (gated)",
+      "consumer": "ncnn stage parity"
+    },
+    "ada_attn_gate_txt": {
+      "logical_shape": [
+        2,
+        512
+      ],
+      "dtype": "float32",
+      "numel": 1024,
+      "finite": true,
+      "mean": 0.0032232683151960373,
+      "std": 0.3262581527233124,
+      "min": -1.937495231628418,
+      "max": 1.5536727905273438,
+      "file": "ada_attn_gate_txt.bin",
+      "producer": "AdaSingle.txt attn out (gated)",
+      "consumer": "ncnn stage parity"
+    },
+    "attention_residual_vid": {
+      "logical_shape": [
+        16,
+        512
+      ],
+      "dtype": "float32",
+      "numel": 8192,
+      "finite": true,
+      "mean": 0.013505149632692337,
+      "std": 1.06479811668396,
+      "min": -4.229704856872559,
+      "max": 3.88456130027771,
+      "file": "attention_residual_vid.bin",
+      "producer": "derive gate+input_vid",
+      "consumer": "ncnn stage parity"
+    },
+    "attention_residual_txt": {
+      "logical_shape": [
+        2,
+        512
+      ],
+      "dtype": "float32",
+      "numel": 1024,
+      "finite": true,
+      "mean": 0.028536949306726456,
+      "std": 1.004162311553955,
+      "min": -3.276334524154663,
+      "max": 2.8053805828094482,
+      "file": "attention_residual_txt.bin",
+      "producer": "derive gate+input_txt",
+      "consumer": "ncnn stage parity"
+    },
+    "mlp_norm_vid": {
+      "logical_shape": [
+        16,
+        512
+      ],
+      "dtype": "float32",
+      "numel": 8192,
+      "finite": true,
+      "mean": 0.012314975261688232,
+      "std": 0.9999808073043823,
+      "min": -4.166576862335205,
+      "max": 3.4776976108551025,
+      "file": "mlp_norm_vid.bin",
+      "producer": "mlp_norm.vid",
+      "consumer": "ncnn stage parity"
+    },
+    "mlp_norm_txt": {
+      "logical_shape": [
+        2,
+        512
+      ],
+      "dtype": "float32",
+      "numel": 1024,
+      "finite": true,
+      "mean": 0.02837054245173931,
+      "std": 1.0000808238983154,
+      "min": -3.258373260498047,
+      "max": 2.790001153945923,
+      "file": "mlp_norm_txt.bin",
+      "producer": "mlp_norm.txt",
+      "consumer": "ncnn stage parity"
+    },
+    "ada_mlp_in_vid": {
+      "logical_shape": [
+        16,
+        512
+      ],
+      "dtype": "float32",
+      "numel": 8192,
+      "finite": true,
+      "mean": -0.003778561018407345,
+      "std": 1.7330875396728516,
+      "min": -15.659881591796875,
+      "max": 10.017354011535645,
+      "file": "ada_mlp_in_vid.bin",
+      "producer": "AdaSingle.vid mlp in (modulated)",
+      "consumer": "ncnn stage parity"
+    },
+    "ada_mlp_in_txt": {
+      "logical_shape": [
+        2,
+        512
+      ],
+      "dtype": "float32",
+      "numel": 1024,
+      "finite": true,
+      "mean": 0.10700997710227966,
+      "std": 1.8070762157440186,
+      "min": -7.648435592651367,
+      "max": 10.027902603149414,
+      "file": "ada_mlp_in_txt.bin",
+      "producer": "AdaSingle.txt mlp in (modulated)",
+      "consumer": "ncnn stage parity"
+    },
+    "swiglu_gate_projection_vid": {
+      "logical_shape": [
+        16,
+        1536
+      ],
+      "dtype": "float32",
+      "numel": 24576,
+      "finite": true,
+      "mean": -0.0019065901869907975,
+      "std": 0.9978679418563843,
+      "min": -3.7048158645629883,
+      "max": 4.001059532165527,
+      "file": "swiglu_gate_projection_vid.bin",
+      "producer": "mlp.vid.proj_in_gate",
+      "consumer": "ncnn stage parity"
+    },
+    "swiglu_gate_projection_txt": {
+      "logical_shape": [
+        2,
+        1536
+      ],
+      "dtype": "float32",
+      "numel": 3072,
+      "finite": true,
+      "mean": 0.00720184063538909,
+      "std": 1.0522993803024292,
+      "min": -3.761317491531372,
+      "max": 3.671790599822998,
+      "file": "swiglu_gate_projection_txt.bin",
+      "producer": "mlp.txt.proj_in_gate",
+      "consumer": "ncnn stage parity"
+    },
+    "swiglu_up_projection_vid": {
+      "logical_shape": [
+        16,
+        1536
+      ],
+      "dtype": "float32",
+      "numel": 24576,
+      "finite": true,
+      "mean": 0.014711187221109867,
+      "std": 1.004726767539978,
+      "min": -3.8828952312469482,
+      "max": 3.7919273376464844,
+      "file": "swiglu_up_projection_vid.bin",
+      "producer": "mlp.vid.proj_in",
+      "consumer": "ncnn stage parity"
+    },
+    "swiglu_up_projection_txt": {
+      "logical_shape": [
+        2,
+        1536
+      ],
+      "dtype": "float32",
+      "numel": 3072,
+      "finite": true,
+      "mean": -0.026708155870437622,
+      "std": 1.0631968975067139,
+      "min": -3.739016532897949,
+      "max": 3.36185359954834,
+      "file": "swiglu_up_projection_txt.bin",
+      "producer": "mlp.txt.proj_in",
+      "consumer": "ncnn stage parity"
+    },
+    "swiglu_product_vid": {
+      "logical_shape": [
+        16,
+        1536
+      ],
+      "dtype": "float32",
+      "numel": 24576,
+      "finite": true,
+      "mean": -0.00636814720928669,
+      "std": 0.6022030711174011,
+      "min": -7.308553218841553,
+      "max": 8.827179908752441,
+      "file": "swiglu_product_vid.bin",
+      "producer": "mlp.vid.proj_out input (silu(gate)*up)",
+      "consumer": "ncnn stage parity"
+    },
+    "swiglu_product_txt": {
+      "logical_shape": [
+        2,
+        1536
+      ],
+      "dtype": "float32",
+      "numel": 3072,
+      "finite": true,
+      "mean": -0.002120753051713109,
+      "std": 0.7081807255744934,
+      "min": -6.296615123748779,
+      "max": 7.061396598815918,
+      "file": "swiglu_product_txt.bin",
+      "producer": "mlp.txt.proj_out input",
+      "consumer": "ncnn stage parity"
+    },
+    "swiglu_output_vid": {
+      "logical_shape": [
+        16,
+        512
+      ],
+      "dtype": "float32",
+      "numel": 8192,
+      "finite": true,
+      "mean": 0.003616355825215578,
+      "std": 0.34481024742126465,
+      "min": -1.4540096521377563,
+      "max": 1.4357354640960693,
+      "file": "swiglu_output_vid.bin",
+      "producer": "mlp.vid.proj_out",
+      "consumer": "ncnn stage parity"
+    },
+    "swiglu_output_txt": {
+      "logical_shape": [
+        2,
+        512
+      ],
+      "dtype": "float32",
+      "numel": 1024,
+      "finite": true,
+      "mean": -0.019193053245544434,
+      "std": 0.40625402331352234,
+      "min": -1.29033625125885,
+      "max": 1.0470280647277832,
+      "file": "swiglu_output_txt.bin",
+      "producer": "mlp.txt.proj_out",
+      "consumer": "ncnn stage parity"
+    },
+    "ada_mlp_gate_vid": {
+      "logical_shape": [
+        16,
+        512
+      ],
+      "dtype": "float32",
+      "numel": 8192,
+      "finite": true,
+      "mean": -0.011024769395589828,
+      "std": 0.3311004042625427,
+      "min": -2.2878003120422363,
+      "max": 2.3070507049560547,
+      "file": "ada_mlp_gate_vid.bin",
+      "producer": "AdaSingle.vid mlp out (gated)",
+      "consumer": "ncnn stage parity"
+    },
+    "ada_mlp_gate_txt": {
+      "logical_shape": [
+        2,
+        512
+      ],
+      "dtype": "float32",
+      "numel": 1024,
+      "finite": true,
+      "mean": 0.010075017809867859,
+      "std": 0.40158820152282715,
+      "min": -1.94573974609375,
+      "max": 2.5725464820861816,
+      "file": "ada_mlp_gate_txt.bin",
+      "producer": "AdaSingle.txt mlp out (gated)",
+      "consumer": "ncnn stage parity"
+    },
+    "final_vid": {
+      "logical_shape": [
+        16,
+        512
+      ],
+      "dtype": "float32",
+      "numel": 8192,
+      "finite": true,
+      "mean": 0.0024803844280540943,
+      "std": 1.1107177734375,
+      "min": -4.167690753936768,
+      "max": 4.011035919189453,
+      "file": "final_vid.bin",
+      "producer": "block output vid",
+      "consumer": "ncnn stage parity"
+    },
+    "final_txt": {
+      "logical_shape": [
+        2,
+        512
+      ],
+      "dtype": "float32",
+      "numel": 1024,
+      "finite": true,
+      "mean": 0.03861197084188461,
+      "std": 1.0696097612380981,
+      "min": -3.470336437225342,
+      "max": 4.3010783195495605,
+      "file": "final_txt.bin",
+      "producer": "block output txt",
+      "consumer": "ncnn stage parity"
+    }
+  },
+  "windows": {
+    "window_shape": [
+      [
+        1,
+        4,
+        4
+      ]
+    ],
+    "window_count": [
+      1
+    ],
+    "window_sizes": [
+      16
+    ],
+    "partition_index": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ],
+    "reverse_index": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ],
+    "segment_lengths": [
+      18
+    ],
+    "cu_seqlens_q": [
+      0,
+      18
+    ],
+    "cu_seqlens_k": [
+      0,
+      18
+    ],
+    "max_segment": 18,
+    "total_packed": 18
+  },
+  "inputs": {
+    "vid_shape": [
+      [
+        1,
+        4,
+        4
+      ]
+    ],
+    "txt_shape": [
+      [
+        2
+      ]
+    ],
+    "vid_tokens": 16,
+    "txt_tokens": 2,
+    "batch": 1
+  }
+}

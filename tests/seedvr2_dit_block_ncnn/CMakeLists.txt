@@ -1,0 +1,36 @@
+﻿cmake_minimum_required(VERSION 3.20)
+project(seedvr2_dit_block_ncnn LANGUAGES CXX)
+
+find_package(ncnn CONFIG REQUIRED PATHS "D:/AIProjects/seedvr2-ncnn/build/ncnn-cpu/install/lib/cmake/ncnn" NO_DEFAULT_PATH)
+
+# Reuse the Phase 9.5/10 attention dispatcher libraries (same source tree).
+# Building this subdirectory also rebuilds the historical regression targets in
+# this fresh build directory so no stale ABI from Phase 10/11 builds is reused.
+add_subdirectory(../attention_dispatcher attention_dispatcher)
+
+add_library(hybrid_dit_block_runtime_lib hybrid_dit_block_runtime.cpp)
+target_include_directories(hybrid_dit_block_runtime_lib PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
+target_link_libraries(hybrid_dit_block_runtime_lib PUBLIC model_cache_lib ncnn)
+target_compile_features(hybrid_dit_block_runtime_lib PUBLIC cxx_std_17)
+target_compile_options(hybrid_dit_block_runtime_lib PRIVATE /EHsc)
+
+add_executable(ada_single_contract_tests ada_single_contract_tests.cpp)
+target_link_libraries(ada_single_contract_tests PRIVATE hybrid_dit_block_runtime_lib)
+target_compile_options(ada_single_contract_tests PRIVATE /EHsc /UNDEBUG)
+
+add_executable(swiglu_contract_tests swiglu_contract_tests.cpp)
+target_link_libraries(swiglu_contract_tests PRIVATE hybrid_dit_block_runtime_lib)
+target_compile_options(swiglu_contract_tests PRIVATE /EHsc /UNDEBUG)
+
+add_executable(dit_block_artifact_registry_tests dit_block_artifact_registry_tests.cpp)
+target_link_libraries(dit_block_artifact_registry_tests PRIVATE artifact_registry_lib)
+target_compile_options(dit_block_artifact_registry_tests PRIVATE /EHsc /UNDEBUG)
+target_link_libraries(dit_block_artifact_registry_tests PRIVATE bcrypt)
+
+add_executable(synthetic_dit_block_validation synthetic_dit_block_validation.cpp)
+target_link_libraries(synthetic_dit_block_validation PRIVATE hybrid_dit_block_runtime_lib)
+target_compile_options(synthetic_dit_block_validation PRIVATE /EHsc /UNDEBUG)
+
+add_executable(synthetic_dit_block_last_layer_validation synthetic_dit_block_last_layer_validation.cpp)
+target_link_libraries(synthetic_dit_block_last_layer_validation PRIVATE hybrid_dit_block_runtime_lib)
+target_compile_options(synthetic_dit_block_last_layer_validation PRIVATE /EHsc /UNDEBUG)

@@ -57,3 +57,19 @@ The synthetic fixture remains byte-identical as a historical regression. Real
 weights, complete DiT block, Vulkan, and VAE remain TODO. See
 [real-seedvr2-mmrope-contract-report.md](real-seedvr2-mmrope-contract-report.md)
 and [synthetic-hd128-runtime-report.md](synthetic-hd128-runtime-report.md).
+
+`Phase 12 synthetic single DiT block staged fidelity = READY` (commit on
+`codex/phase12-synthetic-dit-block-ncnn`). The real `NaMMSRTransformerBlock`
+topology is executed as a scaled C=512/H=4/HD=128 staged ncnn + host hybrid
+runtime (`HybridDiTBlockRuntime`, seed 20260802, MLP hidden 1536 from the real
+SwiGLUMLP formula). Profiles A/B/C/D all PASS: final vid/txt max errors ~4.5e-6
+(< 1e-4), A->B->C->D->A bit-identical; packed q/k/v, MM-RoPE3D, `[vid_win; txt]`
+packing, txt repeat/mean merge, AdaSingle, SwiGLU, residuals and the last-layer
+vid_only double-residual semantics all validated stage-by-stage (registry/cache
+19; negatives 24+7+registry; Phase 9.5/10/11 regressions PASS). Batch>1 txt
+indexing of the real `repeat_concat_idx` is reproduced exactly (q/k reuse
+repeated-txt rows `[cum_b, cum_b+l_b)`; v uses the original txt). `ada_*_in`
+threshold 1e-5 documented (reference-internal recompute bit-exact). Real
+weights, full 2560-width ncnn block, Vulkan and VAE remain Phase 13 scope. See
+[synthetic-seedvr2-dit-block-ncnn-report.md](synthetic-seedvr2-dit-block-ncnn-report.md)
+and `reports/synthetic_dit_block_ncnn_validation.json`.
