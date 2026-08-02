@@ -1,0 +1,62 @@
+{
+  "name": "hybrid_fidelity_rms_rope444_grid_1x2x2",
+  "variant": "fidelity_rms_rope3d_hybrid",
+  "execution": "staged_host_head_merge",
+  "window": [
+    4,
+    4,
+    4
+  ],
+  "grid": [
+    1,
+    2,
+    2
+  ],
+  "padding_rule": "right-edge-to-window-multiple",
+  "tokens_per_window": 64,
+  "input_shape": [
+    1,
+    4,
+    8,
+    8,
+    32
+  ],
+  "dtype": "fp32",
+  "features": {
+    "qk_norm": "rmsnorm",
+    "qk_norm_reference": "mathematical_unfused",
+    "rope3d": "artifact_reference",
+    "masked_attention": true,
+    "head_merge": "host",
+    "output_projection": "ncnn_2d_gemm"
+  },
+  "models": {
+    "heads": [
+      {
+        "name": "head0",
+        "ncnn_param": "attention_heads/head0/model.ncnn.param",
+        "ncnn_bin": "attention_heads/head0/model.ncnn.bin"
+      },
+      {
+        "name": "head1",
+        "ncnn_param": "attention_heads/head1/model.ncnn.param",
+        "ncnn_bin": "attention_heads/head1/model.ncnn.bin"
+      },
+      {
+        "name": "head2",
+        "ncnn_param": "attention_heads/head2/model.ncnn.param",
+        "ncnn_bin": "attention_heads/head2/model.ncnn.bin"
+      },
+      {
+        "name": "head3",
+        "ncnn_param": "attention_heads/head3/model.ncnn.param",
+        "ncnn_bin": "attention_heads/head3/model.ncnn.bin"
+      }
+    ],
+    "output_projection": {
+      "name": "output_projection",
+      "ncnn_param": "output_projection/model.ncnn.param",
+      "ncnn_bin": "output_projection/model.ncnn.bin"
+    }
+  }
+}

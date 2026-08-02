@@ -8,3 +8,8 @@ output Gemm, and reverse/crop. Its final BTHWC maximum absolute error was
 `1.49012e-07`, with mean `2.10550e-08`, zero NaN, and zero Inf values.
 
 The first attempted tuple-head core is also preserved under the hybrid artifact's legacy `attention_heads/model.ncnn.*`; extracting `out0` returned shape `[64,64,8]` (32,768 elements), while its required shape is `[4,64,8]` (2,048 elements). The ready path replaces that invalid rank-3 batched layout with four valid static 2-D head artifacts.
+
+Phase 8 adds a separate mathematical RMSNorm path. Its standalone ncnn
+fixture passes for the sqrt/reciprocal, pow, and explicit rewrites, but the
+complete RMS hybrid head currently exceeds the `1e-4` gate; it is not promoted
+to READY and does not change the LayerNorm result above.

@@ -4,9 +4,10 @@ Metadata-driven Adaptive Window Attention runtime prototype for ncnn.
 
 ## Current status
 
-Phase 7.5-B is READY for five manifest-backed baseline FP32 CPU profiles and
-one ArtifactRegistry-driven staged-hybrid fidelity fixture. This is not a
-complete SeedVR2 port.
+Phase 7.5-B remains READY for five manifest-backed baseline FP32 CPU profiles
+and the LayerNorm staged-hybrid fixture. Phase 8 mathematical RMSNorm is
+PARTIAL/BLOCKED at the complete ncnn attention-head accuracy gate. This is not
+a complete SeedVR2 port.
 
 ```mermaid
 flowchart LR
@@ -41,5 +42,6 @@ matching static core. The hybrid fidelity fixture supplies artifact-owned mask
 and RoPE data and is documented in
 [hybrid-runtime-integration-report.md](D:\AIProjects\seedvr2-ncnn\docs\hybrid-runtime-integration-report.md).
 Host code owns dynamic control flow, while ncnn executes the attention math.
-Vulkan, SeedVR2 weight loading, and generalized runtime validation remain out
-of scope.
+Vulkan, SeedVR2 weight loading, generalized runtime validation, and direct
+Apex `fusedrms` dependency parity remain out of scope or blocked as documented
+in [rms-hybrid-runtime-report.md](D:\AIProjects\seedvr2-ncnn\docs\rms-hybrid-runtime-report.md).

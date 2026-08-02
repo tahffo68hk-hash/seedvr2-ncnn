@@ -1,0 +1,18 @@
+{
+  "shape": [
+    4,
+    64,
+    8
+  ],
+  "dtype": "fp32",
+  "eps": 1e-05,
+  "elementwise_affine": true,
+  "bias": false,
+  "seed": 20260804,
+  "variants": [
+    "A",
+    "B",
+    "C",
+    "D"
+  ]
+}

@@ -16,11 +16,11 @@ Loaded 5 models; steady-state benchmark excludes first-load time.
 
 | Case | Core | Extract | Max error | Mean error |
 |---|---|---|---:|---:|
-|Case A|core_444_grid_1x4x4|PASS|1.78814e-07|1.68651e-08|
-|Case B|core_344_grid_1x4x4|PASS|1.78814e-07|1.69706e-08|
+|Case A|core_444_grid_1x4x4|PASS|1.78814e-07|1.55931e-08|
+|Case B|core_344_grid_1x4x4|PASS|1.49012e-07|1.60619e-08|
 |Case C|core_444_grid_1x5x5|PASS|1.49012e-07|1.57646e-08|
-|Case D|core_444_grid_2x8x8|PASS|1.49012e-07|1.67753e-08|
-|Case E|core_444_grid_2x5x6|PASS|1.49012e-07|1.67689e-08|
+|Case D|core_444_grid_2x8x8|PASS|1.78814e-07|1.55457e-08|
+|Case E|core_444_grid_2x5x6|PASS|2.08616e-07|1.6552e-08|
 
 ## Performance Baseline
 CPU FP32, ncnn threads=1, three warmups and ten cached runs per case. See `reports/runtime_validation.json` for per-stage mean/min/max.

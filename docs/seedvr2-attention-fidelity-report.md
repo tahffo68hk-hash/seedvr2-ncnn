@@ -48,3 +48,19 @@ MatMul, mask Add, Softmax and AV, then fails at the generated post-AV 4-D
 head-merge Permute/Reshape (blob 89; `extract` returns `-1`). Consequently the
 artifact is not added to ArtifactRegistry or Runtime. See
 `full-fidelity-pnnx-graph.md` for the precise stage boundary.
+
+## Phase 8 RMSNorm hybrid status
+
+SeedVR2 source inspection confirms independent affine Q/K normalization with
+`eps=1e-5`, no bias, and a configured `fusedrms` implementation. The local
+environment does not contain the upstream diffusers/Apex implementation, so
+Phase 8 uses an auditable mathematical unfused RMSNorm fixture. Its B/C/D
+primitive rewrites pass standalone Release ncnn extraction below `4.77e-7`;
+the native `rsqrt` rewrite is retained as a documented numerical limitation.
+
+The RMS staged artifact is discovered by `ArtifactRegistry`, loads five ncnn
+models through the existing cache, and completes the host mask/RoPE, head
+merge, reverse/crop and BTHWC pipeline. However, full attention currently
+measures about `3.47e-4` maximum error at merged-head output, above the Phase 8
+`1e-4` gate. The artifact is therefore `PARTIAL_BLOCKED`, not production-ready.
+See `rmsnorm-pnnx-graph-analysis.md` and `rms-hybrid-runtime-report.md`.

@@ -1,0 +1,11 @@
+{
+  "request":{"input_shape":[1,4,8,8,32],"dtype":"fp32","variant":"fidelity_rms_rope3d_hybrid"},
+  "artifact":{"name":"hybrid_fidelity_rms_rope444_grid_1x2x2","window":[4,4,4],"grid":[1,2,2],"execution":"staged_host_head_merge"},
+  "qk_norm":{"type":"rmsnorm","implementation":"mathematical_unfused","eps":1e-5,"affine":true,"bias":false},
+  "contracts":{"mask":{"source":"reference/mask.bin","shape":[4,64,64],"valid_tokens":60,"zero_mask_finite":true,"zero_mask_max_abs_error":0.07941277325,"wrong_shape_rejected":true},"rope":{"source":"reference/rope_cos.bin,reference/rope_sin.bin","float_shape":[64,4],"ncnn_mat":[4,64],"bounds_checked":true}},
+  "accuracy":{"bthwc_max_abs_error":0.0004153847694,"bthwc_mean_abs_error":6.778604731e-05,"nan_count":0,"inf_count":0},
+  "cache":{"size_after":5,"first_bundle_load_ms":1.6412,"second_run_max_difference":0},
+  "latency_ms":{"warmups":3,"iterations":10,"total_mean":1.02192,"total_min":1,"total_max":1.047,"pack_mean":0.0305,"contract_read_mean":0.18871,"head0_mean":0.15955,"head1_mean":0.14859,"head2_mean":0.14806,"head3_mean":0.14851,"merge_mean":0.01862,"projection_mean":0.03427,"unpack_mean":0.0287},
+  "baseline_regression":{"explicit_baseline_rejected":true,"unknown_hybrid_shape_rejected":true,"cache_after_rejections":0},
+  "overall_status":"PARTIAL_BLOCKED"
+}

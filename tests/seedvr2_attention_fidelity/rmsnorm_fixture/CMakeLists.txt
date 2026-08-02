@@ -1,0 +1,7 @@
+cmake_minimum_required(VERSION 3.20)
+project(rmsnorm_fixture LANGUAGES CXX)
+set(CMAKE_CXX_STANDARD 17)
+find_package(ncnn CONFIG REQUIRED PATHS "D:/AIProjects/seedvr2-ncnn/build/ncnn-cpu/install/lib/cmake/ncnn" NO_DEFAULT_PATH)
+add_executable(ncnn_rmsnorm_runner ncnn_rmsnorm_runner.cpp)
+target_link_libraries(ncnn_rmsnorm_runner PRIVATE ncnn)
+target_compile_options(ncnn_rmsnorm_runner PRIVATE /EHsc)

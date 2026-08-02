@@ -16,8 +16,10 @@ int main() {
     assert(baseline.scan(real,e)&&baseline.size()==5);
     for(const auto& c:baseline.list()) assert(c.key.variant=="baseline"&&c.execution_type==ExecutionType::SingleModel&&c.single_model()&&!c.staged_head_merge());
     const fs::path fidelity=fs::path(__FILE__).parent_path().parent_path()/"seedvr2_attention_fidelity/artifacts/attention_core_fidelity";
-    ArtifactRegistry hybrids; assert(hybrids.scan(fidelity,e));
+    ArtifactRegistry hybrids; assert(hybrids.scan(fidelity,e)); assert(hybrids.size()==4);
     const CoreInfo* h=hybrids.lookup({4,4,4,1,2,2,"fidelity_ln_rope3d_hybrid"}); assert(h&&h->staged_head_merge()&&!h->single_model());
+    const CoreInfo* rms=hybrids.lookup({4,4,4,1,2,2,"fidelity_rms_rope3d_hybrid"}); assert(rms&&rms->staged_head_merge()&&!rms->single_model());
+    assert(rms->name=="hybrid_fidelity_rms_rope444_grid_1x2x2");
     assert(h->staged_head_merge()->heads[0].name=="head0"&&h->staged_head_merge()->heads[3].name=="head3"&&h->staged_head_merge()->output_projection.name=="output_projection");
     const fs::path tmp=fs::temp_directory_path()/"seedvr-registry-tests"; const auto b=base();
     assert(rejects(tmp,replace(b,R"("masked_attention":true)",R"("masked_attention":"true")")));
@@ -36,5 +38,5 @@ int main() {
     assert(rejects(tmp,replace(b,"\"models\":{","\"models\":[]")));
     assert(rejects(tmp,replace(b,"\"output_projection\":{","\"output_projection\":[]")));
     fs::remove_all(tmp);
-    std::cout<<"artifact_registry_tests=PASS cases=31 baseline_count="<<baseline.size()<<" fidelity_count="<<hybrids.size()<<'\n';
+    std::cout<<"artifact_registry_tests=PASS cases=34 baseline_count="<<baseline.size()<<" fidelity_count="<<hybrids.size()<<'\n';
 }

@@ -1,0 +1,8 @@
+7767517
+6 5
+pnnx.Input               pnnx_input_0             0 1 0 #0=(4,64,8)f32
+pnnx.Attribute           weight                   0 1 1 @data=(8)f32 #1=(8)f32
+pnnx.Expression          pnnx_expr_5              1 1 0 2 expr=mul(@0,@0) #0=(4,64,8)f32 #2=(4,64,8)f32
+torch.mean               torch.mean_0             1 1 2 3 dim=(-1) keepdim=True $input=2 #2=(4,64,8)f32 #3=(4,64,1)f32
+pnnx.Expression          pnnx_expr_0              3 1 0 3 1 4 expr=mul(mul(@0,pow(add(@1,1.000000e-5),-0.5)),@2) #0=(4,64,8)f32 #3=(4,64,1)f32 #1=(8)f32 #4=(4,64,8)f32
+pnnx.Output              pnnx_output_0            1 0 4 #4=(4,64,8)f32
