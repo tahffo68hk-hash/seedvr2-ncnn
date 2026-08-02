@@ -1,0 +1,103 @@
+{
+  "probe": "seedvr2_real_block_forward",
+  "status": "READY",
+  "overall_pass": true,
+  "duration_sec": 87.249,
+  "env": {
+    "python": "3.11.15",
+    "platform": "Windows-10-10.0.26200-SP0",
+    "torch": "2.4.0+cpu",
+    "torch_cuda_available": false,
+    "numpy": "1.26.4",
+    "einops": "0.7.0",
+    "diffusers": "0.33.1",
+    "rotary_embedding_torch": "0.5.3",
+    "seedvr2_root": "D:\\AIProjects\\third_party\\SeedVR2",
+    "injected": {
+      "flash_attn": "compat",
+      "flash_attn.compat_version": "1.0.0",
+      "apex": "compat",
+      "apex.compat_version": "1.0.0"
+    },
+    "real_modules": {
+      "einops": true,
+      "diffusers": true,
+      "rotary_embedding_torch": true,
+      "torch": true
+    },
+    "wheel_sha256": {
+      "diffusers-0.33.1-py3-none-any.whl": "027469e74f289338eb24127409f8d60d840b1b7ce4b27ffcd3134fd3b8431567",
+      "einops-0.7.0-py3-none-any.whl": "0f3096f26b914f465f6ff3c66f5478f9a5e380bb367ffc6493a68143fbbf1fd1",
+      "numpy-1.26.4-cp311-cp311-win_amd64.whl": "cd25bcecc4974d09257ffcd1f098ee778f7834c3ad767fe5db785be9a4aa9cb2",
+      "rotary_embedding_torch-0.5.3-py3-none-any.whl": "7c0297a21301fbd0d20cfdcba33be5d1ad0a46e33454168af08413dbf3e07457"
+    }
+  },
+  "suites": [
+    {
+      "suite": "dependency_compat",
+      "script": "test_dependency_compat.py",
+      "exit_code": 0,
+      "duration_sec": 4.304,
+      "pass": true,
+      "stdout_tail": [
+        "test_dependency_compat all_pass = True",
+        "  rmsnorm_parity -> True",
+        "  varlen_attention_parity -> True",
+        "  injection -> True",
+        "  missing_compat_safe_fail -> True"
+      ],
+      "stderr_tail": []
+    },
+    {
+      "suite": "real_block_forward",
+      "script": "test_real_block_forward.py",
+      "exit_code": 0,
+      "duration_sec": 52.758,
+      "pass": true,
+      "stdout_tail": [
+        "test_real_block_forward all_pass = True",
+        "  class/module/source/signature: True True True True",
+        "  profiles: [('A_min', True), ('B_multi_window', True), ('C_asymmetric', True), ('D_batch2', True)]",
+        "  determinism: True"
+      ],
+      "stderr_tail": [
+        "C:\\Users\\35287\\.conda\\envs\\seedvr2-block-probe\\Lib\\site-packages\\rotary_embedding_torch\\rotary_embedding_torch.py:35: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.",
+        "  @autocast(enabled = False)",
+        "C:\\Users\\35287\\.conda\\envs\\seedvr2-block-probe\\Lib\\site-packages\\rotary_embedding_torch\\rotary_embedding_torch.py:253: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.",
+        "  @autocast(enabled = False)",
+        "D:\\AIProjects\\seedvr2-ncnn\\tests\\seedvr2_dit_block_contract\\probe_lib.py:149: UserWarning: std(): degrees of freedom is <= 0. Correction should be strictly less than the reduction factor (input numel divided by output numel). (Triggered internally at C:\\actions-runner\\_work\\pytorch\\pytorch\\builder\\windows\\pytorch\\aten\\src\\ATen\\native\\ReduceOps.cpp:1808.)",
+        "  \"mean\": float(tf.mean().item()), \"std\": float(tf.std().item()),"
+      ]
+    },
+    {
+      "suite": "runtime_contract",
+      "script": "test_runtime_contract.py",
+      "exit_code": 0,
+      "duration_sec": 30.187,
+      "pass": true,
+      "stdout_tail": [
+        "  rope_contract -> True",
+        "  ada_six_segments_gates -> True",
+        "  swiglu_mlp -> True",
+        "  segment_ordering -> True",
+        "  txt_mean_coalesce -> True",
+        "  window_reassembly -> True",
+        "  last_layer_vid_only -> True",
+        "  negative_tests: [('heads_times_head_dim_ne_vid_dim', True), ('emb_not_6x_dim', True), ('invalid_window_negative_t', True), ('invalid_window_rank', True), ('rope_frequency_insufficient', True), ('vid_token_count_mismatch', True), ('txt_token_count_mismatch', True), ('l_plus_f_gt_1024', True), ('nan_emb_detected', True), ('nan_vid_detected', True), ('dtype_contract_violation', True), ('cache_type_error', True), ('batch_metadata_inconsistent', True), ('cu_seqlens_non_monotonic', True), ('cu_seqlens_last_mismatch', True), ('missing_compat_covered_by_test_dependency_compat', True), ('segment_cross_attention_covered_by_test_dependency_compat', True)]"
+      ],
+      "stderr_tail": [
+        "C:\\Users\\35287\\.conda\\envs\\seedvr2-block-probe\\Lib\\site-packages\\rotary_embedding_torch\\rotary_embedding_torch.py:35: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.",
+        "  @autocast(enabled = False)",
+        "C:\\Users\\35287\\.conda\\envs\\seedvr2-block-probe\\Lib\\site-packages\\rotary_embedding_torch\\rotary_embedding_torch.py:253: FutureWarning: `torch.cuda.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cuda', args...)` instead.",
+        "  @autocast(enabled = False)",
+        "D:\\AIProjects\\seedvr2-ncnn\\tests\\seedvr2_dit_block_contract\\probe_lib.py:149: UserWarning: std(): degrees of freedom is <= 0. Correction should be strictly less than the reduction factor (input numel divided by output numel). (Triggered internally at C:\\actions-runner\\_work\\pytorch\\pytorch\\builder\\windows\\pytorch\\aten\\src\\ATen\\native\\ReduceOps.cpp:1808.)",
+        "  \"mean\": float(tf.mean().item()), \"std\": float(tf.std().item()),"
+      ]
+    }
+  ],
+  "disclaimers": {
+    "flash_attention_cuda_fidelity": "not validated",
+    "apex_fused_kernel_fidelity": "not validated",
+    "real_seedvr2_weights": "not used (random init)"
+  }
+}

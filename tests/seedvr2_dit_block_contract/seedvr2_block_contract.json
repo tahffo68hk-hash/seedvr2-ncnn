@@ -988,23 +988,104 @@
       "diffusers": "0.29.1",
       "rotary_embedding_torch": "0.5.3",
       "torch": "2.3.0"
+    },
+    "resolved_phase_11_1": {
+      "conda_env": "seedvr2-block-probe",
+      "python": "3.11.15",
+      "installed": {
+        "torch": "2.4.0+cpu",
+        "numpy": "1.26.4",
+        "einops": "0.7.0",
+        "diffusers": "0.33.1",
+        "rotary_embedding_torch": "0.5.3"
+      },
+      "not_installed_cuda_only": [
+        "flash-attn 2.5.9.post1",
+        "apex 0.1"
+      ],
+      "replacement": "test-harness CPU compat (compat/flash_attn_cpu_compat.py, compat/apex_norm_cpu_compat.py) injected via sys.modules; block forward unmodified"
     }
   },
   "real_block_probe": {
-    "status": "BLOCKED",
-    "blocker_modules": [
-      "einops",
-      "diffusers",
-      "flash_attn",
-      "apex",
-      "rotary_embedding_torch"
+    "status": "PASS",
+    "phase": "11.1",
+    "block_params": 158633472,
+    "profiles": [
+      {
+        "name": "A_min",
+        "shape": [
+          1,
+          4,
+          4
+        ],
+        "text_len": 2,
+        "windows": 1,
+        "pass": true
+      },
+      {
+        "name": "B_multi_window",
+        "shape": [
+          5,
+          32,
+          32
+        ],
+        "text_len": 8,
+        "windows": 12,
+        "pass": true
+      },
+      {
+        "name": "C_asymmetric",
+        "shape": [
+          7,
+          45,
+          64
+        ],
+        "text_len": 11,
+        "windows": 36,
+        "pass": true
+      },
+      {
+        "name": "D_batch2",
+        "shapes": [
+          [
+            2,
+            8,
+            8
+          ],
+          [
+            3,
+            10,
+            12
+          ]
+        ],
+        "text_lens": [
+          2,
+          5
+        ],
+        "pass": true
+      }
     ],
-    "reason": "missing non-model Python deps; task forbids installing them",
-    "exit_code": 3,
-    "stdout_tail": [
-      "probe_real_block=BLOCKED missing=einops,diffusers,flash_attn,apex,rotary_embedding_torch"
-    ],
-    "stderr_tail": []
+    "determinism_bit_identical": true,
+    "runtime_contract": {
+      "per_window_vid_then_txt": true,
+      "txt_repeated_per_window": true,
+      "txt_mean_coalesce": true,
+      "vid_freqs_l_to_l_plus_f_offset": true,
+      "identity_tail_2_elementwise": true,
+      "effective_rotary_dim": 126,
+      "configured_rope_dim": 128,
+      "ada_six_segment_gates": true,
+      "swiglu_mlp": true,
+      "residual_ordering": true,
+      "last_layer_vid_only": true,
+      "window_reassembly_no_cross_segment_leak": true,
+      "negative_tests_pass": "17/17"
+    },
+    "disclaimers": {
+      "flash_attention_cuda_fidelity": "not validated",
+      "apex_fused_kernel_fidelity": "not validated",
+      "real_seedvr2_weights": "not used (random init)"
+    }
   },
   "ncnn_mapping_risk": [
     {
@@ -1093,7 +1174,7 @@
   },
   "real_seedvr2_weights": false,
   "ncnn_block_complete": false,
-  "overall_status": "PARTIAL",
-  "blocker": "real random-weight forward probe not executable: missing non-model Python deps apex, diffusers, einops, flash_attn, rotary_embedding_torch (task forbids installing them); source/AST/window contract complete",
+  "overall_status": "READY",
+  "blocker": "resolved in Phase 11.1: real random-weight forward probe executed in isolated conda env seedvr2-block-probe (see reports/seedvr2_real_block_forward.json); flash-attn/apex replaced by test-harness CPU compat only",
   "errors": []
 }

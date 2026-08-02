@@ -12,12 +12,16 @@ the exact SeedVR2 MM-RoPE3D contract (rotary-embedding-torch==0.5.3, effective
 rotary dim 126 of configured 128, 2-dim identity tail, axis_dims=[42,42,42])
 was pinned, oracle-verified, and validated end-to-end (real-contract S/M/P),
 with the Phase 10 synthetic fixture kept as an independent historical
-regression. Phase 11 real single DiT block interface/shape contract is PARTIAL:
-`NaMMSRTransformerBlock` and its call chain, token layout, `vid_freqs[l:l+f]`
-RoPE offset, modulation, attention, MLP and residual order were extracted with
-source/AST evidence, but the real random-weight forward probe is blocked by
-missing non-model deps (einops/diffusers/flash_attn/apex/rotary-embedding-torch;
-see [seedvr2-single-dit-block-contract-report.md](D:/AIProjects/seedvr2-ncnn/docs/seedvr2-single-dit-block-contract-report.md)).
+regression. Phase 11 real single DiT block interface/shape/execution contract is
+READY: `NaMMSRTransformerBlock` (SeedVR2 `e4de8c2`) was executed with the real
+random-weight forward in the isolated conda env `seedvr2-block-probe` (torch
+2.4.0+cpu, einops 0.7.0, diffusers 0.33.1, rotary-embedding-torch 0.5.3) at full
+2560 width (profiles A/B/C/D) with runtime-hook evidence for `[vid_win; txt]`
+packing, `vid_freqs[l:l+f]` offset, identity tail 2, six-segment modulation,
+SwiGLU, residual order, last-layer vid_only, window reassembly, negatives 17/17;
+only flash_attn/apex fused-CUDA libs are replaced by test-harness CPU compat
+(parity < 1e-6; CUDA fidelity not validated). See
+[seedvr2-single-dit-block-contract-report.md](D:/AIProjects/seedvr2-ncnn/docs/seedvr2-single-dit-block-contract-report.md).
 This is not a complete SeedVR2 port.
 
 ```mermaid
@@ -66,15 +70,22 @@ real_mmrope_contract_validation tests/seedvr2_attention_fidelity/artifacts/atten
 It writes [real_seedvr2_mmrope_contract_validation.json](D:\AIProjects\seedvr2-ncnn\reports\real_seedvr2_mmrope_contract_validation.json) and is documented in
 [real-seedvr2-mmrope-contract-report.md](D:\AIProjects\seedvr2-ncnn\docs\real-seedvr2-mmrope-contract-report.md).
 
-Phase 11 real single DiT block contract probe (Python, no ncnn build needed):
+Phase 11 real single DiT block contract: extraction (source/AST, no ncnn build
+needed) and Phase 11.1 real random-weight forward execution:
 
 ```text
 D:\AIProjects\seedvr2-ncnn\.conda-cuda\python.exe tests\seedvr2_dit_block_contract\extract_seedvr2_block_contract.py
+conda run -n seedvr2-block-probe python tests\seedvr2_dit_block_contract\probe_real_block.py
+conda run -n seedvr2-block-probe python run_phase11_1_probe.py
 ```
 
-It writes [seedvr2_single_dit_block_contract.json](D:\AIProjects\seedvr2-ncnn\reports\seedvr2_single_dit_block_contract.json),
-`tests/seedvr2_dit_block_contract/seedvr2_block_contract.json`, and is
-documented in [seedvr2-single-dit-block-contract-report.md](D:\AIProjects\seedvr2-ncnn\docs\seedvr2-single-dit-block-contract-report.md).
+`probe_real_block.py` runs the three suites in-process and writes
+`tests/seedvr2_dit_block_contract/probe_result.json` (PASS). The runner
+`run_phase11_1_probe.py` executes the three test files as subprocesses and
+writes [seedvr2_real_block_forward.json](D:\AIProjects\seedvr2-ncnn\reports\seedvr2_real_block_forward.json).
+Extraction writes [seedvr2_single_dit_block_contract.json](D:\AIProjects\seedvr2-ncnn\reports\seedvr2_single_dit_block_contract.json)
+and `tests/seedvr2_dit_block_contract/seedvr2_block_contract.json`. Documented
+in [seedvr2-single-dit-block-contract-report.md](D:\AIProjects\seedvr2-ncnn\docs\seedvr2-single-dit-block-contract-report.md).
 
 ## Limits
 

@@ -1,89 +1,113 @@
-﻿"""Phase 11: real SeedVR2 block random-weight forward probe.
+"""Phase 11.1 orchestrator: execute the real SeedVR2 block forward contract.
 
-Directly imports the REAL NaMMSRTransformerBlock from third_party/SeedVR2 and,
-when all non-model dependencies are present, instantiates it with the REAL 3B
-config dims and runs eval()/no_grad/CPU/FP32 forward probes with stage hooks.
+Imports the REAL NaMMSRTransformerBlock from third_party/SeedVR2 (real class,
+real forward source, real 3B config dims) and runs the three Phase 11.1 test
+suites in one process:
 
-When a dependency is missing (einops/diffusers/flash_attn/apex/
-rotary_embedding_torch), it fails SAFELY: records the blocker to
-probe_result.json and exits 3. No packages are installed, no weights are
-downloaded, no SeedVR2 source is modified.
+  * test_dependency_compat   - CPU-compat math parity (RMSNorm / varlen attn)
+  * test_real_block_forward  - real 2560-width forwards (A/B/C/D profiles)
+  * test_runtime_contract    - runtime-captured contract points + negatives
+
+Only the fused CUDA kernel libraries (flash_attn / apex) are replaced in the
+test harness by math-equivalent CPU implementations (compat/); the block
+forward itself is never copied or rewritten.  No real SeedVR2 weights are
+used: real_seedvr2_weights=false, random init.
+
+On full PASS writes probe_result.json {status: PASS, ...} and exits 0.
+Any suite failure writes {status: FAIL, ...} and exits 1.
 """
+from __future__ import annotations
+
+import gc
+import importlib
 import json
 import os
+import platform
 import sys
+import time
+
+import torch
 
 OUT_DIR = os.path.dirname(os.path.abspath(__file__))
-SEEDVR2_ROOT = r"D:\AIProjects\third_party\SeedVR2"
 MARKER = os.path.join(OUT_DIR, "probe_result.json")
 
-MISSING = []
-for mod in ["torch", "einops", "diffusers", "flash_attn", "apex", "rotary_embedding_torch"]:
-    import importlib.util
+DISCLAIMERS = {
+    "flash_attention_cuda_fidelity": "not validated",
+    "apex_fused_kernel_fidelity": "not validated",
+    "real_seedvr2_weights": "not used (random init)",
+}
+
+
+def env_info() -> dict:
+    import importlib.metadata as _md
+    import numpy
+    import einops
+    import diffusers
+    from probe_lib import ensure_compat
+    info = ensure_compat()
+    return {
+        "python": platform.python_version(),
+        "platform": platform.platform(),
+        "torch": torch.__version__,
+        "torch_cuda_available": bool(torch.cuda.is_available()),
+        "numpy": numpy.__version__,
+        "einops": getattr(einops, "__version__", "?"),
+        "diffusers": getattr(diffusers, "__version__", "?"),
+        "rotary_embedding_torch": _md.version("rotary_embedding_torch"),
+        "seedvr2_root": info["seedvr2_root"],
+        "injected": info["injected"],
+        "real_modules": info["real_modules"],
+    }
+
+
+def run_suite(import_name: str, label: str) -> dict:
+    mod = importlib.import_module(import_name)
+    t0 = time.perf_counter()
+    report = mod.run_all()
+    dt = time.perf_counter() - t0
+    report.pop("cap", None)
+    return {"suite": label, "module": import_name, "all_pass": bool(report["all_pass"]),
+            "duration_sec": round(dt, 3), "report": report}
+
+
+def main() -> int:
+    t0 = time.perf_counter()
+    env = env_info()
+    suites = []
     try:
-        if importlib.util.find_spec(mod) is None:
-            MISSING.append(mod)
-    except Exception:
-        MISSING.append(mod)
+        suites.append(run_suite("test_dependency_compat", "dependency_compat"))
+        gc.collect()
+        suites.append(run_suite("test_real_block_forward", "real_block_forward"))
+        gc.collect()
+        suites.append(run_suite("test_runtime_contract", "runtime_contract"))
+    except Exception as e:  # noqa: BLE001
+        import traceback
+        marker = {"status": "ERROR", "exception": str(e),
+                  "traceback": traceback.format_exc().splitlines()[-12:],
+                  "env": env, "suites": suites}
+        with open(MARKER, "w", encoding="utf-8") as f:
+            json.dump(marker, f, indent=2, default=str)
+        print("probe_real_block=ERROR " + repr(e))
+        return 4
 
-if MISSING:
+    all_pass = all(s["all_pass"] for s in suites)
+    total = round(time.perf_counter() - t0, 3)
+    marker = {
+        "status": "PASS" if all_pass else "FAIL",
+        "overall_pass": all_pass,
+        "duration_sec": total,
+        "env": env,
+        "suites": [{"suite": s["suite"], "all_pass": s["all_pass"],
+                    "duration_sec": s["duration_sec"]} for s in suites],
+        "disclaimers": dict(DISCLAIMERS),
+    }
     with open(MARKER, "w", encoding="utf-8") as f:
-        json.dump({"status": "BLOCKED", "blocker_modules": MISSING,
-                   "reason": "missing non-model Python deps; task forbids installing them"}, f, indent=2)
-    print("probe_real_block=BLOCKED missing=" + ",".join(MISSING))
-    sys.exit(3)
-
-import torch  # noqa: E402
-
-def main():
-    sys.path.insert(0, SEEDVR2_ROOT)
-    from models.dit_v2.nablocks.mmsr_block import NaMMSRTransformerBlock  # noqa: E402
-    from common.cache import Cache  # noqa: E402
-
-    torch.manual_seed(0)
-    torch.set_num_threads(1)
-    cfg = dict(vid_dim=2560, txt_dim=2560, emb_dim=15360, heads=20, head_dim=128,
-               expand_ratio=4, norm="fusedrms", norm_eps=1e-5, ada="single",
-               qk_bias=False, qk_norm="fusedrms", mlp_type="swiglu",
-               shared_weights=False, rope_type="mmrope3d", rope_dim=128,
-               is_last_layer=False, window=(4, 3, 3), window_method="720pwin_by_size_bysize")
-    block = NaMMSRTransformerBlock(**cfg).eval()
-    cache = Cache(disable=True)
-    profiles = [
-        ("A_min", (1, 4, 4), 2),
-        ("B_multi_window", (5, 32, 32), 8),
-        ("C_asymmetric", (7, 45, 64), 11),
-    ]
-    stages = {}
-    for name, (t, h, w), l in profiles:
-        vid = torch.randn(t * h * w, 2560)
-        txt = torch.randn(l, 2560)
-        vid_shape = torch.tensor([[t, h, w]], dtype=torch.long)
-        txt_shape = torch.tensor([[l]], dtype=torch.long)
-        emb = torch.randn(1, 15360)
-        with torch.no_grad():
-            vid_out, txt_out, vs, ts = block(vid, txt, vid_shape, txt_shape, emb, cache)
-        def stats(x):
-            xf = x.float()
-            return {"shape": list(x.shape), "dtype": str(x.dtype), "numel": x.numel(),
-                    "finite": bool(torch.isfinite(xf).all().item()),
-                    "mean": float(xf.mean().item()), "std": float(xf.std().item()),
-                    "min": float(xf.min().item()), "max": float(xf.max().item())}
-        stages[name] = {"vid_out": stats(vid_out), "txt_out": stats(txt_out),
-                        "vid_shape_out": vs.tolist(), "txt_shape_out": ts.tolist()}
-    with open(MARKER, "w", encoding="utf-8") as f:
-        json.dump({"status": "PASS", "profiles": stages}, f, indent=2)
-    print("probe_real_block=PASS")
-    return 0
+        json.dump(marker, f, indent=2, default=str)
+    print("probe_real_block=" + marker["status"] + " duration_sec=" + str(total))
+    for s in suites:
+        print("  suite " + s["suite"] + " -> " + ("PASS" if s["all_pass"] else "FAIL"))
+    return 0 if all_pass else 1
 
 
 if __name__ == "__main__":
-    try:
-        sys.exit(main())
-    except Exception as e:
-        import traceback
-        with open(MARKER, "w", encoding="utf-8") as f:
-            json.dump({"status": "ERROR", "exception": str(e),
-                       "traceback": traceback.format_exc().splitlines()[-8:]}, f, indent=2)
-        print("probe_real_block=ERROR " + str(e))
-        sys.exit(4)
+    sys.exit(main())

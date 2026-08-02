@@ -991,20 +991,117 @@
     }
   },
   "real_block_probe": {
-    "status": "BLOCKED",
-    "blocker_modules": [
-      "einops",
-      "diffusers",
-      "flash_attn",
-      "apex",
-      "rotary_embedding_torch"
+    "status": "PASS",
+    "phase": "11.1",
+    "env": {
+      "conda_env": "seedvr2-block-probe",
+      "python": "3.11.15",
+      "torch": "2.4.0+cpu",
+      "torch_cuda_available": false,
+      "numpy": "1.26.4",
+      "einops": "0.7.0",
+      "diffusers": "0.33.1",
+      "rotary_embedding_torch": "0.5.3",
+      "flash_attn": "test-harness CPU compat (CUDA kernel not loadable)",
+      "apex": "test-harness CPU compat (CUDA kernel not loadable)"
+    },
+    "real_source_executed": "D:\\AIProjects\\third_party\\SeedVR2\\models/dit_v2/nablocks/mmsr_block.py (NaMMSRTransformerBlock, commit e4de8c24441a67e1b7df56abea10645059bb1185)",
+    "block_params": 158633472,
+    "profiles": [
+      {
+        "name": "A_min",
+        "shape": [
+          1,
+          4,
+          4
+        ],
+        "text_len": 2,
+        "pass": true
+      },
+      {
+        "name": "B_multi_window",
+        "shape": [
+          5,
+          32,
+          32
+        ],
+        "text_len": 8,
+        "pass": true
+      },
+      {
+        "name": "C_asymmetric",
+        "shape": [
+          7,
+          45,
+          64
+        ],
+        "text_len": 11,
+        "pass": true
+      },
+      {
+        "name": "D_batch2",
+        "shapes": [
+          [
+            2,
+            8,
+            8
+          ],
+          [
+            3,
+            10,
+            12
+          ]
+        ],
+        "text_lens": [
+          2,
+          5
+        ],
+        "pass": true
+      }
     ],
-    "reason": "missing non-model Python deps; task forbids installing them",
-    "exit_code": 3,
-    "stdout_tail": [
-      "probe_real_block=BLOCKED missing=einops,diffusers,flash_attn,apex,rotary_embedding_torch"
+    "determinism_bit_identical": true,
+    "suites": [
+      {
+        "suite": "dependency_compat",
+        "all_pass": true,
+        "compat_math_parity_max_abs_lt": "1e-6"
+      },
+      {
+        "suite": "real_block_forward",
+        "all_pass": true
+      },
+      {
+        "suite": "runtime_contract",
+        "all_pass": true
+      }
     ],
-    "stderr_tail": []
+    "runtime_contract_points": {
+      "vid_freqs_offset_l_to_l_plus_f": true,
+      "per_window_vid_then_txt_ordering": true,
+      "txt_repeated_per_window": true,
+      "txt_mean_coalesce": true,
+      "identity_tail_2_elementwise": true,
+      "effective_rotary_dim_126_of_128": true,
+      "ada_six_segment_shift_scale_gate": true,
+      "swiglu_mlp_2560_6912_2560": true,
+      "residual_ordering": true,
+      "last_layer_vid_only": true,
+      "window_reassembly_no_cross_segment_leak": true,
+      "negative_tests": "17/17"
+    },
+    "disclaimers": {
+      "flash_attention_cuda_fidelity": "not validated",
+      "apex_fused_kernel_fidelity": "not validated",
+      "real_seedvr2_weights": "not used (random init)"
+    },
+    "phase10_regressions": {
+      "dynamic_rope3d_tests": "PASS (cos 5.96e-8, hd128 oracle parity <4.8e-7)",
+      "real_mmrope_contract_validation": "PASS (S/M/P, negatives 22/22, cache 15)",
+      "synthetic_hd128_validation": "PASS (S/M/P, negatives 19/19, cache 15)",
+      "dynamic_multi_shape_validation": "PASS (A/B/C 1.49e-7/1.49e-7/2.086e-7)",
+      "runtime_validation": "PASS (A-E, max 1.49e-7..2.09e-7)",
+      "historical_reports_unchanged": true
+    }
   },
   "ncnn_mapping_risk": [
     {
@@ -1093,7 +1190,7 @@
   },
   "real_seedvr2_weights": false,
   "ncnn_block_complete": false,
-  "overall_status": "PARTIAL",
-  "blocker": "real random-weight forward probe not executable: missing non-model Python deps apex, diffusers, einops, flash_attn, rotary_embedding_torch (task forbids installing them); source/AST/window contract complete",
+  "overall_status": "READY",
+  "blocker": "resolved in Phase 11.1: real random-weight forward probe executed in isolated conda env seedvr2-block-probe (see reports/seedvr2_real_block_forward.json); flash-attn/apex replaced by test-harness CPU math-equivalent compat, CUDA kernels not validated",
   "errors": []
 }

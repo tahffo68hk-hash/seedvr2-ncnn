@@ -1,17 +1,23 @@
-﻿# Phase 11: real SeedVR2 single DiT block interface / shape / execution contract
+# Phase 11: real SeedVR2 single DiT block interface / shape / execution contract
 
 ## Status
 
-`Phase 11 = PARTIAL`. The real SeedVR2 DiT block (`NaMMSRTransformerBlock`) was
-located and its full field-level interface, tensor layout, RoPE slicing,
+`Phase 11 = READY`. The real SeedVR2 DiT block (`NaMMSRTransformerBlock`) was
+located, its full field-level interface, tensor layout, RoPE slicing,
 modulation, attention, MLP, and residual order were extracted with source +
 AST evidence, and the real upstream window partition math was executed. The
-random-weight forward probe of the real block is **BLOCKED** because the
-non-model Python deps it imports (`einops`, `diffusers`, `flash_attn`, `apex`,
-`rotary_embedding_torch`) are not installed in the repo `.conda-cuda` env, and
-the task forbids installing them. No hand-written substitute was used for the
-real block probe. Phase 12 (synthetic single DiT block staged fidelity) is not
-started.
+real random-weight forward probe then ran to completion in the **isolated
+conda env `seedvr2-block-probe`** (Phase 11.1): the real block class was
+imported and instantiated unmodified at the real 3B width (2560, 158,633,472
+params) and executed CPU FP32 eval()/no_grad() for profiles A/B/C/D with stage
+hooks. Only the fused-CUDA kernel libraries `flash_attn` / `apex` (which
+cannot load in a Windows CPU-only box) are replaced in the **test harness
+only** by math-equivalent CPU implementations (`tests/.../compat/`, parity
+max_abs < 1e-6); the block forward itself is never copied or rewritten.
+`FlashAttention CUDA kernel fidelity = not validated` and
+`Apex fused kernel fidelity = not validated` are stated in the reports. No
+real SeedVR2 weights are used (`real_seedvr2_weights=false`, random init).
+Phase 12 (synthetic single DiT block staged fidelity) is not started.
 
 ## SeedVR2 commit and config source
 
@@ -149,16 +155,56 @@ Outputs: `vid_out [L_vid, 2560]`, `txt_out [L_txt, 2560]`, shapes passed through
 - Config parse: 32 layers, 20 heads, head_dim 128, hidden 2560, MLP 4x,
   emb 15360, window (4,3,3), mmrope3d 128.
 
-## Dependency gap (Phase 11 blocker)
+## Phase 11.1 isolated execution environment
 
-Missing in `.conda-cuda` (torch only): `einops`, `diffusers`, `flash_attn`,
-`apex`, `rotary_embedding_torch` (pins in SeedVR2 `environment.yml`:
-`flash-attn==2.5.9.post1`, `apex==0.1`, `diffusers==0.33.1`, `einops==0.7.0`,
-`rotary-embedding-torch==0.5.3`; `requirements.txt`: `diffusers==0.29.1`,
-`einops==0.7.0`, `rotary-embedding-torch==0.5.3`). The real random-weight
-forward probe (`probe_real_block.py`) therefore exits BLOCKED (exit 3) with
-`probe_result.json`; per task rules nothing was installed. The source/AST/
-window contract is complete; only the executable forward probe is missing.
+A dedicated conda env `seedvr2-block-probe` (Python 3.11.15) provides the real
+pinned non-model packages (PyPI downloads of small non-model deps only; no
+checkpoints, no `third_party/*` changes, base `.conda-cuda` untouched):
+
+- `torch==2.4.0+cpu` (CPU wheel; CUDA unavailable), `numpy==1.26.4`,
+  `einops==0.7.0`, `diffusers==0.33.1` (requirements.txt pins 0.29.1;
+  environment.yml 0.33.1), `rotary-embedding-torch==0.5.3`.
+- `flash-attn` and `apex` (CUDA-only) are NOT installed; the probe harness
+  injects math-equivalent CPU replacements through `sys.modules`
+  (`compat/dependency_injection.py`) so the real SeedVR2 import chain and the
+  real block forward execute unmodified. Without the compat layer, importing
+  the real block fails safely with `ModuleNotFoundError` (verified in a
+  subprocess).
+- Wheel SHA256 fingerprints are recorded in
+  `reports/seedvr2_real_block_forward.json` (`env.wheel_sha256`).
+
+Entry points (run with `conda run -n seedvr2-block-probe python ...`):
+
+- `tests/seedvr2_dit_block_contract/probe_real_block.py` - in-process
+  orchestrator: runs the three suites and writes `probe_result.json`
+  (`status=PASS`).
+- `run_phase11_1_probe.py` (repo root) - subprocess runner: executes
+  `test_dependency_compat.py`, `test_real_block_forward.py`,
+  `test_runtime_contract.py`, collects exit codes + timing, writes
+  `reports/seedvr2_real_block_forward.json` (`status=READY`).
+
+Suite results (all PASS):
+
+- `test_dependency_compat`: RMSNorm parity 6 cases, varlen block-diagonal
+  attention parity 7 cases (incl. segment isolation, causal, bf16) -
+  max_abs < 1e-6; injection works; missing-compat safe-fail subprocess OK.
+- `test_real_block_forward`: real class + forward signature verified (source
+  under `third_party/SeedVR2`, `forward(self, vid, txt, vid_shape, txt_shape,
+  emb, cache)`); full 2560-width profiles A `(1,4,4)` l=2, B `(5,32,32)` l=8
+  (12 windows), C `(7,45,64)` l=11 (36 windows), D batch2 `(2,8,8)+(3,10,12)`
+  l=[2,5] PASS - shapes round-trip, outputs finite; A re-run bit-identical
+  (determinism).
+- `test_runtime_contract`: runtime-hook evidence for per-window
+  `[vid_win; txt]` packing with txt repeated per window and mean-coalesced
+  outputs; `vid_freqs[l:l+f, :h, :w]` offset exact (wrong-offset sentinel
+  differs); identity tail 2 elementwise identical, effective rotary dim 126 of
+  configured 128; Q/K RMSNorm before RoPE; AdaSingle six-segment
+  shift/scale/gate math + linear-gate placement; SwiGLU `silu(gate)*up` then
+  proj_out; residual ordering (`attn_gate + vid`, `mlp_gate + residual`);
+  last-layer `vid_only` structure and exact txt semantics
+  (`txt_out == 2*(proj_out + txt_in)`, mlp/ada absent on txt); window
+  reassembly via rope-off real-class block with per-window constants (no
+  cross-segment leakage); negatives 17/17; detector selftests 4/4.
 
 ## ncnn mapping risk (Phase 12+)
 
@@ -172,17 +218,27 @@ concat + txt repeat/mean coalesce; per-token modulation broadcast; SwiGLU
 by layer index (layers 0..9 separate, 10..31 shared, last layer vid_only);
 bf16-vs-fp32 parity tolerance.
 
-## Regressions
+## Regressions (Phase 10, re-run on `build/phase10_1-real-mmrope-release`)
 
-Phase 10.1 clean build `build/phase10_1-real-mmrope-release` re-run:
-`dynamic_rope3d_tests`, `real_mmrope_contract_validation`,
-`synthetic_hd128_validation`, `dynamic_multi_shape_validation`,
-`runtime_validation` - see final report for commands and exit codes.
+All five re-ran PASS with exit 0 (historical report JSONs then restored
+byte-for-byte with `git restore`):
+
+- `dynamic_rope3d_tests` - PASS (cos 5.96e-8, sin 0, HD128 golden parity
+  cos/sin 5.96e-8, oracle cos/sin/Q/K < 4.8e-7).
+- `real_mmrope_contract_validation tests/seedvr2_attention_fidelity/artifacts/attention_core_fidelity reports/phase10_regression_inputs.txt` - PASS (S/M/P, determinism, negatives 22/22, cache 15).
+- `synthetic_hd128_validation <same args>` - PASS (S/M/P, negatives 19/19, cache 15).
+- `dynamic_multi_shape_validation tests/attention_dispatcher/artifacts/attention_core tests/seedvr2_attention_fidelity/artifacts/attention_core_fidelity` - PASS (A 1.49e-7, B 1.49e-7, C 2.086e-7).
+- `runtime_validation tests/attention_dispatcher/artifacts/attention_core` - PASS (A-E, max 1.49e-7..2.09e-7).
 
 ## JSON report
 
 `reports/seedvr2_single_dit_block_contract.json` and
 `tests/seedvr2_dit_block_contract/seedvr2_block_contract.json`: Python-stdlib
 parseable, no NaN/Infinity, numeric fields are numbers, source evidence
-complete, `real_seedvr2_weights=false`, `ncnn_block_complete=false`,
-`overall_status=PARTIAL` with the single blocker recorded.
+complete, `real_seedvr2_weights=false`, `ncnn_block_complete=false`. Phase 11.1
+added `real_block_probe.status=PASS` (env, profiles, runtime contract points,
+Phase 10 regressions, disclaimers) and `overall_status=READY`. New
+`reports/seedvr2_real_block_forward.json` records the subprocess runner
+evidence (suite exit codes + timing, env + wheel SHA256,
+`FlashAttention CUDA kernel fidelity = not validated`,
+`Apex fused kernel fidelity = not validated`).
