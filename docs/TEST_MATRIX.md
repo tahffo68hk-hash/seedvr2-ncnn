@@ -10,6 +10,14 @@ real_mmrope_contract_validation tests/seedvr2_attention_fidelity/artifacts/atten
 
 Acceptance: variant `seedvr2_hd128_mmrope3d_hybrid` S/M/P PASS; upstream oracle cos/sin/Q/K parity `<1e-6` (`dynamic_rope3d_tests`); effective rope_dim=126, identity tail 2; heads/merge/projection/windows/BTHWC `<1e-4`; validity/mask exact; S->M->P->S bit-identical; negatives 22/22; cache 15; 10 base regressions PASS; JSON parses with no NaN/Inf and numeric fields; `real_seedvr2_weights=false`; `overall_status=PASS`. Historical synthetic report unchanged.
 
+Phase 11 real single DiT block contract (Python probe, no ncnn build needed):
+
+```text
+D:\AIProjects\seedvr2-ncnn\.conda-cuda\python.exe tests\seedvr2_dit_block_contract\extract_seedvr2_block_contract.py
+```
+
+Acceptance: real block class/call chain located; forward signature and field-level inputs/outputs AST-verified; token layout and `vid_freqs[l:l+f]` offset confirmed; modulation split (emb 15360 = 6*2560, shift/scale/gate per attn/mlp), attention (window (4,3,3), varlen block-diagonal, bf16), MLP (SwiGLU 2560->6912->2560) and residual order confirmed; executable window probe A=1/B=12-27/C=36-64 windows with full coverage and determinism; 16/16 negative tests PASS; JSON no NaN/Inf, numeric fields, `real_seedvr2_weights=false`, `overall_status=PARTIAL` (real forward probe BLOCKED by missing deps).
+
 Phase 10 synthetic HD128 (release build `build/phase10-hd128-synthetic-release`):
 
 ```text

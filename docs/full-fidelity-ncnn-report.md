@@ -31,6 +31,15 @@ CPU FP32 fixture subsystem, not complete SeedVR2 inference.
 
 ## Phase 10 head_dim=128 status
 
+`Phase 11 real single DiT block contract = PARTIAL`. The real
+`NaMMSRTransformerBlock` interface/shape/execution contract was extracted with
+source/AST evidence (call chain, token layout, `vid_freqs[l:l+f]` RoPE offset,
+AdaSingle modulation, NaSwinAttention, SwiGLU MLP, residual order; see
+`seedvr2-single-dit-block-contract-report.md`). The real random-weight forward
+probe is BLOCKED by missing non-model deps
+(einops/diffusers/flash_attn/apex/rotary-embedding-torch); ncnn single DiT
+block execution remains TODO (Phase 12).
+
 `Phase 10 head_dim=128 = READY`. The real SeedVR2 MM-RoPE3D contract was
 confirmed from `rotary-embedding-torch==0.5.3` (SeedVR2 commit `e4de8c2`,
 pinned in requirements.txt:13 / environment.yml:181): SeedVR2 configures

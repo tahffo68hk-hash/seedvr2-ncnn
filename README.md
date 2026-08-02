@@ -12,7 +12,13 @@ the exact SeedVR2 MM-RoPE3D contract (rotary-embedding-torch==0.5.3, effective
 rotary dim 126 of configured 128, 2-dim identity tail, axis_dims=[42,42,42])
 was pinned, oracle-verified, and validated end-to-end (real-contract S/M/P),
 with the Phase 10 synthetic fixture kept as an independent historical
-regression. This is not a complete SeedVR2 port.
+regression. Phase 11 real single DiT block interface/shape contract is PARTIAL:
+`NaMMSRTransformerBlock` and its call chain, token layout, `vid_freqs[l:l+f]`
+RoPE offset, modulation, attention, MLP and residual order were extracted with
+source/AST evidence, but the real random-weight forward probe is blocked by
+missing non-model deps (einops/diffusers/flash_attn/apex/rotary-embedding-torch;
+see [seedvr2-single-dit-block-contract-report.md](D:/AIProjects/seedvr2-ncnn/docs/seedvr2-single-dit-block-contract-report.md)).
+This is not a complete SeedVR2 port.
 
 ```mermaid
 flowchart LR
@@ -59,6 +65,16 @@ real_mmrope_contract_validation tests/seedvr2_attention_fidelity/artifacts/atten
 
 It writes [real_seedvr2_mmrope_contract_validation.json](D:\AIProjects\seedvr2-ncnn\reports\real_seedvr2_mmrope_contract_validation.json) and is documented in
 [real-seedvr2-mmrope-contract-report.md](D:\AIProjects\seedvr2-ncnn\docs\real-seedvr2-mmrope-contract-report.md).
+
+Phase 11 real single DiT block contract probe (Python, no ncnn build needed):
+
+```text
+D:\AIProjects\seedvr2-ncnn\.conda-cuda\python.exe tests\seedvr2_dit_block_contract\extract_seedvr2_block_contract.py
+```
+
+It writes [seedvr2_single_dit_block_contract.json](D:\AIProjects\seedvr2-ncnn\reports\seedvr2_single_dit_block_contract.json),
+`tests/seedvr2_dit_block_contract/seedvr2_block_contract.json`, and is
+documented in [seedvr2-single-dit-block-contract-report.md](D:\AIProjects\seedvr2-ncnn\docs\seedvr2-single-dit-block-contract-report.md).
 
 ## Limits
 

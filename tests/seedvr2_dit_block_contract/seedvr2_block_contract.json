@@ -1,0 +1,1099 @@
+{
+  "phase": "11",
+  "scope": "single real SeedVR2 DiT block interface and shape contract",
+  "seedvr2_commit": "e4de8c24441a67e1b7df56abea10645059bb1185",
+  "seedvr2_commit_clean": true,
+  "config_source": "D:\\AIProjects\\third_party\\SeedVR2\\configs_3b\\main.yaml",
+  "block": {
+    "class": "NaMMSRTransformerBlock",
+    "source_file": "D:\\AIProjects\\third_party\\SeedVR2\\models/dit_v2/nablocks/mmsr_block.py",
+    "init_signature": [
+      "self",
+      "vid_dim",
+      "txt_dim",
+      "emb_dim",
+      "heads",
+      "head_dim",
+      "expand_ratio",
+      "norm",
+      "norm_eps",
+      "ada",
+      "qk_bias",
+      "qk_norm",
+      "mlp_type",
+      "shared_weights",
+      "rope_type",
+      "rope_dim",
+      "is_last_layer",
+      "**kwargs"
+    ],
+    "forward_signature": [
+      "self",
+      "vid",
+      "txt",
+      "vid_shape",
+      "txt_shape",
+      "emb",
+      "cache"
+    ],
+    "hidden_dim": 2560,
+    "heads": 20,
+    "head_dim": 128,
+    "mlp_ratio": 4,
+    "registry_evidence": "models/dit_v2/nablocks/__init__.py: nadit_blocks = {'mmdit_sr': NaMMSRTransformerBlock}"
+  },
+  "call_chain": [
+    "VideoDiffusionTrainer.sample (projects/video_diffusion_sr/infer.py)",
+    "  -> NaDiT.forward(vid, txt, vid_shape, txt_shape, timestep)",
+    "    -> vid_in = NaPatchIn(vid, vid_shape); txt_in = project(txt); emb_in = TimeEmbedding(timestep)",
+    "    -> for i in 0..31: NaMMSRTransformerBlock(vid, txt, vid_shape, txt_shape, emb, cache)",
+    "    -> vid_out_norm/ada + NaPatchOut -> NaDiTOutput(vid_sample)"
+  ],
+  "forward_signature": [
+    "self",
+    "vid",
+    "txt",
+    "vid_shape",
+    "txt_shape",
+    "timestep",
+    "disable_cache"
+  ],
+  "config": {
+    "vid_in_channels": 33,
+    "vid_out_channels": 16,
+    "vid_dim": 2560,
+    "txt_in_dim": 5120,
+    "txt_dim": 2560,
+    "emb_dim": 15360,
+    "heads": 20,
+    "head_dim": 128,
+    "inner_dim": 2560,
+    "qkv_dim": 7680,
+    "expand_ratio": 4,
+    "mlp_hidden_derived": 6912,
+    "norm": "fusedrms",
+    "norm_eps": 1e-05,
+    "ada": "single",
+    "qk_bias": false,
+    "qk_norm": "fusedrms",
+    "patch_size": [
+      1,
+      2,
+      2
+    ],
+    "num_layers": 32,
+    "mm_layers": 10,
+    "mlp_type": "swiglu",
+    "block_type": "mmdit_sr",
+    "window": [
+      4,
+      3,
+      3
+    ],
+    "window_method": "720pwin_by_size_bysize / 720pswin_by_size_bysize (alternating)",
+    "rope_type": "mmrope3d",
+    "rope_dim": 128,
+    "model_class": "NaDiT",
+    "model_module": "models.dit_v2.nadit"
+  },
+  "inputs": [
+    {
+      "name": "vid",
+      "semantic_role": "video hidden states (flattened tokens)",
+      "dtype": "float32",
+      "rank": 2,
+      "logical_shape": "[L_vid, 2560]",
+      "physical_layout": "row-major [L_vid, C]; logical [B, T, H, W, C] with T-major W-fastest flatten",
+      "static_dims": [
+        "2560"
+      ],
+      "dynamic_dims": [
+        "L_vid"
+      ],
+      "producer": "NaPatchIn(vid, vid_shape) -> Linear(4*C_in -> 2560) after patchify (1,2,2)",
+      "consumer": "attn_norm / mlp_norm / attn.proj_qkv",
+      "optional": false,
+      "device": "same as model"
+    },
+    {
+      "name": "txt",
+      "semantic_role": "text/context hidden states",
+      "dtype": "float32",
+      "rank": 2,
+      "logical_shape": "[L_txt, 2560]",
+      "physical_layout": "1-D token sequence [L_txt, C]",
+      "static_dims": [
+        "2560"
+      ],
+      "dynamic_dims": [
+        "L_txt = l"
+      ],
+      "producer": "text encoder [L_txt, 5120] -> txt_in projection (Linear 5120->2560 + fusedln)",
+      "consumer": "attn_norm / mlp_norm / attn.proj_qkv; repeated per window in attention",
+      "optional": false,
+      "device": "same as model"
+    },
+    {
+      "name": "vid_shape",
+      "semantic_role": "per-sample video spatial/frame shape metadata",
+      "dtype": "int64",
+      "rank": 2,
+      "logical_shape": "[b, 3] = (T, H, W) post-patch",
+      "physical_layout": "row-major [b, 3]",
+      "static_dims": [
+        "3"
+      ],
+      "dynamic_dims": [
+        "b",
+        "T",
+        "H",
+        "W"
+      ],
+      "producer": "na.flatten(video latents) then NaPatchIn",
+      "consumer": "window partition, vid_len, RoPE get_freqs",
+      "optional": false,
+      "device": "same as model"
+    },
+    {
+      "name": "txt_shape",
+      "semantic_role": "per-sample text length metadata",
+      "dtype": "int64",
+      "rank": 2,
+      "logical_shape": "[b, 1] = text length l",
+      "physical_layout": "row-major [b, 1]",
+      "static_dims": [
+        "1"
+      ],
+      "dynamic_dims": [
+        "b",
+        "l"
+      ],
+      "producer": "text encoder na.flatten",
+      "consumer": "txt_len, RoPE get_freqs (vid_freqs[l:l+f], txt_freqs[:l])",
+      "optional": false,
+      "device": "same as model"
+    },
+    {
+      "name": "emb",
+      "semantic_role": "timestep/conditioning embedding for AdaSingle modulation",
+      "dtype": "float32",
+      "rank": 2,
+      "logical_shape": "[b, 15360]",
+      "physical_layout": "row-major [b, 6*dim] = [b, d, layers=2, groups=3]",
+      "static_dims": [
+        "15360"
+      ],
+      "dynamic_dims": [
+        "b"
+      ],
+      "producer": "TimeEmbedding(timestep): sinusoidal 256 -> proj_in -> SiLU -> proj_hid -> SiLU -> proj_out",
+      "consumer": "AdaSingle (attn/mlp, in/out)",
+      "optional": false,
+      "device": "same as model"
+    },
+    {
+      "name": "cache",
+      "semantic_role": "memoized inference cache (per-sample reusable values)",
+      "dtype": "object",
+      "rank": 0,
+      "logical_shape": "Cache(namespaced dict)",
+      "physical_layout": "Python object",
+      "static_dims": [],
+      "dynamic_dims": [],
+      "producer": "NaDiT.forward (Cache(disable=...))",
+      "consumer": "all block components (lens, indices, freqs)",
+      "optional": false,
+      "device": "host"
+    },
+    {
+      "name": "attention_mask",
+      "semantic_role": "NO explicit mask tensor; masking is varlen block-diagonal via cu_seqlens_q == cu_seqlens_k per window segment [vid;txt]",
+      "dtype": "n/a",
+      "rank": -1,
+      "logical_shape": "implicit",
+      "physical_layout": "n/a",
+      "static_dims": [],
+      "dynamic_dims": [],
+      "producer": "na.concat_idx / repeat_concat_idx + safe_pad_operation",
+      "consumer": "FlashAttentionVarlen",
+      "optional": true,
+      "device": "n/a"
+    },
+    {
+      "name": "text_mask / video_validity",
+      "semantic_role": "NO explicit mask tensors in the block; padding/validity is implicit in the dynamic window partition (partial boundary windows)",
+      "dtype": "n/a",
+      "rank": -1,
+      "logical_shape": "implicit",
+      "physical_layout": "n/a",
+      "static_dims": [],
+      "dynamic_dims": [],
+      "producer": "window_idx (partial boundary windows)",
+      "consumer": "attention segments",
+      "optional": true,
+      "device": "n/a"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "vid_out",
+      "semantic_role": "block video hidden state after MLP residual",
+      "dtype": "float32",
+      "rank": 2,
+      "logical_shape": "[L_vid, 2560]",
+      "physical_layout": "T-major W-fastest flatten",
+      "static_dims": [
+        "2560"
+      ],
+      "dynamic_dims": [
+        "L_vid"
+      ],
+      "producer": "vid_mlp + vid_attn (second residual)",
+      "consumer": "next block / vid_out_norm + NaPatchOut",
+      "optional": false,
+      "device": "same as model"
+    },
+    {
+      "name": "txt_out",
+      "semantic_role": "block text hidden state (coalesced from window repeats)",
+      "dtype": "float32",
+      "rank": 2,
+      "logical_shape": "[L_txt, 2560]",
+      "physical_layout": "1-D token sequence",
+      "static_dims": [
+        "2560"
+      ],
+      "dynamic_dims": [
+        "L_txt = l"
+      ],
+      "producer": "txt_mlp + txt_attn (second residual)",
+      "consumer": "next block; last layer txt passed through (vid_only)",
+      "optional": false,
+      "device": "same as model"
+    },
+    {
+      "name": "vid_shape / txt_shape",
+      "semantic_role": "unchanged shape metadata pass-through",
+      "dtype": "int64",
+      "rank": 2,
+      "logical_shape": "[b,3] / [b,1]",
+      "physical_layout": "row-major",
+      "static_dims": [
+        "3",
+        "1"
+      ],
+      "dynamic_dims": [
+        "b",
+        "T",
+        "H",
+        "W",
+        "l"
+      ],
+      "producer": "block.forward return",
+      "consumer": "next block / NaDiT",
+      "optional": false,
+      "device": "same as model"
+    }
+  ],
+  "token_layout": {
+    "video_input": "[L_vid, C_in] flattened; logical [B, T, H, W, C_in]; C_in=33 (16 noisy + 16 cond + 1)",
+    "video_after_patch": "[L_vid, 2560] with L_vid = T * (H/2) * (W/2); patch_size (1,2,2)",
+    "video_token_order": "T-major, W-fastest (patch rearrange '(T t) (H h) (W w) c -> T H W (t h w c)')",
+    "text_input": "[L_txt, 5120] -> txt_in projection -> [L_txt, 2560]",
+    "text_token_order": "1-D text sequence; txt_shape=[b,1] = per-sample text length l",
+    "concat_order": "per window segment: [vid_win tokens; txt tokens] (vid first, then txt)",
+    "batch_and_token_dims": "token dim = dim 0 of flattened [L, C]; batch implicit in shapes (vid_shape [b,3], txt_shape [b,1])",
+    "text_repeat": "txt q/k repeated per window; txt outputs coalesced by MEAN over repeats",
+    "text_video_boundary": "per window attention segment = [vid_win tokens; txt tokens]; text q/k repeated per window and outputs coalesced by mean; RoPE uses vid_freqs[l:l+f] (T offset by text length l) for video and txt_freqs[:l] for text"
+  },
+  "rope": {
+    "class": "NaMMRotaryEmbedding3d(MMRotaryEmbeddingBase)",
+    "configured_rope_dim": 128,
+    "per_axis_dim": 42,
+    "effective_rotary_dim": 126,
+    "identity_tail_dim": 2,
+    "freqs_for": "lang",
+    "theta": 10000,
+    "axis_order": [
+      "T",
+      "H",
+      "W"
+    ],
+    "token_order": "T-major W-fastest",
+    "vid_freqs_table": "get_axial_freqs(1024, 128, 128) precomputed grid",
+    "txt_freqs_table": "get_axial_freqs(1024)",
+    "l_semantics": "l = txt_shape[i,0] = per-sample text token count",
+    "f_semantics": "f = vid_shape[i,0] = per-sample post-patch video frame count (T dim), NOT total video tokens",
+    "vid_freq_slice": "vid_freqs[l : l+f, :h, :w]: video T-axis positions offset by text length l in the shared 1024-frame table",
+    "txt_freq_slice": "txt_freqs[:l].repeat(1, 3): first l 1-D freqs replicated across the 3 axis blocks",
+    "applied_to": "q/k per head [L, h, 128]; first 126 dims rotated, tail 2 identity (Phase 10.1 oracle-confirmed)",
+    "block_index_effect": "no block-index dependence; freqs depend only on shapes and text length l",
+    "window_local_coords": "per-window local coords; each window uses its own (f_w,h_w,w_w) with the same l offset",
+    "batch_sharing": "freqs computed per batch item from its own (l, f, h, w); not shared across batch",
+    "ast_verified": true
+  },
+  "modulation": {
+    "class": "AdaSingle",
+    "emb_input": "[b, 15360] (emb_dim == 6 * vid_dim)",
+    "split": "emb rearranged [b, d=2560, l=2, g=3]; per layer (attn, mlp) 3 groups: shift/scale/gate",
+    "per_layer_groups": [
+      "attn_shift",
+      "attn_scale",
+      "attn_gate",
+      "mlp_shift",
+      "mlp_scale",
+      "mlp_gate"
+    ],
+    "learned_params": "per layer: shift (d), scale (d, init ~+1), gate (d)",
+    "mode_in_formula": "hid * (scaleA + scaleB) + (shiftA + shiftB)",
+    "mode_out_formula": "hid * (gateA + gateB)",
+    "gate_activation": "none (linear gate, no sigmoid/tanh)",
+    "application_sites": [
+      "attn_norm after (mode in)",
+      "attention output (mode out)",
+      "mlp_norm after (mode in)",
+      "mlp output (mode out)"
+    ],
+    "per_branch": "vid/txt modulated separately (branch_tag vid|txt; emb repeated per token via hid_len)",
+    "per_block": "each block owns its AdaSingle parameters",
+    "ast_verified": true,
+    "slice_map": [
+      {
+        "emb_slice": "emb[..., 0, :] (attn layer, group 0)",
+        "semantic": "attn_shift",
+        "target_branch": "vid|txt",
+        "target_shape": "[L_*, 2560]",
+        "formula": "hid * (scaleA+scaleB) + (shiftA+shiftB) [mode in]"
+      },
+      {
+        "emb_slice": "emb[..., 1, :] (attn layer, group 1)",
+        "semantic": "attn_scale",
+        "target_branch": "vid|txt",
+        "target_shape": "[L_*, 2560]",
+        "formula": "same as above"
+      },
+      {
+        "emb_slice": "emb[..., 2, :] (attn layer, group 2)",
+        "semantic": "attn_gate",
+        "target_branch": "vid|txt",
+        "target_shape": "[L_*, 2560]",
+        "formula": "hid * (gateA+gateB) [mode out, after attention]"
+      },
+      {
+        "emb_slice": "emb[..., 0, :] (mlp layer, group 0)",
+        "semantic": "mlp_shift",
+        "target_branch": "vid|txt",
+        "target_shape": "[L_*, 2560]",
+        "formula": "hid * (scaleA+scaleB) + (shiftA+shiftB) [mode in]"
+      },
+      {
+        "emb_slice": "emb[..., 1, :] (mlp layer, group 1)",
+        "semantic": "mlp_scale",
+        "target_branch": "vid|txt",
+        "target_shape": "[L_*, 2560]",
+        "formula": "same as above"
+      },
+      {
+        "emb_slice": "emb[..., 2, :] (mlp layer, group 2)",
+        "semantic": "mlp_gate",
+        "target_branch": "vid|txt",
+        "target_shape": "[L_*, 2560]",
+        "formula": "hid * (gateA+gateB) [mode out, after MLP]"
+      }
+    ]
+  },
+  "attention": {
+    "class": "NaSwinAttention(NaMMAttention)",
+    "proj_qkv": "Linear(vid_dim/txt_dim -> 3*heads*head_dim = 7680) per branch (shared_weights per layer index)",
+    "proj_out": "Linear(heads*head_dim = 2560 -> vid_dim/txt_dim)",
+    "qk_norm": "fusedrms (apex FusedRMSNorm), dim=head_dim=128, elementwise_affine=True, eps=1e-5",
+    "qk_bias": false,
+    "window": "(4,3,3)",
+    "window_method": "alternating 720pwin_by_size_bysize / 720pswin_by_size_bysize",
+    "window_partition": "vid qkv [T,H,W,C] partitioned; txt NOT partitioned (repeated per window)",
+    "rope": "window-local MM-RoPE3D on vid q/k with window_shape; txt q/k repeated per window",
+    "attention_impl": "FlashAttentionVarlen (flash_attn.flash_attn_varlen_func) on bf16 cast",
+    "mask_form": "varlen block-diagonal via cu_seqlens_q == cu_seqlens_k per window segment [vid; txt]; no explicit mask, no causal mask",
+    "cross_window": "no cross-window attention (each window segment independent)",
+    "text_pooling": "txt outputs from repeats coalesced by mean",
+    "dtype": "attention math in bfloat16 (inputs cast .bfloat16(); output .type_as(vid_q))",
+    "ast_verified": false
+  },
+  "mlp": {
+    "class": "SwiGLUMLP",
+    "proj_in_gate": "Linear(2560 -> 6912, bias=False)",
+    "proj_in": "Linear(2560 -> 6912, bias=False)",
+    "proj_out": "Linear(6912 -> 2560, bias=False)",
+    "hidden_dim_derived": 6912,
+    "expansion": 4,
+    "activation": "SiLU (gated): silu(gate(x)) * x",
+    "dropout": "none",
+    "bias": "none",
+    "gated": true,
+    "ast_verified": true
+  },
+  "residual_order": [
+    "attn_norm(vid,txt) -> ada(attn, in: scale+shift) -> NaSwinAttention -> ada(attn, out: gate) -> +vid/txt residual",
+    "mlp_norm(vid_attn,txt_attn) -> ada(mlp, in) -> SwiGLU MLP -> ada(mlp, out) -> +vid_attn/txt_attn residual",
+    "pre-norm style; gate applied AFTER attention/MLP and BEFORE the residual add"
+  ],
+  "execution_order": [
+    [
+      "attn_norm",
+      107,
+      {}
+    ],
+    [
+      "ada",
+      108,
+      {
+        "layer": "attn",
+        "mode": "in",
+        "null": "Name(id='ada_kwargs', ctx=Load())"
+      }
+    ],
+    [
+      "attn",
+      109,
+      {}
+    ],
+    [
+      "ada",
+      110,
+      {
+        "layer": "attn",
+        "mode": "out",
+        "null": "Name(id='ada_kwargs', ctx=Load())"
+      }
+    ],
+    [
+      "mlp_norm",
+      113,
+      {}
+    ],
+    [
+      "ada",
+      114,
+      {
+        "layer": "mlp",
+        "mode": "in",
+        "null": "Name(id='ada_kwargs', ctx=Load())"
+      }
+    ],
+    [
+      "mlp",
+      115,
+      {}
+    ],
+    [
+      "ada",
+      116,
+      {
+        "layer": "mlp",
+        "mode": "out",
+        "null": "Name(id='ada_kwargs', ctx=Load())"
+      }
+    ]
+  ],
+  "intermediate_shapes": {
+    "block_input_vid": "[L_vid, 2560]",
+    "block_input_txt": "[L_txt, 2560]",
+    "attn_norm_out": "[L_*, 2560]",
+    "qkv": "[L_*, 7680]",
+    "q/k/v_per_head": "[L_*, 20, 128]",
+    "rope_freqs": "[L_*, 126] (per window)",
+    "attention_out": "[L_*, 20, 128] -> [L_*, 2560]",
+    "proj_out": "[L_*, 2560]",
+    "mlp_hidden": "[L_*, 6912]",
+    "mlp_out": "[L_*, 2560]",
+    "block_output": "[L_vid, 2560], [L_txt, 2560]",
+    "emb": "[b, 15360]",
+    "vid_shape": "[b, 3]",
+    "txt_shape": "[b, 1]"
+  },
+  "probes": {
+    "window_partition": {
+      "loaded": true,
+      "profiles": [
+        {
+          "name": "A_min",
+          "shape": [
+            1,
+            4,
+            4
+          ],
+          "text_len": 2,
+          "methods": {
+            "720pwin_by_size_bysize": {
+              "window_count": 1,
+              "window_shapes": [
+                [
+                  1,
+                  4,
+                  4
+                ]
+              ],
+              "min_tokens": 16,
+              "max_tokens": 16,
+              "coverage_all_cells": true,
+              "deterministic_run": true
+            },
+            "720pswin_by_size_bysize": {
+              "window_count": 1,
+              "window_shapes": [
+                [
+                  1,
+                  4,
+                  4
+                ]
+              ],
+              "min_tokens": 16,
+              "max_tokens": 16,
+              "coverage_all_cells": true,
+              "deterministic_run": true
+            }
+          }
+        },
+        {
+          "name": "B_multi_window",
+          "shape": [
+            5,
+            32,
+            32
+          ],
+          "text_len": 8,
+          "methods": {
+            "720pwin_by_size_bysize": {
+              "window_count": 12,
+              "window_shapes": [
+                [
+                  1,
+                  12,
+                  12
+                ],
+                [
+                  1,
+                  12,
+                  20
+                ],
+                [
+                  1,
+                  20,
+                  12
+                ],
+                [
+                  1,
+                  20,
+                  20
+                ],
+                [
+                  2,
+                  12,
+                  12
+                ],
+                [
+                  2,
+                  12,
+                  20
+                ],
+                [
+                  2,
+                  20,
+                  12
+                ],
+                [
+                  2,
+                  20,
+                  20
+                ]
+              ],
+              "min_tokens": 144,
+              "max_tokens": 800,
+              "coverage_all_cells": true,
+              "deterministic_run": true
+            },
+            "720pswin_by_size_bysize": {
+              "window_count": 27,
+              "window_shapes": [
+                [
+                  1,
+                  2,
+                  2
+                ],
+                [
+                  1,
+                  2,
+                  10
+                ],
+                [
+                  1,
+                  2,
+                  20
+                ],
+                [
+                  1,
+                  10,
+                  2
+                ],
+                [
+                  1,
+                  10,
+                  10
+                ],
+                [
+                  1,
+                  10,
+                  20
+                ],
+                [
+                  1,
+                  20,
+                  2
+                ],
+                [
+                  1,
+                  20,
+                  10
+                ],
+                [
+                  1,
+                  20,
+                  20
+                ],
+                [
+                  2,
+                  2,
+                  2
+                ],
+                [
+                  2,
+                  2,
+                  10
+                ],
+                [
+                  2,
+                  2,
+                  20
+                ],
+                [
+                  2,
+                  10,
+                  2
+                ],
+                [
+                  2,
+                  10,
+                  10
+                ],
+                [
+                  2,
+                  10,
+                  20
+                ],
+                [
+                  2,
+                  20,
+                  2
+                ],
+                [
+                  2,
+                  20,
+                  10
+                ],
+                [
+                  2,
+                  20,
+                  20
+                ]
+              ],
+              "min_tokens": 4,
+              "max_tokens": 800,
+              "coverage_all_cells": true,
+              "deterministic_run": true
+            }
+          }
+        },
+        {
+          "name": "C_asymmetric",
+          "shape": [
+            7,
+            45,
+            64
+          ],
+          "text_len": 11,
+          "methods": {
+            "720pwin_by_size_bysize": {
+              "window_count": 36,
+              "window_shapes": [
+                [
+                  1,
+                  11,
+                  16
+                ],
+                [
+                  1,
+                  11,
+                  24
+                ],
+                [
+                  1,
+                  17,
+                  16
+                ],
+                [
+                  1,
+                  17,
+                  24
+                ],
+                [
+                  2,
+                  11,
+                  16
+                ],
+                [
+                  2,
+                  11,
+                  24
+                ],
+                [
+                  2,
+                  17,
+                  16
+                ],
+                [
+                  2,
+                  17,
+                  24
+                ]
+              ],
+              "min_tokens": 176,
+              "max_tokens": 816,
+              "coverage_all_cells": true,
+              "deterministic_run": true
+            },
+            "720pswin_by_size_bysize": {
+              "window_count": 64,
+              "window_shapes": [
+                [
+                  1,
+                  3,
+                  4
+                ],
+                [
+                  1,
+                  3,
+                  12
+                ],
+                [
+                  1,
+                  3,
+                  24
+                ],
+                [
+                  1,
+                  8,
+                  4
+                ],
+                [
+                  1,
+                  8,
+                  12
+                ],
+                [
+                  1,
+                  8,
+                  24
+                ],
+                [
+                  1,
+                  17,
+                  4
+                ],
+                [
+                  1,
+                  17,
+                  12
+                ],
+                [
+                  1,
+                  17,
+                  24
+                ],
+                [
+                  2,
+                  3,
+                  4
+                ],
+                [
+                  2,
+                  3,
+                  12
+                ],
+                [
+                  2,
+                  3,
+                  24
+                ],
+                [
+                  2,
+                  8,
+                  4
+                ],
+                [
+                  2,
+                  8,
+                  12
+                ],
+                [
+                  2,
+                  8,
+                  24
+                ],
+                [
+                  2,
+                  17,
+                  4
+                ],
+                [
+                  2,
+                  17,
+                  12
+                ],
+                [
+                  2,
+                  17,
+                  24
+                ]
+              ],
+              "min_tokens": 12,
+              "max_tokens": 816,
+              "coverage_all_cells": true,
+              "deterministic_run": true
+            }
+          }
+        }
+      ],
+      "negative": "PASS: ValueError",
+      "deterministic": true
+    }
+  },
+  "negative_tests": [
+    {
+      "name": "hidden_dim % head_dim == 0",
+      "expected": "safe-fail/consistency",
+      "result": "PASS"
+    },
+    {
+      "name": "heads * head_dim == hidden_dim",
+      "expected": "safe-fail/consistency",
+      "result": "PASS"
+    },
+    {
+      "name": "emb_dim == 6 * hidden_dim",
+      "expected": "safe-fail/consistency",
+      "result": "PASS"
+    },
+    {
+      "name": "mlp_hidden % 256 == 0",
+      "expected": "safe-fail/consistency",
+      "result": "PASS"
+    },
+    {
+      "name": "effective_rotary + identity == head_dim",
+      "expected": "safe-fail/consistency",
+      "result": "PASS"
+    },
+    {
+      "name": "l+f <= 1024 (vid_freqs table bound)",
+      "expected": "safe-fail/consistency",
+      "result": "PASS"
+    },
+    {
+      "name": "vid token count == T*H*W",
+      "expected": "safe-fail/consistency",
+      "result": "PASS"
+    },
+    {
+      "name": "get_na_rope unsupported -> NotImplementedError (AST)",
+      "expected": "safe-fail/consistency",
+      "result": "PASS"
+    },
+    {
+      "name": "get_nablock unsupported -> NotImplementedError (AST)",
+      "expected": "safe-fail/consistency",
+      "result": "PASS"
+    },
+    {
+      "name": "get_ada_layer unsupported -> NotImplementedError (AST)",
+      "expected": "safe-fail/consistency",
+      "result": "PASS"
+    },
+    {
+      "name": "get_mlp unknown -> None (AST)",
+      "expected": "safe-fail/consistency",
+      "result": "PASS"
+    },
+    {
+      "name": "registry maps mmdit_sr to NaMMSRTransformerBlock (AST)",
+      "expected": "safe-fail/consistency",
+      "result": "PASS"
+    },
+    {
+      "name": "rope rotates first 126 only, tail identity (AST)",
+      "expected": "safe-fail/consistency",
+      "result": "PASS"
+    },
+    {
+      "name": "patch rearrange T-major W-fastest (AST)",
+      "expected": "safe-fail/consistency",
+      "result": "PASS"
+    },
+    {
+      "name": "window unknown op -> ValueError (executable)",
+      "expected": "safe-fail/consistency",
+      "result": "PASS"
+    },
+    {
+      "name": "window partition determinism (executable)",
+      "expected": "safe-fail/consistency",
+      "result": "PASS"
+    }
+  ],
+  "determinism": {
+    "window_partition": true
+  },
+  "dependency_gap": {
+    "available": {
+      "torch": true,
+      "yaml": true,
+      "numpy": true
+    },
+    "missing": {
+      "einops": true,
+      "diffusers": true,
+      "flash_attn": true,
+      "apex": true,
+      "rotary_embedding_torch": true
+    },
+    "pinned_environment_yml": {
+      "einops": "0.7.0",
+      "diffusers": "0.33.1",
+      "flash_attn": "2.5.9.post1",
+      "apex": "0.1",
+      "rotary_embedding_torch": "0.5.3",
+      "torch": "2.4.0+cu121"
+    },
+    "pinned_requirements_txt": {
+      "einops": "0.7.0",
+      "diffusers": "0.29.1",
+      "rotary_embedding_torch": "0.5.3",
+      "torch": "2.3.0"
+    }
+  },
+  "real_block_probe": {
+    "status": "BLOCKED",
+    "blocker_modules": [
+      "einops",
+      "diffusers",
+      "flash_attn",
+      "apex",
+      "rotary_embedding_torch"
+    ],
+    "reason": "missing non-model Python deps; task forbids installing them",
+    "exit_code": 3,
+    "stdout_tail": [
+      "probe_real_block=BLOCKED missing=einops,diffusers,flash_attn,apex,rotary_embedding_torch"
+    ],
+    "stderr_tail": []
+  },
+  "ncnn_mapping_risk": [
+    {
+      "risk": "FlashAttentionVarlen (flash_attn_varlen_func)",
+      "note": "CUDA-only; needs varlen/block-diagonal attention equivalent; cu_seqlens segment [vid;txt] per window; bf16 upstream"
+    },
+    {
+      "risk": "gather_seq_scatter_heads_qkv / gather_heads_scatter_seq",
+      "note": "sequence-parallel index permutations; reducible to static index maps in ncnn"
+    },
+    {
+      "risk": "window partition by-size (dynamic)",
+      "note": "window sizes computed at runtime from vid_shape; maps to existing dynamic window adapter"
+    },
+    {
+      "risk": "apex FusedRMSNorm / FusedLayerNorm",
+      "note": "standard RMS/LN math; covered by existing fixed/dynamic RMS fixtures"
+    },
+    {
+      "risk": "diffusers RMSNorm + get_timestep_embedding",
+      "note": "pure torch math; sinusoidal embedding must match flip_sin_to_cos=False, downscale_freq_shift=0"
+    },
+    {
+      "risk": "dynamic token concatenation [vid;txt] + txt repeat/mean coalesce",
+      "note": "index permutation + mean reduction; needs exact parity"
+    },
+    {
+      "risk": "modulation broadcast",
+      "note": "per-token broadcast of [b,d] scale/shift/gate with branch-specific hid_len repetition"
+    },
+    {
+      "risk": "gated MLP (SwiGLU)",
+      "note": "silu(gate)*x then linear; two GEMMs; no bias"
+    },
+    {
+      "risk": "RoPE frequency offset (vid_freqs[l:l+f])",
+      "note": "T-axis offset by text length l; window-local coordinates; effective 126 of 128 with identity tail 2"
+    },
+    {
+      "risk": "shared vs separate vid/txt weights by layer index",
+      "note": "layers 0..9 separate (mm_layers=10), layers 10..31 shared; last layer vid_only mlp/ada"
+    },
+    {
+      "risk": "bf16 attention vs fp32 ncnn",
+      "note": "upstream casts attention to bf16; fp32 ncnn parity target must define tolerance"
+    }
+  ],
+  "dynamic_dimensions": [
+    "L_vid (video token count, from vid_shape T*H*W)",
+    "L_txt (text token count l)",
+    "vid_shape [b,3] (T,H,W post-patch)",
+    "txt_shape [b,1] (text length l)",
+    "timestep (per sample)",
+    "window partition count/sizes (derived from vid_shape + window_method)"
+  ],
+  "freshness": {
+    "seedvr2_commit": "e4de8c24441a67e1b7df56abea10645059bb1185",
+    "expected_commit": "e4de8c24441a67e1b7df56abea10645059bb1185",
+    "commit_matches": true,
+    "sources_exist": {
+      "models/dit_v2/nadit.py": true,
+      "models/dit_v2/nablocks/__init__.py": true,
+      "models/dit_v2/nablocks/mmsr_block.py": true,
+      "models/dit_v2/nablocks/attention/mmattn.py": true,
+      "models/dit_v2/rope.py": true,
+      "models/dit_v2/modulation.py": true,
+      "models/dit_v2/mlp.py": true,
+      "models/dit_v2/normalization.py": true,
+      "models/dit_v2/window.py": true,
+      "models/dit_v2/patch/patch_v1.py": true,
+      "models/dit_v2/attention.py": true,
+      "models/dit_v2/embedding.py": true,
+      "models/dit_v2/mm.py": true,
+      "models/dit_v2/na.py": true,
+      "common/cache.py": true,
+      "common/config.py": true
+    },
+    "symbol_checks": {
+      "NaMMSRTransformerBlock": true,
+      "NaDiT": true,
+      "NaSwinAttention": true,
+      "NaMMRotaryEmbedding3d": true,
+      "AdaSingle": true,
+      "SwiGLUMLP": true
+    }
+  },
+  "real_seedvr2_weights": false,
+  "ncnn_block_complete": false,
+  "overall_status": "PARTIAL",
+  "blocker": "real random-weight forward probe not executable: missing non-model Python deps apex, diffusers, einops, flash_attn, rotary_embedding_torch (task forbids installing them); source/AST/window contract complete",
+  "errors": []
+}
