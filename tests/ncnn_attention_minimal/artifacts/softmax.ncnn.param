@@ -1,0 +1,7 @@
+7767517
+5 6
+Input                    in0                      0 1 in0
+Split                    splitncnn_0              1 2 in0 1 2
+MatMul                   matmultransb_0           2 1 1 2 3 0=1
+BinaryOp                 mul_0                    1 1 3 4 0=2 1=1 2=0.353553385
+Softmax                  softmax_0                1 1 4 out0 0=2 1=1

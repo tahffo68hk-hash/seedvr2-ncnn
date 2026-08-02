@@ -1,0 +1,7 @@
+TorchScript full wrapper: PASS (fixed Case C trace)
+TorchScript two-input core: PASS
+input_shape=(1, 4, 17, 17, 32)
+windows_shape=(25, 64, 32)
+mask_shape=(25, 64, 64)
+mask_dtype=torch.float32
+padding=(0, 3, 3)

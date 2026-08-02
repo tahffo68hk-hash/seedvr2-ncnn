@@ -1,0 +1,7 @@
+cmake_minimum_required(VERSION 3.20)
+project(ncnn_load_test LANGUAGES CXX)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+find_package(ncnn CONFIG REQUIRED)
+add_executable(ncnn_load_test main.cpp)
+target_link_libraries(ncnn_load_test PRIVATE ncnn)

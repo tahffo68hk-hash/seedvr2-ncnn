@@ -1,0 +1,75 @@
+7767517
+73 92
+Input                    in0                      0 1 in0
+Split                    splitncnn_0              1 2 in0 1 2
+Input                    in1                      0 1 in1
+Input                    in2                      0 1 in2
+Input                    in3                      0 1 in3
+Reshape                  reshape_9                1 1 1 6 0=32 1=256
+Gemm                     gemm_0                   1 1 6 7 10=4 2=0 3=1 4=0 5=1 6=1 7=256 8=96 9=32
+Reshape                  reshape_10               1 1 7 8 12=233 13=0 6="8,4,3,64,4"
+Slice                    unbind_0                 1 3 8 9 10 11 -23300=3,-233,-233,-233 1=1
+Reshape                  reshape_11               1 1 11 12 0=8 1=4 2=64
+Reshape                  reshape_12               1 1 10 13 0=8 1=4 2=64
+Reshape                  reshape_13               1 1 9 14 0=8 1=4 2=64
+LayerNorm                ln_3                     1 1 14 15 0=8 1=1.000000e-5 2=1
+Split                    splitncnn_1              1 2 15 16 17
+LayerNorm                ln_4                     1 1 13 18 0=8 1=1.000000e-5 2=1
+Split                    splitncnn_2              1 2 18 19 20
+Tile                     repeat_32                1 1 in2 21 -23302=2,4,1
+Tile                     repeat_33                1 1 in3 22 -23302=2,4,1
+Reshape                  reshape_14               1 1 16 23 0=8 1=4 12=0 13=233 2=256
+Split                    splitncnn_3              1 2 23 24 25
+Reshape                  reshape_15               1 1 24 26 0=2 1=4 11=4 2=256
+ExpandDims               unsqueeze_36             1 1 21 27 -23303=1,1
+Split                    splitncnn_4              1 4 27 28 29 30 31
+ExpandDims               unsqueeze_37             1 1 22 32 -23303=1,1
+Split                    splitncnn_5              1 4 32 33 34 35 36
+Slice                    unbind_1                 1 2 26 37 38 -23300=2,-233,-233 1=3
+Reshape                  reshape_16               1 1 38 39 0=4 1=4 2=256
+Split                    splitncnn_6              1 2 39 40 41
+Reshape                  reshape_17               1 1 37 42 0=4 1=4 2=256
+Split                    splitncnn_7              1 2 42 43 44
+BinaryOp                 mul_0                    2 1 40 33 45 0=2
+BinaryOp                 mul_1                    2 1 43 28 46 0=2
+BinaryOp                 sub_2                    2 1 46 45 47 0=1
+BinaryOp                 mul_3                    2 1 41 29 48 0=2
+BinaryOp                 mul_4                    2 1 44 34 49 0=2
+BinaryOp                 add_5                    2 1 49 48 50 0=0
+Reshape                  reshape_18               1 1 47 51 0=1 1=4 11=4 2=256
+Reshape                  reshape_19               1 1 50 52 0=1 1=4 11=4 2=256
+Concat                   stack_0                  2 1 51 52 53 0=3
+Reshape                  reshape_as_27            2 1 53 25 54 6="1w,1h,1c"
+Reshape                  reshape_as_28            2 1 54 17 55 12=233 13=0 6="1w,1h,1c,1n"
+Reshape                  reshape_20               1 1 19 56 0=8 1=4 12=0 13=233 2=256
+Split                    splitncnn_8              1 2 56 57 58
+Reshape                  reshape_21               1 1 57 59 0=2 1=4 11=4 2=256
+Slice                    unbind_2                 1 2 59 60 61 -23300=2,-233,-233 1=3
+Reshape                  reshape_22               1 1 61 62 0=4 1=4 2=256
+Split                    splitncnn_9              1 2 62 63 64
+Reshape                  reshape_23               1 1 60 65 0=4 1=4 2=256
+Split                    splitncnn_10             1 2 65 66 67
+BinaryOp                 mul_6                    2 1 63 35 68 0=2
+BinaryOp                 mul_7                    2 1 66 30 69 0=2
+BinaryOp                 sub_8                    2 1 69 68 70 0=1
+BinaryOp                 mul_9                    2 1 64 31 71 0=2
+BinaryOp                 mul_10                   2 1 67 36 72 0=2
+BinaryOp                 add_11                   2 1 72 71 73 0=0
+Reshape                  reshape_24               1 1 70 74 0=1 1=4 11=4 2=256
+Reshape                  reshape_25               1 1 73 75 0=1 1=4 11=4 2=256
+Concat                   stack_1                  2 1 74 75 76 0=3
+Reshape                  reshape_as_29            2 1 76 58 77 6="1w,1h,1c"
+Reshape                  reshape_as_30            2 1 77 20 78 12=233 13=0 6="1w,1h,1c,1n"
+Permute                  permute_5                1 1 55 79 0=2
+Permute                  permute_6                1 1 78 80 0=3
+MatMul                   matmul_34                2 1 79 80 81
+ExpandDims               unsqueeze_38             1 1 in1 82 -23303=1,0
+BinaryOp                 mul_12                   1 1 81 83 0=2 1=1 2=0.353553385
+BinaryOp                 add_13                   2 1 83 82 84 0=0
+Softmax                  softmax_2                1 1 84 85 0=2 1=1
+Permute                  permute_7                1 1 12 86 0=2
+MatMul                   matmul_35                2 1 85 86 87
+Permute                  permute_8                1 1 87 88 0=2
+Reshape                  reshape_26               1 1 88 89 0=32 1=256 12=0 13=233
+Gemm                     gemm_1                   1 1 89 90 10=4 2=0 3=1 4=0 5=1 6=1 7=256 8=32 9=32
+Reshape                  reshape_as_31            2 1 90 2 out0 6="1w,1h,1c"

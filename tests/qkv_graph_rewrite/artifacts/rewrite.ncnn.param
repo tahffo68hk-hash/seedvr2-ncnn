@@ -1,0 +1,6 @@
+7767517
+4 4
+Input                    in0                      0 1 in0
+Reshape                  reshape_1                1 1 in0 1 0=32 1=128
+Gemm                     gemm_0                   1 1 1 2 10=4 2=0 3=1 4=0 5=1 6=1 7=128 8=96 9=32
+Reshape                  reshape_2                1 1 2 out0 0=96 1=32 2=4

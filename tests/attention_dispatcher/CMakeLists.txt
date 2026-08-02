@@ -1,0 +1,65 @@
+cmake_minimum_required(VERSION 3.20)
+project(attention_dispatcher LANGUAGES CXX)
+
+find_package(ncnn CONFIG REQUIRED PATHS "D:/AIProjects/seedvr2-ncnn/build/ncnn-cpu/install/lib/cmake/ncnn" NO_DEFAULT_PATH)
+
+add_library(attention_dispatcher_lib attention_dispatcher.cpp)
+target_include_directories(attention_dispatcher_lib PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
+target_compile_features(attention_dispatcher_lib PUBLIC cxx_std_17)
+target_compile_options(attention_dispatcher_lib PRIVATE /EHsc)
+
+add_executable(dispatcher_tests dispatcher_tests.cpp)
+target_link_libraries(dispatcher_tests PRIVATE attention_dispatcher_lib artifact_registry_lib)
+target_compile_options(dispatcher_tests PRIVATE /EHsc)
+target_compile_options(dispatcher_tests PRIVATE /UNDEBUG)
+
+add_library(artifact_registry_lib artifact_registry.cpp)
+target_include_directories(artifact_registry_lib PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
+target_compile_features(artifact_registry_lib PUBLIC cxx_std_17)
+target_compile_options(artifact_registry_lib PRIVATE /EHsc)
+
+add_executable(artifact_registry_tests artifact_registry_tests.cpp)
+target_link_libraries(artifact_registry_tests PRIVATE artifact_registry_lib)
+target_compile_options(artifact_registry_tests PRIVATE /EHsc)
+target_compile_options(artifact_registry_tests PRIVATE /UNDEBUG)
+
+add_executable(attention_dispatcher_runner EXCLUDE_FROM_ALL runner.cpp)
+target_link_libraries(attention_dispatcher_runner PRIVATE attention_dispatcher_lib artifact_registry_lib ncnn)
+target_compile_options(attention_dispatcher_runner PRIVATE /EHsc)
+
+add_library(model_cache_lib model_cache.cpp)
+target_include_directories(model_cache_lib PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
+target_link_libraries(model_cache_lib PUBLIC artifact_registry_lib ncnn)
+target_compile_features(model_cache_lib PUBLIC cxx_std_17)
+target_compile_options(model_cache_lib PRIVATE /EHsc)
+
+add_library(attention_runtime_lib attention_runtime.cpp)
+target_include_directories(attention_runtime_lib PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
+target_link_libraries(attention_runtime_lib PUBLIC attention_dispatcher_lib model_cache_lib ncnn)
+target_compile_features(attention_runtime_lib PUBLIC cxx_std_17)
+target_compile_options(attention_runtime_lib PRIVATE /EHsc)
+
+add_library(hybrid_attention_runtime_lib hybrid_model_bundle.cpp hybrid_attention_runtime.cpp ../seedvr2_attention_fidelity/host_head_merge.cpp)
+target_include_directories(hybrid_attention_runtime_lib PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/../seedvr2_attention_fidelity")
+target_link_libraries(hybrid_attention_runtime_lib PUBLIC attention_dispatcher_lib model_cache_lib hybrid_window_adapter_lib ncnn)
+target_compile_features(hybrid_attention_runtime_lib PUBLIC cxx_std_17)
+target_compile_options(hybrid_attention_runtime_lib PRIVATE /EHsc)
+add_library(hybrid_window_adapter_lib hybrid_window_adapter.cpp)
+target_include_directories(hybrid_window_adapter_lib PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
+target_compile_features(hybrid_window_adapter_lib PUBLIC cxx_std_17)
+add_executable(hybrid_window_adapter_tests hybrid_window_adapter_tests.cpp)
+target_link_libraries(hybrid_window_adapter_tests PRIVATE hybrid_window_adapter_lib)
+target_compile_options(hybrid_window_adapter_tests PRIVATE /EHsc /UNDEBUG)
+
+add_executable(model_cache_tests EXCLUDE_FROM_ALL model_cache_tests.cpp)
+target_link_libraries(model_cache_tests PRIVATE model_cache_lib)
+target_compile_options(model_cache_tests PRIVATE /EHsc)
+target_compile_options(model_cache_tests PRIVATE /UNDEBUG)
+
+add_executable(runtime_validation EXCLUDE_FROM_ALL runtime_validation.cpp)
+target_link_libraries(runtime_validation PRIVATE attention_runtime_lib)
+target_compile_options(runtime_validation PRIVATE /EHsc)
+
+add_executable(hybrid_runtime_validation EXCLUDE_FROM_ALL hybrid_runtime_validation.cpp)
+target_link_libraries(hybrid_runtime_validation PRIVATE hybrid_attention_runtime_lib)
+target_compile_options(hybrid_runtime_validation PRIVATE /EHsc)

@@ -1,0 +1,10 @@
+{
+  "request":{"input_shape":[1,4,8,8,32],"dtype":"fp32","variant":"fidelity_ln_rope3d_hybrid"},
+  "artifact":{"name":"hybrid_fidelity_ln_rope444_grid_1x2x2","window":[4,4,4],"grid":[1,2,2],"execution":"staged_host_head_merge"},
+  "contracts":{"mask":{"source":"reference/mask.bin","shape":[4,64,64],"valid_tokens":60,"zero_mask_finite":true,"zero_mask_max_abs_error":0.07963926345,"wrong_shape_rejected":true},"rope":{"source":"reference/rope_cos.bin,reference/rope_sin.bin","float_shape":[64,4],"ncnn_mat":[4,64],"bounds_checked":true}},
+  "accuracy":{"bthwc_max_abs_error":1.490116119e-07,"bthwc_mean_abs_error":2.105500163e-08,"nan_count":0,"inf_count":0},
+  "cache":{"size_after":5,"first_bundle_load_ms":1.4982,"second_run_max_difference":0},
+  "latency_ms":{"warmups":3,"iterations":10,"total_mean":2.84983,"total_min":2.4342,"total_max":3.5095,"pack_mean":0.03419,"contract_read_mean":0.27233,"head0_mean":0.57274,"head1_mean":0.53452,"head2_mean":0.57943,"head3_mean":0.55699,"merge_mean":0.02584,"projection_mean":0.03459,"unpack_mean":0.03182},
+  "baseline_regression":{"explicit_baseline_rejected":true,"unknown_hybrid_shape_rejected":true,"cache_after_rejections":0},
+  "overall_status":"PASS"
+}

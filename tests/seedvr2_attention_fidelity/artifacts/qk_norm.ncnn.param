@@ -1,0 +1,4 @@
+7767517
+2 2
+Input                    in0                      0 1 in0
+LayerNorm                ln_0                     1 1 in0 out0 0=8 1=1.000000e-5 2=1

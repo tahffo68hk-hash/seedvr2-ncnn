@@ -1,0 +1,9 @@
+{
+  "max_abs_error": null,
+  "mean_abs_error": null,
+  "max_relative_error": null,
+  "nan_count": null,
+  "inf_count": null,
+  "status": "BLOCKED",
+  "reason": "ncnn CPU runner loads the pnnx core graph and accepts input, but crashes during extract() with Windows exit code -1073741819; no output tensor exists to compare."
+}

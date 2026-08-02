@@ -1,0 +1,31 @@
+7767517
+29 28
+pnnx.Input               pnnx_input_0             0 1 0 #0=(1,2,8,8,32)f32
+Tensor.reshape           Tensor.reshape_14        1 1 0 1 shape=(1,1,2,2,4,2,4,32) $input=0 #0=(1,2,8,8,32)f32 #1=(1,1,2,2,4,2,4,32)f32
+Tensor.permute           Tensor.permute_12        1 1 1 2 dims=(0,1,3,5,2,4,6,7) $input=1 #1=(1,1,2,2,4,2,4,32)f32 #2=(1,1,2,2,2,4,4,32)f32
+Tensor.reshape           Tensor.reshape_15        1 1 2 3 shape=(4,32,32) $input=2 #2=(1,1,2,2,2,4,4,32)f32 #3=(4,32,32)f32
+nn.Linear                attention.wq             1 1 3 4 bias=True in_features=32 out_features=32 @bias=(32)f32 @weight=(32,32)f32 #3=(4,32,32)f32 #4=(4,32,32)f32
+Tensor.reshape           Tensor.reshape_16        1 1 4 5 shape=(4,32,4,8) $input=4 #4=(4,32,32)f32 #5=(4,32,4,8)f32
+torch.transpose          torch.transpose_26       1 1 5 6 dim0=1 dim1=2 $input=5 #5=(4,32,4,8)f32 #6=(4,4,32,8)f32
+nn.Linear                attention.wk             1 1 3 7 bias=True in_features=32 out_features=32 @bias=(32)f32 @weight=(32,32)f32 #3=(4,32,32)f32 #7=(4,32,32)f32
+Tensor.reshape           Tensor.reshape_17        1 1 7 8 shape=(4,32,4,8) $input=7 #7=(4,32,32)f32 #8=(4,32,4,8)f32
+torch.transpose          torch.transpose_27       1 1 8 9 dim0=1 dim1=2 $input=8 #8=(4,32,4,8)f32 #9=(4,4,32,8)f32
+nn.Linear                attention.wv             1 1 3 10 bias=True in_features=32 out_features=32 @bias=(32)f32 @weight=(32,32)f32 #3=(4,32,32)f32 #10=(4,32,32)f32
+Tensor.reshape           Tensor.reshape_18        1 1 10 11 shape=(4,32,4,8) $input=10 #10=(4,32,32)f32 #11=(4,32,4,8)f32
+torch.transpose          torch.transpose_28       1 1 11 12 dim0=1 dim1=2 $input=11 #11=(4,32,4,8)f32 #12=(4,4,32,8)f32
+Tensor.reshape           Tensor.reshape_19        1 1 6 13 shape=(16,32,8) $input=6 #6=(4,4,32,8)f32 #13=(16,32,8)f32
+Tensor.reshape           Tensor.reshape_20        1 1 9 14 shape=(16,32,8) $input=9 #9=(4,4,32,8)f32 #14=(16,32,8)f32
+Tensor.reshape           Tensor.reshape_21        1 1 12 15 shape=(16,32,8) $input=12 #12=(4,4,32,8)f32 #15=(16,32,8)f32
+torch.transpose          torch.transpose_29       1 1 14 16 dim0=-2 dim1=-1 $input=14 #14=(16,32,8)f32 #16=(16,8,32)f32
+torch.matmul             torch.matmul_31          2 1 13 16 17 $input=13 $other=16 #13=(16,32,8)f32 #16=(16,8,32)f32 #17=(16,32,32)f32
+pnnx.Expression          pnnx_expr_31             1 1 17 18 expr=mul(@0,0.353553385) #17=(16,32,32)f32 #18=(16,32,32)f32
+F.softmax                F.softmax_33             1 1 18 19 dim=-1 $input=18 #18=(16,32,32)f32 #19=(16,32,32)f32
+torch.matmul             torch.matmul_32          2 1 19 15 20 $input=19 $other=15 #19=(16,32,32)f32 #15=(16,32,8)f32 #20=(16,32,8)f32
+Tensor.reshape           Tensor.reshape_22        1 1 20 21 shape=(4,4,32,8) $input=20 #20=(16,32,8)f32 #21=(4,4,32,8)f32
+torch.transpose          torch.transpose_30       1 1 21 22 dim0=1 dim1=2 $input=21 #21=(4,4,32,8)f32 #22=(4,32,4,8)f32
+Tensor.reshape           Tensor.reshape_23        1 1 22 23 shape=(4,32,32) $input=22 #22=(4,32,4,8)f32 #23=(4,32,32)f32
+nn.Linear                attention.wo             1 1 23 24 bias=True in_features=32 out_features=32 @bias=(32)f32 @weight=(32,32)f32 #23=(4,32,32)f32 #24=(4,32,32)f32
+Tensor.reshape           Tensor.reshape_24        1 1 24 25 shape=(1,1,2,2,2,4,4,32) $input=24 #24=(4,32,32)f32 #25=(1,1,2,2,2,4,4,32)f32
+Tensor.permute           Tensor.permute_13        1 1 25 26 dims=(0,1,4,2,5,3,6,7) $input=25 #25=(1,1,2,2,2,4,4,32)f32 #26=(1,1,2,2,4,2,4,32)f32
+Tensor.reshape           Tensor.reshape_25        1 1 26 27 shape=(1,2,8,8,32) $input=26 #26=(1,1,2,2,4,2,4,32)f32 #27=(1,2,8,8,32)f32
+pnnx.Output              pnnx_output_0            1 0 27 #27=(1,2,8,8,32)f32

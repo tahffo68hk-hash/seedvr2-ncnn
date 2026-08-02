@@ -1,0 +1,7 @@
+TorchScript full wrapper: PASS
+TorchScript ncnn core: PASS
+input_shape=(1, 2, 8, 8, 32)
+windows_shape=(4, 32, 32)
+qkv_shape=(4, 32, 96)
+output_shape=(1, 2, 8, 8, 32)
+parameters=4224

@@ -1,0 +1,25 @@
+{
+  "name": "core_444_grid_1x4x4",
+  "window": [
+    4,
+    4,
+    4
+  ],
+  "grid": [
+    1,
+    4,
+    4
+  ],
+  "padding_rule": "right-edge-to-window-multiple",
+  "tokens_per_window": 64,
+  "input_shape": [
+    1,
+    4,
+    16,
+    16,
+    32
+  ],
+  "dtype": "fp32",
+  "ncnn_param": "core_444_grid_1x4x4.ncnn.param",
+  "ncnn_bin": "core_444_grid_1x4x4.ncnn.bin"
+}

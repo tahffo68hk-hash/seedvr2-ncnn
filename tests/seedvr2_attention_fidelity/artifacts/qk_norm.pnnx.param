@@ -1,0 +1,5 @@
+7767517
+3 2
+pnnx.Input               pnnx_input_0             0 1 0 #0=(64,4,8)f32
+nn.LayerNorm             norm                     1 1 0 1 elementwise_affine=True eps=1.000000e-5 normalized_shape=(8) @bias=(8)f32 @weight=(8)f32 #0=(64,4,8)f32 #1=(64,4,8)f32
+pnnx.Output              pnnx_output_0            1 0 1 #1=(64,4,8)f32

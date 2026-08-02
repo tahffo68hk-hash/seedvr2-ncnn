@@ -1,0 +1,15 @@
+{
+  "input_shape": [
+    1,
+    2,
+    8,
+    8,
+    32
+  ],
+  "dtype": "float32",
+  "python_cpu_avg_ms": 0.30842499691061676,
+  "python_cpu_threads": 1,
+  "estimated_input_output_bytes": 32768,
+  "ncnn_cpu_avg_ms": null,
+  "ncnn_status": "BLOCKED: runtime access violation during extract()"
+}

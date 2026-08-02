@@ -1,0 +1,120 @@
+7767517
+118 136
+pnnx.Input               pnnx_input_0             0 1 0 #0=(4,64,32)f32
+pnnx.Input               pnnx_input_1             0 1 1 #1=(4,64,64)f32
+pnnx.Input               pnnx_input_2             0 1 2 #2=(64,4)f32
+pnnx.Input               pnnx_input_3             0 1 3 #3=(64,4)f32
+Tensor.reshape           Tensor.reshape_34        1 1 0 4 shape=(256,32) $input=0 #0=(4,64,32)f32 #4=(256,32)f32
+nn.Linear                qkv                      1 1 4 5 bias=True in_features=32 out_features=96 @bias=(96)f32 @weight=(96,32)f32 #4=(256,32)f32 #5=(256,96)f32
+Tensor.reshape           Tensor.reshape_35        1 1 5 6 shape=(4,64,96) $input=5 #5=(256,96)f32 #6=(4,64,96)f32
+torch.split              torch.split_105          1 3 6 7 8 9 dim=-1 split_size_or_sections=32 $tensor=6 #6=(4,64,96)f32 #7=(4,64,32)f32 #8=(4,64,32)f32 #9=(4,64,32)f32
+torch.tensor_split       Tensor.slice_166         1 4 7 10 11 12 13 dim=2 indices=(8,16,24) #7=(4,64,32)f32 #10=(4,64,8)f32 #11=(4,64,8)f32 #12=(4,64,8)f32 #13=(4,64,8)f32
+torch.tensor_split       Tensor.slice_167         1 4 8 14 15 16 17 dim=2 indices=(8,16,24) #8=(4,64,32)f32 #14=(4,64,8)f32 #15=(4,64,8)f32 #16=(4,64,8)f32 #17=(4,64,8)f32
+torch.tensor_split       Tensor.slice_168         1 4 9 18 19 20 21 dim=2 indices=(8,16,24) #9=(4,64,32)f32 #18=(4,64,8)f32 #19=(4,64,8)f32 #20=(4,64,8)f32 #21=(4,64,8)f32
+nn.LayerNorm             ln_0                     1 1 10 22 elementwise_affine=True eps=1.000000e-5 normalized_shape=(8) @bias=(8)f32 @weight=(8)f32 $input=10 #10=(4,64,8)f32 #22=(4,64,8)f32
+nn.LayerNorm             ln_1                     1 1 14 23 elementwise_affine=True eps=1.000000e-5 normalized_shape=(8) @bias=(8)f32 @weight=(8)f32 $input=14 #14=(4,64,8)f32 #23=(4,64,8)f32
+Tensor.repeat            Tensor.repeat_26         1 1 2 24 sizes=(4,1) $input=2 #2=(64,4)f32 #24=(256,4)f32
+Tensor.repeat            Tensor.repeat_27         1 1 3 25 sizes=(4,1) $input=3 #3=(64,4)f32 #25=(256,4)f32
+Tensor.reshape           Tensor.reshape_36        1 1 22 26 shape=(256,1,8) $input=22 #22=(4,64,8)f32 #26=(256,1,8)f32
+Tensor.reshape           Tensor.reshape_37        1 1 26 27 shape=(256,1,4,2) $input=26 #26=(256,1,8)f32 #27=(256,1,4,2)f32
+torch.unsqueeze          torch.unsqueeze_118      1 1 24 28 dim=1 $input=24 #24=(256,4)f32 #28=(256,1,4)f32
+torch.unsqueeze          torch.unsqueeze_119      1 1 25 29 dim=1 $input=25 #25=(256,4)f32 #29=(256,1,4)f32
+torch.unbind             Tensor.select_134        1 2 27 30 31 dim=3 #27=(256,1,4,2)f32 #30=(256,1,4)f32 #31=(256,1,4)f32
+pnnx.Expression          pnnx_expr_291            4 1 30 28 31 29 32 expr=sub(mul(@0,@1),mul(@2,@3)) #30=(256,1,4)f32 #28=(256,1,4)f32 #31=(256,1,4)f32 #29=(256,1,4)f32 #32=(256,1,4)f32
+pnnx.Expression          pnnx_expr_287            4 1 30 29 31 28 33 expr=add(mul(@0,@1),mul(@2,@3)) #30=(256,1,4)f32 #29=(256,1,4)f32 #31=(256,1,4)f32 #28=(256,1,4)f32 #33=(256,1,4)f32
+torch.stack              torch.stack_106          2 1 32 33 34 dim=-1 #32=(256,1,4)f32 #33=(256,1,4)f32 #34=(256,1,4,2)f32
+Tensor.reshape_as        Tensor.reshape_as_56     2 1 34 26 35 $input=34 $other=26 #34=(256,1,4,2)f32 #26=(256,1,8)f32 #35=(256,1,8)f32
+Tensor.reshape_as        Tensor.reshape_as_57     2 1 35 22 36 $input=35 $other=22 #35=(256,1,8)f32 #22=(4,64,8)f32 #36=(4,64,8)f32
+Tensor.reshape           Tensor.reshape_38        1 1 23 37 shape=(256,1,8) $input=23 #23=(4,64,8)f32 #37=(256,1,8)f32
+Tensor.reshape           Tensor.reshape_39        1 1 37 38 shape=(256,1,4,2) $input=37 #37=(256,1,8)f32 #38=(256,1,4,2)f32
+torch.unbind             Tensor.select_138        1 2 38 39 40 dim=3 #38=(256,1,4,2)f32 #39=(256,1,4)f32 #40=(256,1,4)f32
+pnnx.Expression          pnnx_expr_268            4 1 39 28 40 29 41 expr=sub(mul(@0,@1),mul(@2,@3)) #39=(256,1,4)f32 #28=(256,1,4)f32 #40=(256,1,4)f32 #29=(256,1,4)f32 #41=(256,1,4)f32
+pnnx.Expression          pnnx_expr_264            4 1 39 29 40 28 42 expr=add(mul(@0,@1),mul(@2,@3)) #39=(256,1,4)f32 #29=(256,1,4)f32 #40=(256,1,4)f32 #28=(256,1,4)f32 #42=(256,1,4)f32
+torch.stack              torch.stack_107          2 1 41 42 43 dim=-1 #41=(256,1,4)f32 #42=(256,1,4)f32 #43=(256,1,4,2)f32
+Tensor.reshape_as        Tensor.reshape_as_58     2 1 43 37 44 $input=43 $other=37 #43=(256,1,4,2)f32 #37=(256,1,8)f32 #44=(256,1,8)f32
+Tensor.reshape_as        Tensor.reshape_as_59     2 1 44 23 45 $input=44 $other=23 #44=(256,1,8)f32 #23=(4,64,8)f32 #45=(4,64,8)f32
+torch.transpose          torch.transpose_114      1 1 45 46 dim0=-2 dim1=-1 $input=45 #45=(4,64,8)f32 #46=(4,8,64)f32
+torch.matmul             torch.matmul_186         2 1 36 46 47 $input=36 $other=46 #36=(4,64,8)f32 #46=(4,8,64)f32 #47=(4,64,64)f32
+pnnx.Expression          pnnx_expr_258            2 1 47 1 48 expr=add(mul(@0,0.353553385),@1) #47=(4,64,64)f32 #1=(4,64,64)f32 #48=(4,64,64)f32
+F.softmax                F.softmax_194            1 1 48 49 dim=-1 $input=48 #48=(4,64,64)f32 #49=(4,64,64)f32
+torch.matmul             torch.matmul_187         2 1 49 18 50 $input=49 $other=18 #49=(4,64,64)f32 #18=(4,64,8)f32 #50=(4,64,8)f32
+nn.LayerNorm             ln_2                     1 1 11 51 elementwise_affine=True eps=1.000000e-5 normalized_shape=(8) @bias=(8)f32 @weight=(8)f32 $input=11 #11=(4,64,8)f32 #51=(4,64,8)f32
+nn.LayerNorm             ln_3                     1 1 15 52 elementwise_affine=True eps=1.000000e-5 normalized_shape=(8) @bias=(8)f32 @weight=(8)f32 $input=15 #15=(4,64,8)f32 #52=(4,64,8)f32
+Tensor.reshape           Tensor.reshape_40        1 1 51 53 shape=(256,1,8) $input=51 #51=(4,64,8)f32 #53=(256,1,8)f32
+Tensor.reshape           Tensor.reshape_41        1 1 53 54 shape=(256,1,4,2) $input=53 #53=(256,1,8)f32 #54=(256,1,4,2)f32
+torch.unbind             Tensor.select_142        1 2 54 55 56 dim=3 #54=(256,1,4,2)f32 #55=(256,1,4)f32 #56=(256,1,4)f32
+pnnx.Expression          pnnx_expr_222            4 1 55 28 56 29 57 expr=sub(mul(@0,@1),mul(@2,@3)) #55=(256,1,4)f32 #28=(256,1,4)f32 #56=(256,1,4)f32 #29=(256,1,4)f32 #57=(256,1,4)f32
+pnnx.Expression          pnnx_expr_218            4 1 55 29 56 28 58 expr=add(mul(@0,@1),mul(@2,@3)) #55=(256,1,4)f32 #29=(256,1,4)f32 #56=(256,1,4)f32 #28=(256,1,4)f32 #58=(256,1,4)f32
+torch.stack              torch.stack_108          2 1 57 58 59 dim=-1 #57=(256,1,4)f32 #58=(256,1,4)f32 #59=(256,1,4,2)f32
+Tensor.reshape_as        Tensor.reshape_as_60     2 1 59 53 60 $input=59 $other=53 #59=(256,1,4,2)f32 #53=(256,1,8)f32 #60=(256,1,8)f32
+Tensor.reshape_as        Tensor.reshape_as_61     2 1 60 51 61 $input=60 $other=51 #60=(256,1,8)f32 #51=(4,64,8)f32 #61=(4,64,8)f32
+Tensor.reshape           Tensor.reshape_42        1 1 52 62 shape=(256,1,8) $input=52 #52=(4,64,8)f32 #62=(256,1,8)f32
+Tensor.reshape           Tensor.reshape_43        1 1 62 63 shape=(256,1,4,2) $input=62 #62=(256,1,8)f32 #63=(256,1,4,2)f32
+torch.unbind             Tensor.select_146        1 2 63 64 65 dim=3 #63=(256,1,4,2)f32 #64=(256,1,4)f32 #65=(256,1,4)f32
+pnnx.Expression          pnnx_expr_199            4 1 64 28 65 29 66 expr=sub(mul(@0,@1),mul(@2,@3)) #64=(256,1,4)f32 #28=(256,1,4)f32 #65=(256,1,4)f32 #29=(256,1,4)f32 #66=(256,1,4)f32
+pnnx.Expression          pnnx_expr_195            4 1 64 29 65 28 67 expr=add(mul(@0,@1),mul(@2,@3)) #64=(256,1,4)f32 #29=(256,1,4)f32 #65=(256,1,4)f32 #28=(256,1,4)f32 #67=(256,1,4)f32
+torch.stack              torch.stack_109          2 1 66 67 68 dim=-1 #66=(256,1,4)f32 #67=(256,1,4)f32 #68=(256,1,4,2)f32
+Tensor.reshape_as        Tensor.reshape_as_62     2 1 68 62 69 $input=68 $other=62 #68=(256,1,4,2)f32 #62=(256,1,8)f32 #69=(256,1,8)f32
+Tensor.reshape_as        Tensor.reshape_as_63     2 1 69 52 70 $input=69 $other=52 #69=(256,1,8)f32 #52=(4,64,8)f32 #70=(4,64,8)f32
+torch.transpose          torch.transpose_115      1 1 70 71 dim0=-2 dim1=-1 $input=70 #70=(4,64,8)f32 #71=(4,8,64)f32
+torch.matmul             torch.matmul_188         2 1 61 71 72 $input=61 $other=71 #61=(4,64,8)f32 #71=(4,8,64)f32 #72=(4,64,64)f32
+pnnx.Expression          pnnx_expr_187            2 1 72 1 73 expr=add(mul(@0,0.353553385),@1) #72=(4,64,64)f32 #1=(4,64,64)f32 #73=(4,64,64)f32
+F.softmax                F.softmax_195            1 1 73 74 dim=-1 $input=73 #73=(4,64,64)f32 #74=(4,64,64)f32
+torch.matmul             torch.matmul_189         2 1 74 19 75 $input=74 $other=19 #74=(4,64,64)f32 #19=(4,64,8)f32 #75=(4,64,8)f32
+nn.LayerNorm             ln_4                     1 1 12 76 elementwise_affine=True eps=1.000000e-5 normalized_shape=(8) @bias=(8)f32 @weight=(8)f32 $input=12 #12=(4,64,8)f32 #76=(4,64,8)f32
+nn.LayerNorm             ln_5                     1 1 16 77 elementwise_affine=True eps=1.000000e-5 normalized_shape=(8) @bias=(8)f32 @weight=(8)f32 $input=16 #16=(4,64,8)f32 #77=(4,64,8)f32
+Tensor.reshape           Tensor.reshape_44        1 1 76 78 shape=(256,1,8) $input=76 #76=(4,64,8)f32 #78=(256,1,8)f32
+Tensor.reshape           Tensor.reshape_45        1 1 78 79 shape=(256,1,4,2) $input=78 #78=(256,1,8)f32 #79=(256,1,4,2)f32
+torch.unbind             Tensor.select_150        1 2 79 80 81 dim=3 #79=(256,1,4,2)f32 #80=(256,1,4)f32 #81=(256,1,4)f32
+pnnx.Expression          pnnx_expr_151            4 1 80 28 81 29 82 expr=sub(mul(@0,@1),mul(@2,@3)) #80=(256,1,4)f32 #28=(256,1,4)f32 #81=(256,1,4)f32 #29=(256,1,4)f32 #82=(256,1,4)f32
+pnnx.Expression          pnnx_expr_147            4 1 80 29 81 28 83 expr=add(mul(@0,@1),mul(@2,@3)) #80=(256,1,4)f32 #29=(256,1,4)f32 #81=(256,1,4)f32 #28=(256,1,4)f32 #83=(256,1,4)f32
+torch.stack              torch.stack_110          2 1 82 83 84 dim=-1 #82=(256,1,4)f32 #83=(256,1,4)f32 #84=(256,1,4,2)f32
+Tensor.reshape_as        Tensor.reshape_as_64     2 1 84 78 85 $input=84 $other=78 #84=(256,1,4,2)f32 #78=(256,1,8)f32 #85=(256,1,8)f32
+Tensor.reshape_as        Tensor.reshape_as_65     2 1 85 76 86 $input=85 $other=76 #85=(256,1,8)f32 #76=(4,64,8)f32 #86=(4,64,8)f32
+Tensor.reshape           Tensor.reshape_46        1 1 77 87 shape=(256,1,8) $input=77 #77=(4,64,8)f32 #87=(256,1,8)f32
+Tensor.reshape           Tensor.reshape_47        1 1 87 88 shape=(256,1,4,2) $input=87 #87=(256,1,8)f32 #88=(256,1,4,2)f32
+torch.unbind             Tensor.select_154        1 2 88 89 90 dim=3 #88=(256,1,4,2)f32 #89=(256,1,4)f32 #90=(256,1,4)f32
+pnnx.Expression          pnnx_expr_128            4 1 89 28 90 29 91 expr=sub(mul(@0,@1),mul(@2,@3)) #89=(256,1,4)f32 #28=(256,1,4)f32 #90=(256,1,4)f32 #29=(256,1,4)f32 #91=(256,1,4)f32
+pnnx.Expression          pnnx_expr_124            4 1 89 29 90 28 92 expr=add(mul(@0,@1),mul(@2,@3)) #89=(256,1,4)f32 #29=(256,1,4)f32 #90=(256,1,4)f32 #28=(256,1,4)f32 #92=(256,1,4)f32
+torch.stack              torch.stack_111          2 1 91 92 93 dim=-1 #91=(256,1,4)f32 #92=(256,1,4)f32 #93=(256,1,4,2)f32
+Tensor.reshape_as        Tensor.reshape_as_66     2 1 93 87 94 $input=93 $other=87 #93=(256,1,4,2)f32 #87=(256,1,8)f32 #94=(256,1,8)f32
+Tensor.reshape_as        Tensor.reshape_as_67     2 1 94 77 95 $input=94 $other=77 #94=(256,1,8)f32 #77=(4,64,8)f32 #95=(4,64,8)f32
+torch.transpose          torch.transpose_116      1 1 95 96 dim0=-2 dim1=-1 $input=95 #95=(4,64,8)f32 #96=(4,8,64)f32
+torch.matmul             torch.matmul_190         2 1 86 96 97 $input=86 $other=96 #86=(4,64,8)f32 #96=(4,8,64)f32 #97=(4,64,64)f32
+pnnx.Expression          pnnx_expr_116            2 1 97 1 98 expr=add(mul(@0,0.353553385),@1) #97=(4,64,64)f32 #1=(4,64,64)f32 #98=(4,64,64)f32
+F.softmax                F.softmax_196            1 1 98 99 dim=-1 $input=98 #98=(4,64,64)f32 #99=(4,64,64)f32
+torch.matmul             torch.matmul_191         2 1 99 20 100 $input=99 $other=20 #99=(4,64,64)f32 #20=(4,64,8)f32 #100=(4,64,8)f32
+nn.LayerNorm             ln_6                     1 1 13 101 elementwise_affine=True eps=1.000000e-5 normalized_shape=(8) @bias=(8)f32 @weight=(8)f32 $input=13 #13=(4,64,8)f32 #101=(4,64,8)f32
+nn.LayerNorm             ln_7                     1 1 17 102 elementwise_affine=True eps=1.000000e-5 normalized_shape=(8) @bias=(8)f32 @weight=(8)f32 $input=17 #17=(4,64,8)f32 #102=(4,64,8)f32
+Tensor.reshape           Tensor.reshape_48        1 1 101 103 shape=(256,1,8) $input=101 #101=(4,64,8)f32 #103=(256,1,8)f32
+Tensor.reshape           Tensor.reshape_49        1 1 103 104 shape=(256,1,4,2) $input=103 #103=(256,1,8)f32 #104=(256,1,4,2)f32
+torch.unbind             Tensor.select_158        1 2 104 105 106 dim=3 #104=(256,1,4,2)f32 #105=(256,1,4)f32 #106=(256,1,4)f32
+pnnx.Expression          pnnx_expr_79             4 1 105 28 106 29 107 expr=sub(mul(@0,@1),mul(@2,@3)) #105=(256,1,4)f32 #28=(256,1,4)f32 #106=(256,1,4)f32 #29=(256,1,4)f32 #107=(256,1,4)f32
+pnnx.Expression          pnnx_expr_75             4 1 105 29 106 28 108 expr=add(mul(@0,@1),mul(@2,@3)) #105=(256,1,4)f32 #29=(256,1,4)f32 #106=(256,1,4)f32 #28=(256,1,4)f32 #108=(256,1,4)f32
+torch.stack              torch.stack_112          2 1 107 108 109 dim=-1 #107=(256,1,4)f32 #108=(256,1,4)f32 #109=(256,1,4,2)f32
+Tensor.reshape_as        Tensor.reshape_as_68     2 1 109 103 110 $input=109 $other=103 #109=(256,1,4,2)f32 #103=(256,1,8)f32 #110=(256,1,8)f32
+Tensor.reshape_as        Tensor.reshape_as_69     2 1 110 101 111 $input=110 $other=101 #110=(256,1,8)f32 #101=(4,64,8)f32 #111=(4,64,8)f32
+Tensor.reshape           Tensor.reshape_50        1 1 102 112 shape=(256,1,8) $input=102 #102=(4,64,8)f32 #112=(256,1,8)f32
+Tensor.reshape           Tensor.reshape_51        1 1 112 113 shape=(256,1,4,2) $input=112 #112=(256,1,8)f32 #113=(256,1,4,2)f32
+torch.unbind             Tensor.select_162        1 2 113 114 115 dim=3 #113=(256,1,4,2)f32 #114=(256,1,4)f32 #115=(256,1,4)f32
+pnnx.Expression          pnnx_expr_56             4 1 114 28 115 29 116 expr=sub(mul(@0,@1),mul(@2,@3)) #114=(256,1,4)f32 #28=(256,1,4)f32 #115=(256,1,4)f32 #29=(256,1,4)f32 #116=(256,1,4)f32
+pnnx.Expression          pnnx_expr_52             4 1 114 29 115 28 117 expr=add(mul(@0,@1),mul(@2,@3)) #114=(256,1,4)f32 #29=(256,1,4)f32 #115=(256,1,4)f32 #28=(256,1,4)f32 #117=(256,1,4)f32
+torch.stack              torch.stack_113          2 1 116 117 118 dim=-1 #116=(256,1,4)f32 #117=(256,1,4)f32 #118=(256,1,4,2)f32
+Tensor.reshape_as        Tensor.reshape_as_70     2 1 118 112 119 $input=118 $other=112 #118=(256,1,4,2)f32 #112=(256,1,8)f32 #119=(256,1,8)f32
+Tensor.reshape_as        Tensor.reshape_as_71     2 1 119 102 120 $input=119 $other=102 #119=(256,1,8)f32 #102=(4,64,8)f32 #120=(4,64,8)f32
+torch.transpose          torch.transpose_117      1 1 120 121 dim0=-2 dim1=-1 $input=120 #120=(4,64,8)f32 #121=(4,8,64)f32
+torch.matmul             torch.matmul_192         2 1 111 121 122 $input=111 $other=121 #111=(4,64,8)f32 #121=(4,8,64)f32 #122=(4,64,64)f32
+pnnx.Expression          pnnx_expr_44             2 1 122 1 123 expr=add(mul(@0,0.353553385),@1) #122=(4,64,64)f32 #1=(4,64,64)f32 #123=(4,64,64)f32
+F.softmax                F.softmax_197            1 1 123 124 dim=-1 $input=123 #123=(4,64,64)f32 #124=(4,64,64)f32
+torch.matmul             torch.matmul_193         2 1 124 21 125 $input=124 $other=21 #124=(4,64,64)f32 #21=(4,64,8)f32 #125=(4,64,8)f32
+Tensor.reshape           Tensor.reshape_52        1 1 50 126 shape=(256,8) $input=50 #50=(4,64,8)f32 #126=(256,8)f32
+nn.Linear                F_linear_0               1 1 126 127 bias=False in_features=8 out_features=32 @weight=(32,8)f32 $input=126 #126=(256,8)f32 #127=(256,32)f32
+Tensor.reshape           Tensor.reshape_53        1 1 75 128 shape=(256,8) $input=75 #75=(4,64,8)f32 #128=(256,8)f32
+nn.Linear                F_linear_1               1 1 128 129 bias=False in_features=8 out_features=32 @weight=(32,8)f32 $input=128 #128=(256,8)f32 #129=(256,32)f32
+Tensor.reshape           Tensor.reshape_54        1 1 100 130 shape=(256,8) $input=100 #100=(4,64,8)f32 #130=(256,8)f32
+nn.Linear                F_linear_2               1 1 130 131 bias=False in_features=8 out_features=32 @weight=(32,8)f32 $input=130 #130=(256,8)f32 #131=(256,32)f32
+Tensor.reshape           Tensor.reshape_55        1 1 125 132 shape=(256,8) $input=125 #125=(4,64,8)f32 #132=(256,8)f32
+nn.Linear                F_linear_3               1 1 132 133 bias=True in_features=8 out_features=32 @bias=(32)f32 @weight=(32,8)f32 $input=132 #132=(256,8)f32 #133=(256,32)f32
+pnnx.Expression          pnnx_expr_0              4 1 127 129 131 133 134 expr=add(add(add(@0,@1),@2),@3) #127=(256,32)f32 #129=(256,32)f32 #131=(256,32)f32 #133=(256,32)f32 #134=(256,32)f32
+Tensor.reshape_as        Tensor.reshape_as_72     2 1 134 0 135 $input=134 $other=0 #134=(256,32)f32 #0=(4,64,32)f32 #135=(4,64,32)f32
+pnnx.Output              pnnx_output_0            1 0 135 #135=(4,64,32)f32

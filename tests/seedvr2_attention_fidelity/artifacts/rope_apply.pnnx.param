@@ -1,0 +1,15 @@
+7767517
+13 13
+pnnx.Input               pnnx_input_0             0 1 0 #0=(64,4,8)f32
+pnnx.Input               pnnx_input_1             0 1 1 #1=(64,4)f32
+Tensor.reshape           Tensor.reshape_2         1 1 0 2 shape=(64,4,4,2) $input=0 #0=(64,4,8)f32 #2=(64,4,4,2)f32
+pnnx.Expression          pnnx_expr_14             1 1 1 3 expr=cos(@0) #1=(64,4)f32 #3=(64,4)f32
+torch.unsqueeze          torch.unsqueeze_7        1 1 3 4 dim=1 $input=3 #3=(64,4)f32 #4=(64,1,4)f32
+pnnx.Expression          pnnx_expr_13             1 1 1 5 expr=sin(@0) #1=(64,4)f32 #5=(64,4)f32
+torch.unsqueeze          torch.unsqueeze_8        1 1 5 6 dim=1 $input=5 #5=(64,4)f32 #6=(64,1,4)f32
+torch.unbind             Tensor.select_9          1 2 2 7 8 dim=3 #2=(64,4,4,2)f32 #7=(64,4,4)f32 #8=(64,4,4)f32
+pnnx.Expression          pnnx_expr_6              4 1 7 4 8 6 9 expr=sub(mul(@0,@1),mul(@2,@3)) #7=(64,4,4)f32 #4=(64,1,4)f32 #8=(64,4,4)f32 #6=(64,1,4)f32 #9=(64,4,4)f32
+pnnx.Expression          pnnx_expr_2              4 1 7 6 8 4 10 expr=add(mul(@0,@1),mul(@2,@3)) #7=(64,4,4)f32 #6=(64,1,4)f32 #8=(64,4,4)f32 #4=(64,1,4)f32 #10=(64,4,4)f32
+torch.stack              torch.stack_6            2 1 9 10 11 dim=-1 #9=(64,4,4)f32 #10=(64,4,4)f32 #11=(64,4,4,2)f32
+Tensor.reshape_as        Tensor.reshape_as_3      2 1 11 0 12 $input=11 $other=0 #11=(64,4,4,2)f32 #0=(64,4,8)f32 #12=(64,4,8)f32
+pnnx.Output              pnnx_output_0            1 0 12 #12=(64,4,8)f32

@@ -1,0 +1,22 @@
+# Local environments and generated build trees
+.conda/
+.conda-cuda/
+build/
+**/CMakeFiles/
+**/.ninja_*
+*.pdb
+*.obj
+__pycache__/
+*.pyc
+
+# Top-level conversion scratch outputs
+/linear_relu.ncnn.*
+/linear_relu.optimized.*
+/linear_relu.pnnx.*
+/linear_relu.pt
+
+# Generated model intermediates and local test outputs
+tests/**/*.pt
+tests/**/*.pt2
+tests/**/*.pnnx.bin
+tests/**/reports/

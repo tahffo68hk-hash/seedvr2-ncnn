@@ -1,0 +1,39 @@
+#include "hybrid_attention_runtime.h"
+#include <algorithm>
+#include <array>
+#include <chrono>
+#include <cmath>
+#include <filesystem>
+#include <fstream>
+#include <iomanip>
+#include <iostream>
+namespace fs=std::filesystem; using namespace attention_dispatcher;
+struct ErrorStats { float maximum=0; double mean=0; size_t nan=0, inf=0; };
+static bool read(const fs::path& p,std::vector<float>& v,size_t n) { std::ifstream f(p,std::ios::binary);v.resize(n);f.read(reinterpret_cast<char*>(v.data()),static_cast<std::streamsize>(n*sizeof(float)));return f.gcount()==static_cast<std::streamsize>(n*sizeof(float)); }
+static ErrorStats compare(const std::vector<float>& a,const fs::path& p) { std::vector<float>b; ErrorStats s;if(!read(p,b,a.size())) {s.maximum=INFINITY;return s;}for(size_t i=0;i<a.size();++i){const float d=std::fabs(a[i]-b[i]);s.maximum=std::max(s.maximum,d);s.mean+=d;s.nan+=std::isnan(a[i]);s.inf+=std::isinf(a[i]);}s.mean/=a.size();return s; }
+static bool emit(const char* name,const ErrorStats&s) {std::cout<<name<<" max_abs_error="<<s.maximum<<" mean_abs_error="<<s.mean<<" nan_count="<<s.nan<<" inf_count="<<s.inf<<'\n';return s.maximum<1e-4f&&!s.nan&&!s.inf;}
+static bool finite(const std::vector<float>& v){return std::all_of(v.begin(),v.end(),[](float x){return std::isfinite(x);});}
+int main(int argc,char**argv)
+{
+ if(argc!=3){std::cerr<<"usage: hybrid_runtime_validation <baseline_root> <fidelity_root>\n";return 2;}
+ ArtifactRegistry reg;std::string e;if(!reg.scan(std::vector<fs::path>{argv[1],argv[2]},e)){std::cerr<<e<<'\n';return 3;}
+ const fs::path d=fs::path(argv[2])/"hybrid_fidelity_ln_rope444_grid_1x2x2";std::vector<float>in;if(!read(d/"reference/input.bin",in,8192))return 4;
+ NcnnModelCache cache; AttentionRequest q{1,4,8,8,32,"fp32","fidelity_ln_rope3d_hybrid"}; bool ok=true;
+ // A baseline key may be registered, but this executor must never load it as a hybrid bundle.
+ AttentionRequest baseline{1,4,8,8,32,"fp32","baseline"};auto baseline_result=run_hybrid_attention(baseline,in,reg,cache);ok&=!baseline_result.success&&baseline_result.error_message=="executor requires staged_host_head_merge"&&cache.size()==0;
+ AttentionRequest unknown{1,4,9,8,32,"fp32","fidelity_ln_rope3d_hybrid"};auto unknown_result=run_hybrid_attention(unknown,std::vector<float>(1*4*9*8*32),reg,cache);ok&=!unknown_result.success&&unknown_result.error_message.rfind("lookup:",0)==0&&cache.size()==0;
+ auto r1=run_hybrid_attention(q,in,reg,cache);if(!r1.success){std::cerr<<r1.error_message<<'\n';return 5;} ok&=r1.selected_artifact=="hybrid_fidelity_ln_rope444_grid_1x2x2";
+ std::array<ErrorStats,4> heads;for(int h=0;h<4;++h){heads[h]=compare(r1.head_outputs[h],d/("reference/head"+std::to_string(h)+".bin"));ok&=emit(("head"+std::to_string(h)).c_str(),heads[h]);}
+ const ErrorStats merged=compare(r1.merged_output,d/"reference/merged.bin"), projection=compare(r1.projection_output,d/"reference/projection_2d.bin"), windows=compare(r1.windows_output,d/"reference/windows_output.bin"), bthwc=compare(r1.bthwc_output,d/"reference/bthwc_output.bin");ok&=emit("merged",merged)&&emit("projection",projection)&&emit("windows",windows)&&emit("bthwc",bthwc);
+ // The exported mask is [4,64,64] with valid_tokens=60. A zero mask stays finite but is deliberately inaccurate.
+ std::vector<float>zero_mask(4*64*64,0.f);HybridRuntimeOptions wrong_mask;wrong_mask.mask_override=&zero_mask;auto zero_result=run_hybrid_attention(q,in,reg,cache,wrong_mask);const ErrorStats zero_error=zero_result.success?compare(zero_result.bthwc_output,d/"reference/bthwc_output.bin"):ErrorStats{INFINITY};ok&=zero_result.success&&finite(zero_result.bthwc_output)&&zero_error.maximum>1e-4f;
+ std::vector<float>bad_mask(1,0.f);HybridRuntimeOptions wrong_shape;wrong_shape.mask_override=&bad_mask;auto shape_result=run_hybrid_attention(q,in,reg,cache,wrong_shape);ok&=!shape_result.success&&shape_result.error_message.find("mask expected_floats=16384 actual_floats=1")!=std::string::npos;
+ std::vector<float>bad_rope(1,0.f);HybridRuntimeOptions bad_rope_options;bad_rope_options.rope_cos_override=&bad_rope;auto rope_result=run_hybrid_attention(q,in,reg,cache,bad_rope_options);ok&=!rope_result.success&&rope_result.error_message.find("rope_cos expected_floats=256 actual_floats=1")!=std::string::npos;
+ auto r2=run_hybrid_attention(q,in,reg,cache);float diff=INFINITY;if(r2.success){diff=0;for(size_t i=0;i<r1.bthwc_output.size();++i)diff=std::max(diff,std::fabs(r1.bthwc_output[i]-r2.bthwc_output[i]));}ok&=r2.success&&cache.size()==5&&diff==0.f;
+ for(int i=0;i<3;++i) ok&=run_hybrid_attention(q,in,reg,cache).success;
+ std::array<double,10> totals{},packs{},contracts{},merges{},projections{},unpacks{};std::array<std::array<double,10>,4> head_times{};
+ for(int i=0;i<10;++i){auto r=run_hybrid_attention(q,in,reg,cache);ok&=r.success;totals[i]=r.timings.total_ms;packs[i]=r.timings.pack_ms;contracts[i]=r.timings.contract_read_ms;merges[i]=r.timings.merge_ms;projections[i]=r.timings.projection_ms;unpacks[i]=r.timings.unpack_ms;for(int h=0;h<4;++h)head_times[h][i]=r.timings.head_ms[h];}
+ auto mean=[](const auto& x){double v=0;for(double n:x)v+=n;return v/x.size();};auto min=[](const auto& x){return *std::min_element(x.begin(),x.end());};auto max=[](const auto& x){return *std::max_element(x.begin(),x.end());};
+ const fs::path report=fs::path(__FILE__).parent_path().parent_path().parent_path()/"reports"/"hybrid_fidelity_runtime_validation.json";fs::create_directories(report.parent_path());std::ofstream j(report);j<<std::setprecision(10)<<"{\n  \"request\":{\"input_shape\":[1,4,8,8,32],\"dtype\":\"fp32\",\"variant\":\"fidelity_ln_rope3d_hybrid\"},\n  \"artifact\":{\"name\":\""<<r1.selected_artifact<<"\",\"window\":[4,4,4],\"grid\":[1,2,2],\"execution\":\"staged_host_head_merge\"},\n  \"contracts\":{\"mask\":{\"source\":\"reference/mask.bin\",\"shape\":[4,64,64],\"valid_tokens\":60,\"zero_mask_finite\":"<<(zero_result.success&&finite(zero_result.bthwc_output)?"true":"false")<<",\"zero_mask_max_abs_error\":"<<zero_error.maximum<<",\"wrong_shape_rejected\":"<<(!shape_result.success?"true":"false")<<"},\"rope\":{\"source\":\"reference/rope_cos.bin,reference/rope_sin.bin\",\"float_shape\":[64,4],\"ncnn_mat\":[4,64],\"bounds_checked\":"<<(!rope_result.success?"true":"false")<<"}},\n  \"accuracy\":{\"bthwc_max_abs_error\":"<<bthwc.maximum<<",\"bthwc_mean_abs_error\":"<<bthwc.mean<<",\"nan_count\":"<<bthwc.nan<<",\"inf_count\":"<<bthwc.inf<<"},\n  \"cache\":{\"size_after\":"<<cache.size()<<",\"first_bundle_load_ms\":"<<r1.cache_stats.load_ms<<",\"second_run_max_difference\":"<<diff<<"},\n  \"latency_ms\":{\"warmups\":3,\"iterations\":10,\"total_mean\":"<<mean(totals)<<",\"total_min\":"<<min(totals)<<",\"total_max\":"<<max(totals)<<",\"pack_mean\":"<<mean(packs)<<",\"contract_read_mean\":"<<mean(contracts)<<",\"head0_mean\":"<<mean(head_times[0])<<",\"head1_mean\":"<<mean(head_times[1])<<",\"head2_mean\":"<<mean(head_times[2])<<",\"head3_mean\":"<<mean(head_times[3])<<",\"merge_mean\":"<<mean(merges)<<",\"projection_mean\":"<<mean(projections)<<",\"unpack_mean\":"<<mean(unpacks)<<"},\n  \"baseline_regression\":{\"explicit_baseline_rejected\":"<<(!baseline_result.success?"true":"false")<<",\"unknown_hybrid_shape_rejected\":"<<(!unknown_result.success?"true":"false")<<",\"cache_after_rejections\":0},\n  \"overall_status\":\""<<(ok?"PASS":"FAIL")<<"\"\n}\n";
+ std::cout<<"mask_contract reference_valid_tokens=60 zero_mask_max_abs_error="<<zero_error.maximum<<" wrong_shape="<<(!shape_result.success?"PASS":"FAIL")<<" rope_bounds="<<(!rope_result.success?"PASS":"FAIL")<<'\n';std::cout<<"benchmark_ms warmups=3 iterations=10 total_mean="<<mean(totals)<<" total_min="<<min(totals)<<" total_max="<<max(totals)<<'\n';std::cout<<"hybrid_runtime_validation="<<(ok?"PASS":"FAIL")<<" cache_size="<<cache.size()<<" second_run_max_difference="<<diff<<" report="<<report.string()<<'\n';return ok?0:6;
+}

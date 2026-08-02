@@ -1,0 +1,37 @@
+TorchScript: PASS
+torch.export: PASS
+input_shape=(1, 2, 8, 8, 32)
+output_shape=(1, 2, 8, 8, 32)
+parameters=4224
+core_input_shape=(4, 32, 32)
+core_trace=adaptive_window_core_trace.pt
+export_core_trace=adaptive_window_export_core_trace.pt
+torch_export_call_functions:
+aten.reshape.default
+aten.permute.default
+aten.reshape.default
+aten.linear.default
+aten.reshape.default
+aten.transpose.int
+aten.linear.default
+aten.reshape.default
+aten.transpose.int
+aten.linear.default
+aten.reshape.default
+aten.transpose.int
+aten.reshape.default
+aten.reshape.default
+aten.reshape.default
+aten.transpose.int
+aten.matmul.default
+aten.mul.Tensor
+aten.softmax.int
+aten.matmul.default
+aten.reshape.default
+aten.reshape.default
+aten.transpose.int
+aten.reshape.default
+aten.linear.default
+aten.reshape.default
+aten.permute.default
+aten.reshape.default

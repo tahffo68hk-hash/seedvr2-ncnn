@@ -1,0 +1,7 @@
+TorchScript qk_norm: PASS
+TorchScript rope_apply: PASS
+TorchScript qkv_norm_rope: PASS
+tokens_shape=(64, 4, 8)
+phases_shape=(64, 4)
+windows_shape=(4, 64, 32)
+output_shape=(1, 4, 8, 8, 32)

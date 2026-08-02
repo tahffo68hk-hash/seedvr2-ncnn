@@ -1,0 +1,28 @@
+7767517
+26 37
+Input                    in0                      0 1 in0
+Split                    splitncnn_0              1 3 in0 1 2 3
+InnerProduct             linear_4                 1 1 3 4 0=32 1=1 2=1024
+InnerProduct             linear_5                 1 1 2 5 0=32 1=1 2=1024
+InnerProduct             linear_6                 1 1 1 6 0=32 1=1 2=1024
+Slice                    split_0                  1 4 4 7 8 9 10 -23300=4,8,8,8,-233 1=2
+Slice                    split_1                  1 4 5 11 12 13 14 -23300=4,8,8,8,-233 1=2
+Slice                    split_2                  1 4 6 15 16 17 18 -23300=4,8,8,8,-233 1=2
+MatMul                   matmultransb_0           2 1 7 11 19 0=1
+BinaryOp                 mul_0                    1 1 19 20 0=2 1=1 2=0.353553385
+Softmax                  softmax_0                1 1 20 21 0=2 1=1
+MatMul                   matmul_9                 2 1 21 15 22
+MatMul                   matmultransb_1           2 1 8 12 23 0=1
+BinaryOp                 mul_1                    1 1 23 24 0=2 1=1 2=0.353553385
+Softmax                  softmax_1                1 1 24 25 0=2 1=1
+MatMul                   matmul_11                2 1 25 16 26
+MatMul                   matmultransb_2           2 1 9 13 27 0=1
+BinaryOp                 mul_2                    1 1 27 28 0=2 1=1 2=0.353553385
+Softmax                  softmax_2                1 1 28 29 0=2 1=1
+MatMul                   matmul_13                2 1 29 17 30
+MatMul                   matmultransb_3           2 1 10 14 31 0=1
+BinaryOp                 mul_3                    1 1 31 32 0=2 1=1 2=0.353553385
+Softmax                  softmax_3                1 1 32 33 0=2 1=1
+MatMul                   matmul_15                2 1 33 18 34
+Concat                   cat_0                    4 1 22 26 30 34 35 0=2
+InnerProduct             linear_7                 1 1 35 out0 0=32 1=1 2=1024

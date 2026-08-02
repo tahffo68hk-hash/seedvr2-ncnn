@@ -1,0 +1,1 @@
+{'original_shape': (1, 4, 17, 17, 32), 'padded_shape': (1, 4, 20, 20, 32), 'window': (4, 4, 4), 'window_t': 4, 'window_h': 4, 'window_w': 4, 'grid': (1, 5, 5), 'num_windows': 25, 'tokens_per_window': 64, 'padding': (0, 3, 3)}

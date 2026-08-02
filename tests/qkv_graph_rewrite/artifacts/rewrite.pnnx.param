@@ -1,0 +1,7 @@
+7767517
+5 4
+pnnx.Input               pnnx_input_0             0 1 0 #0=(4,32,32)f32
+Tensor.reshape           Tensor.reshape_3         1 1 0 1 shape=(128,32) $input=0 #0=(4,32,32)f32 #1=(128,32)f32
+nn.Linear                proj                     1 1 1 2 bias=True in_features=32 out_features=96 @bias=(96)f32 @weight=(96,32)f32 #1=(128,32)f32 #2=(128,96)f32
+Tensor.reshape           Tensor.reshape_4         1 1 2 3 shape=(4,32,96) $input=2 #2=(128,96)f32 #3=(4,32,96)f32
+pnnx.Output              pnnx_output_0            1 0 3 #3=(4,32,96)f32

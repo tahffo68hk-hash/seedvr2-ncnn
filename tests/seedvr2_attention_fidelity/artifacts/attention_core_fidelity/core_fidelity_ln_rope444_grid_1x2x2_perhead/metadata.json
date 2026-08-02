@@ -1,0 +1,14 @@
+{
+  "name": "core_fidelity_ln_rope444_grid_1x2x2_perhead",
+  "window": [4, 4, 4],
+  "grid": [1, 2, 2],
+  "padding_rule": "right-edge-to-window-multiple",
+  "tokens_per_window": 64,
+  "input_shape": [1, 4, 8, 8, 32],
+  "dtype": "fp32",
+  "ncnn_param": "model.ncnn.param",
+  "ncnn_bin": "model.ncnn.bin",
+  "variant": "fidelity_ln_rope3d_perhead",
+  "features": {"qk_norm": "layernorm", "rope3d": "host_tensor", "head_execution": "static_per_head", "masked_attention": true, "output_projection": true},
+  "inputs": ["input", "mask", "rope_cos", "rope_sin"]
+}
