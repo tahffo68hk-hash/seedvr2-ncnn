@@ -10,16 +10,17 @@ artifacts. The variant lookup does not fall back to LayerNorm.
 
 The Registry-driven runtime loads five models and completes window packing,
 four head extracts, host merge, projection, reverse/crop, and cache reuse. The
-current RMS runtime is **PARTIAL/BLOCKED** because the final head errors exceed
-`1e-4`:
+artifact is now **PASS** after every ncnn model was regenerated with pnnx
+`fp16=0`; the earlier `fp16=1` default quantized the QKV/projection weights.
 
 | stage | max abs error |
 | --- | ---: |
-| head0 | 2.95371e-4 |
-| head1 | 3.47316e-4 |
-| head2 | 3.22342e-4 |
-| head3 | 3.12507e-4 |
-| merged | 3.47316e-4 |
+| head0 | 1.93715e-7 |
+| head1 | 1.49012e-7 |
+| head2 | 1.78814e-7 |
+| head3 | 1.49012e-7 |
+| merged | 1.93715e-7 |
 
-Outputs remain finite and repeated cached runs are deterministic. LayerNorm
-hybrid and baseline A-E validation remain unchanged and are not replaced.
+Final BTHWC is `1.78814e-7`, with zero NaN/Inf and zero repeat-run difference.
+LayerNorm hybrid and baseline A-E validation remain unchanged and are not
+replaced.

@@ -60,7 +60,7 @@ the native `rsqrt` rewrite is retained as a documented numerical limitation.
 
 The RMS staged artifact is discovered by `ArtifactRegistry`, loads five ncnn
 models through the existing cache, and completes the host mask/RoPE, head
-merge, reverse/crop and BTHWC pipeline. However, full attention currently
-measures about `3.47e-4` maximum error at merged-head output, above the Phase 8
-`1e-4` gate. The artifact is therefore `PARTIAL_BLOCKED`, not production-ready.
-See `rmsnorm-pnnx-graph-analysis.md` and `rms-hybrid-runtime-report.md`.
+merge, reverse/crop and BTHWC pipeline. Phase 8.1 traced the former error to
+pnnx default FP16 weight conversion in QKV/projection, not RMSNorm. Re-export
+with `fp16=0` yields `1.78814e-7` final BTHWC error, below the Phase 8 `1e-4`
+gate. See `rms-hybrid-actual-graph.md` and `rms-hybrid-runtime-report.md`.

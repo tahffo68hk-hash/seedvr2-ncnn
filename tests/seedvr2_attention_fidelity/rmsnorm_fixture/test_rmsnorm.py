@@ -41,6 +41,23 @@ class RMSNormFixtureTests(unittest.TestCase):
         self.assertTrue(torch.allclose(output[2, 19].square().mean(), torch.tensor(1.0), atol=1.0e-5))
         self.assertEqual(model.bias, None)
 
+    def test_single_channel_and_window_amplitudes_do_not_mix_statistics(self):
+        model = RMSNormReference(8, eps=1.0e-5, weight=torch.ones(8))
+        values = torch.zeros(3, 4, 8)
+        values[0, 0, 0] = 3.0
+        values[0, 1, 0] = 6.0
+        values[1, 0, 0] = -9.0
+        output = model(values)
+        for window, token, amplitude in ((0, 0, 3.0), (0, 1, 6.0), (1, 0, -9.0)):
+            expected = amplitude / torch.sqrt(torch.tensor(amplitude * amplitude / 8.0 + 1.0e-5))
+            self.assertTrue(torch.allclose(output[window, token, 0], expected, atol=1.0e-6))
+            self.assertTrue(torch.equal(output[window, token, 1:], torch.zeros(7)))
+        self.assertTrue(torch.equal(output[2], torch.zeros_like(output[2])))
+        changed = values.clone(); changed[0, 0, 0] = 30.0
+        changed_output = model(changed)
+        self.assertTrue(torch.equal(output[0, 1], changed_output[0, 1]))
+        self.assertTrue(torch.equal(output[1], changed_output[1]))
+
 
 if __name__ == "__main__":
     unittest.main()

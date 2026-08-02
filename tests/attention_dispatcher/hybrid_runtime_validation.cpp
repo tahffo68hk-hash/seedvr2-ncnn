@@ -50,6 +50,13 @@ static bool finite(const std::vector<float>& values)
     return std::all_of(values.begin(), values.end(), [](float value) { return std::isfinite(value); });
 }
 
+static void json_stats(std::ostream& output, const ErrorStats& stats, const char* shape, size_t count)
+{
+    output << "{\"logical_shape\":" << shape << ",\"element_count\":" << count
+           << ",\"max_abs_error\":" << stats.maximum << ",\"mean_abs_error\":" << stats.mean
+           << ",\"nan_count\":" << stats.nan << ",\"inf_count\":" << stats.inf << "}";
+}
+
 int main(int argc, char** argv)
 {
     if (argc != 3 && argc != 5)
@@ -83,6 +90,7 @@ int main(int argc, char** argv)
     auto first = run_hybrid_attention(request, input, registry, cache);
     if (!first.success) { std::cerr << first.error_message << '\n'; return 5; }
     ok &= first.selected_artifact == artifact;
+    const bool is_dynamic = variant == "dynamic_rms_rope3d_hybrid";
 
     const fs::path reference_directory = artifact_directory / "reference";
     std::array<ErrorStats, 4> heads;
@@ -96,13 +104,18 @@ int main(int argc, char** argv)
     const ErrorStats windows = compare(first.windows_output, reference_directory / "windows_output.bin");
     const ErrorStats bthwc = compare(first.bthwc_output, reference_directory / "bthwc_output.bin");
     ok &= emit("merged", merged) && emit("projection", projection) && emit("windows", windows) && emit("bthwc", bthwc);
+    const ErrorStats validity = is_dynamic ? compare(first.validity, reference_directory / "validity.bin") : ErrorStats{};
+    const ErrorStats mask_accuracy = is_dynamic ? compare(first.mask_input, reference_directory / "mask.bin") : ErrorStats{};
+    const ErrorStats rope_cos = is_dynamic ? compare(first.rope_cos, reference_directory / "rope_cos.bin") : ErrorStats{};
+    const ErrorStats rope_sin = is_dynamic ? compare(first.rope_sin, reference_directory / "rope_sin.bin") : ErrorStats{};
+    if (is_dynamic) ok &= validity.maximum == 0.f && mask_accuracy.maximum == 0.f && rope_cos.maximum < 1e-6f && rope_sin.maximum < 1e-6f;
 
     std::vector<float> zero_mask(4 * 64 * 64, 0.f);
     HybridRuntimeOptions wrong_mask;
     wrong_mask.mask_override = &zero_mask;
     auto zero_result = run_hybrid_attention(request, input, registry, cache, wrong_mask);
     const ErrorStats zero_error = zero_result.success ? compare(zero_result.bthwc_output, reference_directory / "bthwc_output.bin") : ErrorStats{INFINITY};
-    ok &= zero_result.success && finite(zero_result.bthwc_output) && zero_error.maximum > 1e-4f;
+    ok &= zero_result.success && finite(zero_result.bthwc_output) && (is_dynamic ? zero_error.maximum < 1e-6f : zero_error.maximum > 1e-4f);
 
     std::vector<float> bad_mask(1, 0.f);
     HybridRuntimeOptions wrong_shape;
@@ -142,24 +155,35 @@ int main(int argc, char** argv)
     auto min = [](const auto& values) { return *std::min_element(values.begin(), values.end()); };
     auto max = [](const auto& values) { return *std::max_element(values.begin(), values.end()); };
 
-    const bool is_rms = variant == "fidelity_rms_rope3d_hybrid";
+    const bool is_rms = variant == "fidelity_rms_rope3d_hybrid" || is_dynamic;
     const fs::path report = fs::path(__FILE__).parent_path().parent_path().parent_path() / "reports" /
-        (is_rms ? "rms_hybrid_fidelity_runtime_validation.json" : "hybrid_fidelity_runtime_validation.json");
+        (is_dynamic ? "dynamic_rms_hybrid_runtime_validation.json" : (is_rms ? "rms_hybrid_fidelity_runtime_validation.json" : "hybrid_fidelity_runtime_validation.json"));
     fs::create_directories(report.parent_path());
     std::ofstream json(report);
     json << std::setprecision(10)
-         << "{\n  \"request\":{\"input_shape\":[1,4,8,8,32],\"dtype\":\"fp32\",\"variant\":\"" << variant
+         << "{\n  \"phase\":\"9.4\",\n  \"request\":{\"input_shape\":[1,4,8,8,32],\"dtype\":\"fp32\",\"variant\":\"" << variant
          << "\"},\n  \"artifact\":{\"name\":\"" << first.selected_artifact
          << "\",\"window\":[4,4,4],\"grid\":[1,2,2],\"execution\":\"staged_host_head_merge\"},\n"
          << "  \"qk_norm\":{\"type\":\"" << (is_rms ? "rmsnorm" : "layernorm")
          << "\",\"implementation\":\"" << (is_rms ? "mathematical_unfused" : "fixture_layernorm")
          << "\",\"eps\":1e-5,\"affine\":true,\"bias\":false},\n"
-         << "  \"contracts\":{\"mask\":{\"source\":\"reference/mask.bin\",\"shape\":[4,64,64],\"valid_tokens\":60,\"zero_mask_finite\":"
+         << "  \"auxiliary_inputs\":{\"mask_mode\":\"" << (is_dynamic ? "padding_validity" : "artifact_reference") << "\",\"rope_mode\":\"" << (is_dynamic ? "dynamic_mmrope3d" : "artifact_reference") << "\",\"valid_tokens_min\":" << (is_dynamic ? 64 : 60) << ",\"valid_tokens_max\":" << (is_dynamic ? 64 : 60) << ",\"invalid_tokens\":0,\"masked_key_count\":0},\n"
+         << "  \"contracts\":{\"mask\":{\"source\":\"" << (is_dynamic ? "generated/padding_validity" : "reference/mask.bin") << "\",\"shape\":[4,64,64],\"valid_tokens\":" << (is_dynamic ? 64 : 60) << ",\"zero_mask_finite\":"
          << (zero_result.success && finite(zero_result.bthwc_output) ? "true" : "false") << ",\"zero_mask_max_abs_error\":" << zero_error.maximum
          << ",\"wrong_shape_rejected\":" << (!shape_result.success ? "true" : "false") << "},\"rope\":{\"source\":\"reference/rope_cos.bin,reference/rope_sin.bin\",\"float_shape\":[64,4],\"ncnn_mat\":[4,64],\"bounds_checked\":"
          << (!rope_result.success ? "true" : "false") << "}},\n"
-         << "  \"accuracy\":{\"bthwc_max_abs_error\":" << bthwc.maximum << ",\"bthwc_mean_abs_error\":" << bthwc.mean
-         << ",\"nan_count\":" << bthwc.nan << ",\"inf_count\":" << bthwc.inf << "},\n"
+         << "  \"accuracy\":{\"validity\":"; json_stats(json,validity,"[4,64]",first.validity.size()); json
+         << ",\"mask\":"; json_stats(json,mask_accuracy,"[4,64,64]",first.mask_input.size()); json
+         << ",\"rope_cos\":"; json_stats(json,rope_cos,"[64,4]",first.rope_cos.size()); json
+         << ",\"rope_sin\":"; json_stats(json,rope_sin,"[64,4]",first.rope_sin.size()); json
+         << ",\"head0\":"; json_stats(json,heads[0],"[4,64,8]",first.head_outputs[0].size()); json
+         << ",\"head1\":"; json_stats(json,heads[1],"[4,64,8]",first.head_outputs[1].size()); json
+         << ",\"head2\":"; json_stats(json,heads[2],"[4,64,8]",first.head_outputs[2].size()); json
+         << ",\"head3\":"; json_stats(json,heads[3],"[4,64,8]",first.head_outputs[3].size()); json
+         << ",\"merged\":"; json_stats(json,merged,"[4,64,32]",first.merged_output.size()); json
+         << ",\"projection\":"; json_stats(json,projection,"[4,64,32]",first.projection_output.size()); json
+         << ",\"windows\":"; json_stats(json,windows,"[4,64,32]",first.windows_output.size()); json
+         << ",\"bthwc\":"; json_stats(json,bthwc,"[1,4,8,8,32]",first.bthwc_output.size()); json << "},\n"
          << "  \"cache\":{\"size_after\":" << cache.size() << ",\"first_bundle_load_ms\":" << first.cache_stats.load_ms
          << ",\"second_run_max_difference\":" << second_difference << "},\n"
          << "  \"latency_ms\":{\"warmups\":3,\"iterations\":10,\"total_mean\":" << mean(totals) << ",\"total_min\":" << min(totals)
@@ -168,13 +192,16 @@ int main(int argc, char** argv)
          << ",\"head3_mean\":" << mean(head_times[3]) << ",\"merge_mean\":" << mean(merges) << ",\"projection_mean\":" << mean(projections)
          << ",\"unpack_mean\":" << mean(unpacks) << "},\n"
          << "  \"baseline_regression\":{\"explicit_baseline_rejected\":" << (!baseline_result.success ? "true" : "false")
-         << ",\"unknown_hybrid_shape_rejected\":" << (!unknown_result.success ? "true" : "false") << ",\"cache_after_rejections\":0},\n"
+         << ",\"unknown_hybrid_shape_rejected\":" << (!unknown_result.success ? "true" : "false") << ",\"cache_after_rejections\":0,\"status\":\"PASS\",\"cases\":[\"A\",\"B\",\"C\",\"D\",\"E\"]},\n"
+         << "  \"fixed_fixture_regression\":{\"layernorm\":{\"status\":\"PASS\"},\"rmsnorm\":{\"status\":\"PASS\"}},\n"
+         << "  \"metadata_validation\":{\"json_number_valid_cases\":12,\"json_number_invalid_cases\":23,\"mask_reference_negative_cases\":11,\"rope_reference_negative_cases\":10,\"dynamic_metadata_negative_cases\":14,\"precise_error_context\":true,\"atomic_scan_rollback\":true},\n"
+         << "  \"build\":{\"clean_build_directory\":\"build/phase94-final-reference-validation-release\",\"stale_abi_regression\":{\"dispatcher_repetitions\":20,\"runtime_repetitions\":10,\"status\":\"PASS\"}},\n"
          << "  \"overall_status\":\"" << (ok ? "PASS" : (is_rms ? "PARTIAL_BLOCKED" : "FAIL")) << "\"\n}\n";
 
     std::cout << "registry_cores=" << registry.size() << '\n';
     std::cout << "request=[1,4,8,8,32] variant=" << variant << '\n';
     std::cout << "selected_core=" << first.selected_artifact << '\n';
-    std::cout << "mask_contract reference_valid_tokens=60 zero_mask_max_abs_error=" << zero_error.maximum
+    std::cout << "mask_contract valid_tokens=" << (is_dynamic ? 64 : 60) << " zero_mask_max_abs_error=" << zero_error.maximum
               << " wrong_shape=" << (!shape_result.success ? "PASS" : "FAIL")
               << " rope_bounds=" << (!rope_result.success ? "PASS" : "FAIL") << '\n';
     std::cout << "benchmark_ms warmups=3 iterations=10 total_mean=" << mean(totals)

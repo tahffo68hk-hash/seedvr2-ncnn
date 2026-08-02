@@ -4,6 +4,7 @@
   "execution":"staged_host_head_merge",
   "window":[4,4,4], "grid":[1,2,2], "tokens_per_window":64, "dtype":"fp32",
   "features":{"qk_norm":"layernorm","rope3d":"host_tensor","masked_attention":true,"head_merge":"host","output_projection":"ncnn_2d_gemm"},
+  "auxiliary_inputs":{"mask":{"mode":"artifact_reference","path":"reference/mask.bin"},"rope":{"mode":"artifact_reference","cos":"reference/rope_cos.bin","sin":"reference/rope_sin.bin"}},
   "models":{"heads":[
     {"name":"head0","ncnn_param":"attention_heads/head0/model.ncnn.param","ncnn_bin":"attention_heads/head0/model.ncnn.bin"},
     {"name":"head1","ncnn_param":"attention_heads/head1/model.ncnn.param","ncnn_bin":"attention_heads/head1/model.ncnn.bin"},

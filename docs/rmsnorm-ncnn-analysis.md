@@ -15,7 +15,13 @@ but its standalone ncnn error is `4.31776e-4`; B (`sqrt` plus reciprocal), C
 
 The complete RMS attention head graph converts only after flattening each head
 to token rows. It emits primitive `Reduction`, `Sqrt`, and `Reciprocal` nodes;
-no custom layer is required by the graph. Its current staged runtime result is
-not yet within the acceptance threshold: head maxima are
-`2.95371e-4`, `3.47316e-4`, `3.22342e-4`, and `3.12507e-4`. This is recorded as
-a real numerical blocker for the next iteration, not as fusedrms parity.
+no custom layer is required by the graph. Phase 8.1 found that the former
+complete-head failure was not an RMSNorm failure: pnnx had been invoked with
+its default `fp16=1`, quantizing QKV/projection weights. The QKV Stage-1 error
+was `9.59277e-4` before RMSNorm. Re-exporting every head and the projection
+with `fp16=0` reduces QKV to `2.38419e-7`, Q/K RMSNorm to at most
+`4.76837e-7`, and final BTHWC to `1.78814e-7`.
+
+`convert_attention_heads_rms.py` makes `fp16=0` reproducible. The production
+artifact records `rmsnorm_rewrite: explicit_sqrt_reciprocal` and
+`pnnx_fp16: false`; direct Apex fused-kernel parity remains unverified.

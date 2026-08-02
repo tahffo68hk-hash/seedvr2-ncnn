@@ -13,3 +13,18 @@ Phase 8 adds a separate mathematical RMSNorm path. Its standalone ncnn
 fixture passes for the sqrt/reciprocal, pow, and explicit rewrites, but the
 complete RMS hybrid head currently exceeds the `1e-4` gate; it is not promoted
 to READY and does not change the LayerNorm result above.
+
+## Phase 9.4 metadata/runtime routing
+
+`Phase 9.4 metadata/runtime routing = READY`: fixed LayerNorm, fixed RMSNorm,
+and Dynamic A select their typed metadata routes without cross-profile fallback.
+Dynamic A uses natural `valid_tokens=64`; fixed RMS retains the artificial
+fidelity override `valid_tokens=60`. Phase 9 multi-shape validation remains
+`PARTIAL` because Dynamic B/C are not implemented.
+
+## Phase 9.5 multi-shape status
+
+`Phase 9.5 Dynamic multi-shape RMS Hybrid Runtime = READY`. Dynamic A/B/C use one
+metadata-driven route with grids `[1,2,2]`, `[1,3,3]`, `[2,3,3]`; their BTHWC
+maximum errors are `1.49012e-7`, `1.49012e-7`, and `2.08616e-7`. This remains a
+CPU FP32 fixture subsystem, not complete SeedVR2 inference.

@@ -25,10 +25,16 @@
   "features": {
     "qk_norm": "rmsnorm",
     "qk_norm_reference": "mathematical_unfused",
+    "rmsnorm_rewrite": "explicit_sqrt_reciprocal",
+    "pnnx_fp16": false,
     "rope3d": "artifact_reference",
     "masked_attention": true,
     "head_merge": "host",
     "output_projection": "ncnn_2d_gemm"
+  },
+  "auxiliary_inputs": {
+    "mask": {"mode": "artifact_reference", "path": "reference/mask.bin"},
+    "rope": {"mode": "artifact_reference", "cos": "reference/rope_cos.bin", "sin": "reference/rope_sin.bin"}
   },
   "models": {
     "heads": [

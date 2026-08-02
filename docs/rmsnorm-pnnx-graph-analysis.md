@@ -21,7 +21,7 @@ current ncnn graph conversion. This is not a custom ncnn layer and does not
 claim fused Apex parity. The standalone runner selects D and reports the real
 A failure while requiring B/C/D to pass.
 
-The remaining blocker is downstream full-head numerical drift: the same
-primitive RMSNorm inside Q/K attention currently produces approximately
-`3.47e-04` maximum error at the merged-head stage, exceeding the Phase 8
-`<1e-4` acceptance threshold.
+Phase 8.1 showed that the former downstream drift was caused by pnnx default
+`fp16=1` conversion of QKV/projection weights, not the RMSNorm primitive.
+Re-exporting the complete hybrid artifact with `fp16=0` gives a final BTHWC
+maximum error of `1.78814e-7`, below the Phase 8 `<1e-4` acceptance threshold.
