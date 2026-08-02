@@ -1,9 +1,12 @@
 """Export case-driven Dynamic RMS Hybrid references using one fixed model."""
 from pathlib import Path
+import argparse
+import json
 import torch
 from attention_fidelity import partition_bthwc
-from rms_attention import RMSPerHeadBranchRewrite
-from rope3d_reference import host_rope_cos_sin
+from rms_attention import RMSPerHeadBranchRewrite, SingleRMSAttentionHead
+from rope3d_reference import host_rope_cos_sin, host_dynamic_rope3d_cos_sin
+from output_projection_core import OutputProjectionCore
 
 ROOT = Path(__file__).resolve().parent
 PROFILES = [
@@ -11,6 +14,19 @@ PROFILES = [
     {"name": "dynamic_b", "shape": [1, 4, 9, 10, 32], "window": [4, 4, 4], "grid": [1, 3, 3], "padding": [0, 3, 2]},
     {"name": "dynamic_c", "shape": [1, 5, 9, 10, 32], "window": [4, 4, 4], "grid": [2, 3, 3], "padding": [3, 3, 2]},
 ]
+
+# Phase 10 synthetic head_dim=128 / rope_dim=128 shape-only fixture.  The axis
+# split below is a documented SYNTHETIC contract (even pair dims summing to
+# rope_dim=128 with the same theta/axis-scale scheme as the Phase 9.5 C=32
+# fixture).  It does not claim to reproduce the real SeedVR2 mmrope3d split,
+# which cannot be resolved locally because rotary-embedding-torch is absent.
+HD128_PROFILES = [
+    {"name": "hd128_single", "shape": [1, 4, 4, 4, 512], "window": [4, 4, 4], "grid": [1, 1, 1], "padding": [0, 0, 0]},
+    {"name": "hd128_multi", "shape": [1, 4, 8, 8, 512], "window": [4, 4, 4], "grid": [1, 2, 2], "padding": [0, 0, 0]},
+    {"name": "hd128_padded", "shape": [1, 5, 9, 10, 512], "window": [4, 4, 4], "grid": [2, 3, 3], "padding": [3, 3, 2]},
+]
+HD128_VARIANT = "synthetic_hd128_dynamic_rms_rope3d_hybrid"
+HD128_ROPE = {"rope_dim": 128, "theta": 10000.0, "axis_dims": [44, 42, 42], "axis_scales": [1.0, 0.01, 1e-4]}
 
 def write(value, path):
     value.detach().cpu().contiguous().float().numpy().tofile(path)
@@ -47,7 +63,68 @@ def export_profile(model, profile):
     values.update({f"head{i}": stages[f"head{i}_av"] for i in range(4)})
     for name, value in values.items(): write(value, root / f"{name}.bin")
 
+def write_metadata(artifact, grid):
+    models = {"heads": [{"name": f"head{i}", "ncnn_param": f"attention_heads/head{i}/model.ncnn.param",
+                        "ncnn_bin": f"attention_heads/head{i}/model.ncnn.bin"} for i in range(4)],
+              "output_projection": {"name": "output_projection", "ncnn_param": "output_projection/model.ncnn.param",
+                                    "ncnn_bin": "output_projection/model.ncnn.bin"}}
+    manifest = {"name": artifact.name, "variant": HD128_VARIANT, "execution": "staged_host_head_merge",
+                "window": [4, 4, 4], "grid": list(grid), "tokens_per_window": 64, "dtype": "fp32",
+                "features": {"qk_norm": "rmsnorm", "rope3d": "dynamic_mmrope3d", "masked_attention": True,
+                             "head_merge": "host", "output_projection": "ncnn_2d_gemm"},
+                "auxiliary_inputs": {"mask": {"mode": "padding_validity", "invalid_key_value": -10000.0},
+                                     "rope": {"mode": "dynamic_mmrope3d", **HD128_ROPE}},
+                "models": models}
+    (artifact / "metadata.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+
+
+def export_hd128():
+    """One shared synthetic C=512/heads=4/head_dim=128 model with three shape-only profiles."""
+    torch.manual_seed(20260805)
+    model = RMSPerHeadBranchRewrite(channels=512, heads=4, head_dim=128).eval()
+    source = ROOT / "artifacts/attention_core_fidelity" / "hybrid_synthetic_hd128_rope444_grid_1x1x1"
+    heads_root, projection_root = source / "attention_heads", source / "output_projection"
+    for directory in (heads_root, projection_root): directory.mkdir(parents=True, exist_ok=True)
+    x = torch.randn(1, 4, 4, 4, 512)
+    windows, _ = partition_bthwc(x, (4, 4, 4))
+    valid = validity([1, 4, 4, 4, 512], (4, 4, 4), (1, 1, 1))
+    mask = torch.where(valid[:, None, :].bool(), torch.zeros(1), torch.full((1,), -10000.0)).expand(-1, 64, -1).clone()
+    cos, sin = host_dynamic_rope3d_cos_sin(4, 4, 4, head_dim=128, rope_dim=HD128_ROPE["rope_dim"],
+                                           theta=HD128_ROPE["theta"], axis_dims=HD128_ROPE["axis_dims"],
+                                           axis_scales=HD128_ROPE["axis_scales"])
+    with torch.no_grad(): stages = model.forward_stages(x, mask, cos, sin)
+    merged = torch.cat(tuple(stages[f"head{i}_av"] for i in range(4)), dim=-1)
+    for i in range(4):
+        head = SingleRMSAttentionHead(model, i).eval()
+        directory = heads_root / f"head{i}"; directory.mkdir(exist_ok=True)
+        torch.jit.trace(head, (windows[0], mask[0], cos, sin), check_trace=True).save(str(directory / "model.pt"))
+    torch.jit.trace(OutputProjectionCore(model.output).eval(), (merged.reshape(-1, 512),), check_trace=True).save(str(projection_root / "model.pt"))
+    for profile in HD128_PROFILES:
+        shape, window, grid = profile["shape"], tuple(profile["window"]), profile["grid"]
+        artifact = ROOT / "artifacts/attention_core_fidelity" / f"hybrid_synthetic_hd128_rope444_grid_{grid[0]}x{grid[1]}x{grid[2]}"
+        root = artifact / "reference"; root.mkdir(parents=True, exist_ok=True)
+        x = torch.randn(*shape)
+        windows, _ = partition_bthwc(x, window)
+        valid = validity(shape, window, grid)
+        mask = torch.where(valid[:, None, :].bool(), torch.zeros(1), torch.full((1,), -10000.0)).expand(-1, 64, -1).clone()
+        with torch.no_grad(): stages = model.forward_stages(x, mask, cos, sin)
+        merged = torch.cat(tuple(stages[f"head{i}_av"] for i in range(4)), dim=-1)
+        projection = model.output(merged.reshape(-1, 512))
+        values = {"input": x, "windows": windows, "validity": valid, "mask": mask, "rope_cos": cos, "rope_sin": sin,
+                  "merged": merged, "projection": projection, "projection_2d": projection,
+                  "windows_output": stages["windows"], "bthwc_output": stages["output"]}
+        values.update({f"head{i}": stages[f"head{i}_av"] for i in range(4)})
+        for name, value in values.items(): write(value, root / f"{name}.bin")
+        write_metadata(artifact, grid)
+
+
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--hd128", action="store_true", help="export Phase 10 synthetic head_dim=128 profiles")
+    args = parser.parse_args()
+    if args.hd128:
+        export_hd128()
+        return
     torch.manual_seed(20260805)
     model = RMSPerHeadBranchRewrite().eval()
     for profile in PROFILES: export_profile(model, profile)

@@ -1,0 +1,74 @@
+{
+  "name": "hybrid_synthetic_hd128_rope444_grid_1x1x1",
+  "variant": "synthetic_hd128_dynamic_rms_rope3d_hybrid",
+  "execution": "staged_host_head_merge",
+  "window": [
+    4,
+    4,
+    4
+  ],
+  "grid": [
+    1,
+    1,
+    1
+  ],
+  "tokens_per_window": 64,
+  "dtype": "fp32",
+  "features": {
+    "qk_norm": "rmsnorm",
+    "rope3d": "dynamic_mmrope3d",
+    "masked_attention": true,
+    "head_merge": "host",
+    "output_projection": "ncnn_2d_gemm"
+  },
+  "auxiliary_inputs": {
+    "mask": {
+      "mode": "padding_validity",
+      "invalid_key_value": -10000.0
+    },
+    "rope": {
+      "mode": "dynamic_mmrope3d",
+      "rope_dim": 128,
+      "theta": 10000.0,
+      "axis_dims": [
+        44,
+        42,
+        42
+      ],
+      "axis_scales": [
+        1.0,
+        0.01,
+        0.0001
+      ]
+    }
+  },
+  "models": {
+    "heads": [
+      {
+        "name": "head0",
+        "ncnn_param": "attention_heads/head0/model.ncnn.param",
+        "ncnn_bin": "attention_heads/head0/model.ncnn.bin"
+      },
+      {
+        "name": "head1",
+        "ncnn_param": "attention_heads/head1/model.ncnn.param",
+        "ncnn_bin": "attention_heads/head1/model.ncnn.bin"
+      },
+      {
+        "name": "head2",
+        "ncnn_param": "attention_heads/head2/model.ncnn.param",
+        "ncnn_bin": "attention_heads/head2/model.ncnn.bin"
+      },
+      {
+        "name": "head3",
+        "ncnn_param": "attention_heads/head3/model.ncnn.param",
+        "ncnn_bin": "attention_heads/head3/model.ncnn.bin"
+      }
+    ],
+    "output_projection": {
+      "name": "output_projection",
+      "ncnn_param": "output_projection/model.ncnn.param",
+      "ncnn_bin": "output_projection/model.ncnn.bin"
+    }
+  }
+}

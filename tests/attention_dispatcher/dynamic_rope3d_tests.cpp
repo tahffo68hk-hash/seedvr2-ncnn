@@ -80,5 +80,50 @@ int main()
     malformed = make_contract(4, 4, 4); malformed.rope_dim = 10;
     assert(!generate_dynamic_rope3d(malformed, config, output, error) && output.cos.empty());
     assert(generate_dynamic_rope3d(make_contract(1, 2, 3), config, output, error));
-    std::cout << "dynamic_rope3d_tests=PASS cos_max=" << cos_max << " sin_max=" << sin_max << '\n';
+
+    // Phase 10: rope_dim=128 parity against the synthetic HD128-S reference.
+    DynamicAttentionContract hd{};
+    hd.batch = 1; hd.time = 4; hd.height = 4; hd.width = 4; hd.channels = 512;
+    hd.window_t = 4; hd.window_h = 4; hd.window_w = 4;
+    hd.grid_t = 1; hd.grid_h = 1; hd.grid_w = 1;
+    hd.pad_t = 0; hd.pad_h = 0; hd.pad_w = 0;
+    hd.num_windows = 1; hd.tokens_per_window = 64;
+    hd.heads = 4; hd.head_dim = 128; hd.rope_dim = 128;
+    Rope3DConfig hd_config{};
+    hd_config.theta = 10000.0;
+    hd_config.axis_dims = {44, 42, 42};
+    hd_config.axis_scales = {1.0, 1.0 / 100.0, 1.0 / 10000.0};
+    Rope3DOutput hd_output{};
+    assert(generate_dynamic_rope3d(hd, hd_config, hd_output, error));
+    assert(hd_output.tokens == 64 && hd_output.pairs == 64 && hd_output.cos.size() == 4096 && hd_output.sin.size() == 4096);
+    const fs::path hd_reference = fs::path(__FILE__).parent_path().parent_path() / "seedvr2_attention_fidelity/artifacts/attention_core_fidelity/hybrid_synthetic_hd128_rope444_grid_1x1x1/reference";
+    const auto hd_expected_cos = read_floats(hd_reference / "rope_cos.bin", 4096);
+    const auto hd_expected_sin = read_floats(hd_reference / "rope_sin.bin", 4096);
+    float hd_cos_max = 0.f, hd_sin_max = 0.f;
+    for (size_t i = 0; i < 4096; ++i)
+    {
+        hd_cos_max = std::max(hd_cos_max, std::fabs(hd_output.cos[i] - hd_expected_cos[i]));
+        hd_sin_max = std::max(hd_sin_max, std::fabs(hd_output.sin[i] - hd_expected_sin[i]));
+    }
+    assert(hd_cos_max < 1e-6f && hd_sin_max < 1e-6f);
+    // All 64 pairs are active for rope_dim=128; token 0 (origin) is identity.
+    assert(hd_output.sin[0] == 0.f && hd_output.sin[63] == 0.f);
+    assert(hd_output.sin[1 * 64 + 43] != 0.f);   // token 1: W pair 43
+    assert(hd_output.sin[16 * 64 + 0] != 0.f);   // token 16 (1,0,0): T pair 0
+    assert(hd_output.sin[4 * 64 + 22] != 0.f);    // token 4 (0,1,0): H pair 22
+    assert(hd_output.sin[63 * 64 + 63] != 0.f);  // token 63: all dims non-zero
+    // Negative contract checks for the synthetic rope_dim=128 contract.
+    DynamicAttentionContract hd_bad = hd; hd_bad.rope_dim = 256;
+    assert(!generate_dynamic_rope3d(hd_bad, hd_config, output, error) && output.cos.empty());
+    hd_bad = hd; hd_bad.rope_dim = 64;
+    assert(!generate_dynamic_rope3d(hd_bad, hd_config, output, error) && output.sin.empty());
+    Rope3DConfig hd_bad_config = hd_config; hd_bad_config.axis_dims = {44, 42, 44};
+    assert(!generate_dynamic_rope3d(hd, hd_bad_config, output, error) && output.cos.empty());
+    hd_bad_config = hd_config; hd_bad_config.axis_dims = {43, 43, 42};
+    assert(!generate_dynamic_rope3d(hd, hd_bad_config, output, error) && output.sin.empty());
+    hd_bad_config = hd_config; hd_bad_config.axis_scales[2] = 0.0;
+    assert(!generate_dynamic_rope3d(hd, hd_bad_config, output, error) && output.cos.empty());
+
+    std::cout << "dynamic_rope3d_tests=PASS cos_max=" << cos_max << " sin_max=" << sin_max
+              << " hd128_cos_max=" << hd_cos_max << " hd128_sin_max=" << hd_sin_max << '\n';
 }

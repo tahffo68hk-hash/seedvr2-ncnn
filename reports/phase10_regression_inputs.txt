@@ -1,0 +1,10 @@
+artifact_registry_tests=PASS
+dispatcher_tests=PASS
+dynamic_multi_shape_validation=PASS
+dynamic_padding_mask_tests=PASS
+dynamic_rope3d_tests=PASS
+hybrid_runtime_validation=PASS
+hybrid_window_adapter_tests=PASS
+model_cache_tests=PASS
+ncnn_mat_contract_tests=PASS
+runtime_validation=PASS

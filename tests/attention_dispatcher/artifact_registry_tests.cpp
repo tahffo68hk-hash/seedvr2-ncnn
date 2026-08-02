@@ -22,7 +22,12 @@ int main() {
     assert(baseline.scan(real,e)&&baseline.size()==5);
     for(const auto& c:baseline.list()) assert(c.key.variant=="baseline"&&c.execution_type==ExecutionType::SingleModel&&c.single_model()&&!c.staged_head_merge());
     const fs::path fidelity=fs::path(__FILE__).parent_path().parent_path()/"seedvr2_attention_fidelity/artifacts/attention_core_fidelity";
-    ArtifactRegistry hybrids; assert(hybrids.scan(fidelity,e)); assert(hybrids.size()==7);
+    ArtifactRegistry hybrids; assert(hybrids.scan(fidelity,e)); assert(hybrids.size()==10);
+    const CoreInfo* hd128=hybrids.lookup({4,4,4,1,1,1,"synthetic_hd128_dynamic_rms_rope3d_hybrid"});
+    assert(hd128&&hd128->auxiliary()&&hd128->auxiliary()->rope_mode==RopeMode::DynamicMMRoPE3D);
+    assert(std::get<DynamicMMRoPE3DConfig>(hd128->auxiliary()->rope).rope_dim==128);
+    assert(hybrids.lookup({4,4,4,1,2,2,"synthetic_hd128_dynamic_rms_rope3d_hybrid"}));
+    assert(hybrids.lookup({4,4,4,2,3,3,"synthetic_hd128_dynamic_rms_rope3d_hybrid"}));
     const CoreInfo* h=hybrids.lookup({4,4,4,1,2,2,"fidelity_ln_rope3d_hybrid"}); assert(h&&h->staged_head_merge()&&!h->single_model());
     const CoreInfo* rms=hybrids.lookup({4,4,4,1,2,2,"fidelity_rms_rope3d_hybrid"}); assert(rms&&rms->staged_head_merge()&&!rms->single_model());
     assert(rms->name=="hybrid_fidelity_rms_rope444_grid_1x2x2");
@@ -37,6 +42,9 @@ int main() {
     assert(rejects(tmp,replace(b,R"("masked_attention":true)",R"("masked_attention":True)")));
     assert(rejects(tmp,replace(b,R"(,"variant":"fidelity_ln_rope3d_hybrid")","")));
     assert(rejects(tmp,replace(b,"fidelity_ln_rope3d_hybrid","baseline")));
+    assert(accepts(tmp,replace(b,R"("rope_dim":6,"theta":10000,"axis_dims":[2,2,2])",R"("rope_dim":128,"theta":10000,"axis_dims":[44,42,42])")));
+    assert(rejects(tmp,replace(b,R"("rope_dim":6,"theta":10000,"axis_dims":[2,2,2])",R"("rope_dim":256,"theta":10000,"axis_dims":[44,42,42])")));
+    assert(rejects(tmp,replace(b,R"("rope_dim":6,"theta":10000,"axis_dims":[2,2,2])",R"("rope_dim":128,"theta":10000,"axis_dims":[44,44,42])")));
     assert(rejects(tmp,replace(b,"staged_host_head_merge","unsupported")));
     assert(rejects(tmp,replace(b,"\"h0p\"","\"missing\"")));
     assert(rejects(tmp,replace(b,"\"h0b\"","\"missing\"")));

@@ -69,3 +69,44 @@ def apply_rope_cos_sin(x: torch.Tensor, cos: torch.Tensor, sin: torch.Tensor) ->
     cos, sin = cos.float().unsqueeze(1), sin.float().unsqueeze(1)
     even, odd = values[..., 0], values[..., 1]
     return torch.stack((even * cos - odd * sin, even * sin + odd * cos), dim=-1).reshape_as(x).to(x.dtype)
+
+
+def host_dynamic_rope3d_cos_sin(window_t, window_h, window_w, *, head_dim, rope_dim, theta=10000.0,
+                                axis_dims=(2, 2, 2), axis_scales=(1.0, 0.01, 1e-4)):
+    """Mirror the C++ ``generate_dynamic_rope3d`` FP32 contract exactly.
+
+    Returns FP32 [T*H*W, head_dim/2] interleaved-pair cos/sin for the dynamic
+    MM-RoPE3D contract.  Pairs are laid out axis-major: all T pairs, then all
+    H pairs, then all W pairs, then identity pairs for the remaining dims.
+    Tokens are flattened with W fastest, then H, then T.
+    """
+    if head_dim % 2 or rope_dim <= 0 or rope_dim > head_dim or rope_dim % 2:
+        raise ValueError("head_dim and rope_dim must be even and rope_dim <= head_dim")
+    if len(axis_dims) != 3 or len(axis_scales) != 3:
+        raise ValueError("axis_dims and axis_scales must be length 3")
+    if sum(axis_dims) != rope_dim or any(dim % 2 or dim < 0 for dim in axis_dims):
+        raise ValueError("axis_dims must be non-negative even dims summing to rope_dim")
+    if any(scale <= 0.0 for scale in axis_scales):
+        raise ValueError("axis_scales must be positive")
+    pairs = head_dim // 2
+    active_pairs = rope_dim // 2
+    total_tokens = window_t * window_h * window_w
+    positions_t = torch.arange(window_t, dtype=torch.float32).view(window_t, 1, 1).expand(window_t, window_h, window_w).reshape(-1)
+    positions_h = torch.arange(window_h, dtype=torch.float32).view(1, window_h, 1).expand(window_t, window_h, window_w).reshape(-1)
+    positions_w = torch.arange(window_w, dtype=torch.float32).view(1, 1, window_w).expand(window_t, window_h, window_w).reshape(-1)
+    positions = [positions_t, positions_h, positions_w]
+    cos = torch.ones(total_tokens, pairs, dtype=torch.float32)
+    sin = torch.zeros(total_tokens, pairs, dtype=torch.float32)
+    pair_offset = 0
+    for axis in range(3):
+        axis_pairs = axis_dims[axis] // 2
+        for local_pair in range(axis_pairs):
+            pair = pair_offset + local_pair
+            inv_freq = torch.exp(-torch.log(torch.tensor(theta, dtype=torch.float32))
+                                 * torch.tensor(pair, dtype=torch.float32)
+                                 / torch.tensor(active_pairs, dtype=torch.float32)).item()
+            angles = positions[axis] * float(axis_scales[axis]) * float(inv_freq)
+            cos[:, pair] = torch.cos(angles)
+            sin[:, pair] = torch.sin(angles)
+        pair_offset += axis_pairs
+    return cos, sin

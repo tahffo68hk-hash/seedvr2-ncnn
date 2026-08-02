@@ -90,3 +90,7 @@ target_compile_options(hybrid_runtime_validation PRIVATE /EHsc)
 add_executable(dynamic_multi_shape_validation EXCLUDE_FROM_ALL dynamic_multi_shape_validation.cpp)
 target_link_libraries(dynamic_multi_shape_validation PRIVATE hybrid_attention_runtime_lib)
 target_compile_options(dynamic_multi_shape_validation PRIVATE /EHsc /UNDEBUG)
+
+add_executable(synthetic_hd128_validation EXCLUDE_FROM_ALL synthetic_hd128_validation.cpp)
+target_link_libraries(synthetic_hd128_validation PRIVATE hybrid_attention_runtime_lib)
+target_compile_options(synthetic_hd128_validation PRIVATE /EHsc /UNDEBUG)
