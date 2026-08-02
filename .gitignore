@@ -20,3 +20,7 @@ tests/**/*.pt
 tests/**/*.pt2
 tests/**/*.pnnx.bin
 tests/**/reports/
+
+# Toolchain test build products
+toolchain-test/build-*/
+toolchain-test/*.exe
