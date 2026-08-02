@@ -1,0 +1,103 @@
+{
+  "phase": "phase13",
+  "target": "phase13_historical_regressions",
+  "phase12_build": "build/phase13-real-width-release",
+  "core_build": "build/phase10_1-real-mmrope-release",
+  "phase12": {
+    "ada_single_contract_tests": {
+      "exit": 0,
+      "pass": true
+    },
+    "swiglu_contract_tests": {
+      "exit": 0,
+      "pass": true
+    },
+    "dit_block_artifact_registry_tests": {
+      "exit": 0,
+      "pass": true
+    },
+    "synthetic_dit_block_validation": {
+      "exit": 0,
+      "pass": true
+    },
+    "synthetic_dit_block_last_layer_validation": {
+      "exit": 0,
+      "pass": true
+    }
+  },
+  "core": {
+    "artifact_registry_tests": {
+      "exit": 0,
+      "pass": true
+    },
+    "dispatcher_tests": {
+      "exit": 0,
+      "pass": true
+    },
+    "model_cache_tests": {
+      "exit": 0,
+      "pass": true
+    },
+    "runtime_validation": {
+      "exit": 0,
+      "pass": true
+    },
+    "dynamic_padding_mask_tests": {
+      "exit": 0,
+      "pass": true
+    },
+    "dynamic_rope3d_tests": {
+      "exit": 0,
+      "pass": true
+    },
+    "ncnn_mat_contract_tests": {
+      "exit": 0,
+      "pass": true
+    },
+    "hybrid_window_adapter_tests": {
+      "exit": 0,
+      "pass": true
+    },
+    "hybrid_runtime_validation": {
+      "exit": 0,
+      "pass": true
+    },
+    "dynamic_multi_shape_validation": {
+      "exit": 0,
+      "pass": true
+    },
+    "synthetic_hd128_validation": {
+      "exit": 0,
+      "pass": true
+    },
+    "real_mmrope_contract_validation": {
+      "exit": 0,
+      "pass": true
+    }
+  },
+  "phase11_python": {
+    "test_dependency_compat.py": {
+      "exit": 0,
+      "pass": true
+    },
+    "test_real_block_forward.py": {
+      "exit": 0,
+      "pass": true
+    },
+    "test_runtime_contract.py": {
+      "exit": 0,
+      "pass": true
+    },
+    "run_phase11_1_probe.py": {
+      "exit": 0,
+      "pass": true
+    }
+  },
+  "overall_pass": true,
+  "overall_status": "PASS",
+  "real_seedvr2_weights": false,
+  "realwidth_block": true,
+  "full_32_block_dit": false,
+  "android_vulkan": false,
+  "large_artifacts_committed": false
+}

@@ -1,0 +1,45 @@
+{
+  "phase": "phase13",
+  "target": "realwidth_artifact_inventory_tests",
+  "repetitions": 3,
+  "runs": [
+    {
+      "ok": true,
+      "problems": [],
+      "entry_count": 38,
+      "total_bytes": 634413578,
+      "fp16": 0,
+      "hidden_dim": 2560,
+      "heads": 20,
+      "repetition": 1
+    },
+    {
+      "ok": true,
+      "problems": [],
+      "entry_count": 38,
+      "total_bytes": 634413578,
+      "fp16": 0,
+      "hidden_dim": 2560,
+      "heads": 20,
+      "repetition": 2
+    },
+    {
+      "ok": true,
+      "problems": [],
+      "entry_count": 38,
+      "total_bytes": 634413578,
+      "fp16": 0,
+      "hidden_dim": 2560,
+      "heads": 20,
+      "repetition": 3
+    }
+  ],
+  "overall_pass": true,
+  "overall_status": "PASS",
+  "real_seedvr2_weights": false,
+  "realwidth_block": true,
+  "full_32_block_dit": false,
+  "android_vulkan": false,
+  "large_artifacts_committed": false,
+  "determinism_stable_across_runs": true
+}

@@ -73,3 +73,7 @@ threshold 1e-5 documented (reference-internal recompute bit-exact). Real
 weights, full 2560-width ncnn block, Vulkan and VAE remain Phase 13 scope. See
 [synthetic-seedvr2-dit-block-ncnn-report.md](synthetic-seedvr2-dit-block-ncnn-report.md)
 and `reports/synthetic_dit_block_ncnn_validation.json`.
+
+## Phase 13 real-width status
+
+`Phase 13 real-width single-block feasibility + weight mapping = READY` (commit on `codex/phase13-real-width-weight-map`). The real `NaMMSRTransformerBlock` config (C=2560/H=20/HD=128, MLP 6912, seed 20260803, random weights) is exported to 19 FP32 ncnn stage models (`pnnx fp16=0`) and runs RW-A -> RW-A end-to-end on the existing `HybridDiTBlockRuntime`: all stages within Phase 13 thresholds (final vid 1.00e-5 / txt 6.4e-6, limit 2e-4), bit-identical across processes, zero NaN/Inf; first-load ~236-258 ms, cached ~31-35 ms, peak working set ~685 MB, cache 19. A full state_dict->ncnn weight mapping contract (29/29, mapped_numel==source_numel, AdaSingle runtime-only, qk-norm all-ones folded by pnnx, last-layer reuses all 19 models) is committed and validated (12 checks x5, negatives 25/25). Regressions 21/21 PASS. Estimates only: 32 blocks ~20.1 GB FP32 / ~10.0 GB FP16, per-block streaming required; Pad 7 Pro / Android / Vulkan NOT validated. Real weights, 32-block DiT, VAE/scheduler remain TODO (Phase 14+).

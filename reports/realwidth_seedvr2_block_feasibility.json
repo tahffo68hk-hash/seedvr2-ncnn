@@ -1,0 +1,79 @@
+{
+  "phase": "phase13",
+  "target": "realwidth_seedvr2_block_feasibility",
+  "variant": "realwidth_seedvr2_dit_block_c2560_h20_hd128_random",
+  "sequence": "RW-A,RW-A",
+  "repetitions": 3,
+  "runs": [
+    {
+      "repetition": 1,
+      "exit_code": 0,
+      "pass": true,
+      "determinism": true,
+      "init_ms_first_load": 236.0573,
+      "latency_run1_ms": 35.4495,
+      "latency_run2_ms": 31.7145,
+      "working_set_mb_before": 5.2265625,
+      "working_set_mb_after_load": 617.53125,
+      "peak_working_set_mb": 685.035156,
+      "working_set_mb_after_runs": 638.28125,
+      "cache_size_after_init": 19
+    },
+    {
+      "repetition": 2,
+      "exit_code": 0,
+      "pass": true,
+      "determinism": true,
+      "init_ms_first_load": 258.1117,
+      "latency_run1_ms": 35.0486,
+      "latency_run2_ms": 31.2386,
+      "working_set_mb_before": 5.21484375,
+      "working_set_mb_after_load": 617.257812,
+      "peak_working_set_mb": 684.761719,
+      "working_set_mb_after_runs": 638.332031,
+      "cache_size_after_init": 19
+    },
+    {
+      "repetition": 3,
+      "exit_code": 0,
+      "pass": true,
+      "determinism": true,
+      "init_ms_first_load": 242.6068,
+      "latency_run1_ms": 33.8467,
+      "latency_run2_ms": 30.3317,
+      "working_set_mb_before": 5.23828125,
+      "working_set_mb_after_load": 617.242188,
+      "peak_working_set_mb": 684.746094,
+      "working_set_mb_after_runs": 638.316406,
+      "cache_size_after_init": 19
+    }
+  ],
+  "inventory_runs": [
+    {
+      "repetition": 1,
+      "exit_code": 0,
+      "pass": true,
+      "stdout_tail": "(70778884 bytes)\n  loaded swiglu_out_vid (70778884 bytes)\n  loaded swiglu_up_txt (70778884 bytes)\n  loaded swiglu_up_vid (70778884 bytes)\nconfig checks=10 models=38 cache_size=19 negatives=5 ALL PASS\n"
+    },
+    {
+      "repetition": 2,
+      "exit_code": 0,
+      "pass": true,
+      "stdout_tail": "(70778884 bytes)\n  loaded swiglu_out_vid (70778884 bytes)\n  loaded swiglu_up_txt (70778884 bytes)\n  loaded swiglu_up_vid (70778884 bytes)\nconfig checks=10 models=38 cache_size=19 negatives=5 ALL PASS\n"
+    },
+    {
+      "repetition": 3,
+      "exit_code": 0,
+      "pass": true,
+      "stdout_tail": "(70778884 bytes)\n  loaded swiglu_out_vid (70778884 bytes)\n  loaded swiglu_up_txt (70778884 bytes)\n  loaded swiglu_up_vid (70778884 bytes)\nconfig checks=10 models=38 cache_size=19 negatives=5 ALL PASS\n"
+    }
+  ],
+  "determinism_stable_across_runs": true,
+  "overall_pass": true,
+  "overall_status": "PASS",
+  "real_seedvr2_weights": false,
+  "realwidth_block": true,
+  "full_32_block_dit": false,
+  "android_vulkan": false,
+  "large_artifacts_committed": false
+}

@@ -44,3 +44,20 @@ synthetic_hd128_validation tests/seedvr2_attention_fidelity/artifacts/attention_
 ```
 
 Acceptance: three HD128 cases PASS, heads/merge/projection/windows/BTHWC `<1e-4`, rope cos/sin `<1e-6`, validity/mask exact, S->M->P->S bit-identical, negatives 19/19, cache 15, 10 base regressions PASS, JSON parses with no NaN/Inf and numeric fields, `real_seedvr2_weights=false`, `overall_status=PASS`.
+
+Phase 13 real-width feasibility + weight mapping (release build `build/phase13-real-width-release`, probe env `seedvr2-block-probe` for Python):
+
+```text
+build/phase13-real-width-release/realwidth_dit_block_validation.exe .phase13_local_artifacts reports/realwidth_seedvr2_block_feasibility.json
+build/phase13-real-width-release/realwidth_artifact_inventory_tests.exe .phase13_local_artifacts reports/realwidth_artifact_inventory.json
+conda run -n seedvr2-block-probe python tests/seedvr2_weight_mapping/aggregate_realwidth_feasibility.py
+conda run -n seedvr2-block-probe python tests/seedvr2_weight_mapping/validate_weight_mapping_contract.py
+conda run -n seedvr2-block-probe python tests/seedvr2_weight_mapping/test_weight_mapping_roundtrip.py
+conda run -n seedvr2-block-probe python tests/seedvr2_weight_mapping/negative_tests.py
+conda run -n seedvr2-block-probe python tests/seedvr2_weight_mapping/validate_realwidth_artifact_inventory.py
+conda run -n seedvr2-block-probe python tests/seedvr2_weight_mapping/verify_realwidth_last_layer.py
+conda run -n seedvr2-block-probe python tests/seedvr2_weight_mapping/run_phase13_regressions.py
+conda run -n seedvr2-block-probe python tests/seedvr2_weight_mapping/check_no_large_tracked_artifacts.py
+```
+
+Acceptance (Phase 13 READY): RW-A->RW-A final vid/txt < 2e-4 (measured ~1e-5), all stages within thresholds, bit-identical across 3 processes, zero NaN/Inf; 19 models / cache 19; mapping contract 29/29 mapped_numel==source_numel with 0 unmapped/duplicates (12 checks x5 PASS); inventory 38 entries x3 PASS; negatives 25/25; last-layer reuse PASS (20 keys, txt MLP/ada absent, all 19 models reused); regressions 21/21 PASS; git protection PASS; flags `real_seedvr2_weights=false`, `full_32_block_dit=false`, `android_vulkan=false`, `overall_status=PASS`. Historical report baselines must be restored after regression runs (`git restore`).

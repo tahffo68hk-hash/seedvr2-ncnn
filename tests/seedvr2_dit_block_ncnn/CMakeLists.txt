@@ -34,3 +34,14 @@ target_compile_options(synthetic_dit_block_validation PRIVATE /EHsc /UNDEBUG)
 add_executable(synthetic_dit_block_last_layer_validation synthetic_dit_block_last_layer_validation.cpp)
 target_link_libraries(synthetic_dit_block_last_layer_validation PRIVATE hybrid_dit_block_runtime_lib)
 target_compile_options(synthetic_dit_block_last_layer_validation PRIVATE /EHsc /UNDEBUG)
+
+# Phase 13: real-width (C=2560/H=20/HD=128) single-block feasibility targets.
+# All real-width artifacts live in the git-ignored .phase13_local_artifacts/
+# directory; these targets are run against that local root.
+add_executable(realwidth_dit_block_validation realwidth_dit_block_validation.cpp)
+target_link_libraries(realwidth_dit_block_validation PRIVATE hybrid_dit_block_runtime_lib)
+target_compile_options(realwidth_dit_block_validation PRIVATE /EHsc /UNDEBUG)
+
+add_executable(realwidth_artifact_inventory_tests realwidth_artifact_inventory_tests.cpp)
+target_link_libraries(realwidth_artifact_inventory_tests PRIVATE artifact_registry_lib model_cache_lib ncnn bcrypt)
+target_compile_options(realwidth_artifact_inventory_tests PRIVATE /EHsc /UNDEBUG)

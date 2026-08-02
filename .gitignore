@@ -24,3 +24,7 @@ tests/**/reports/
 # Toolchain test build products
 toolchain-test/build-*/
 toolchain-test/*.exe
+
+# Phase 13 real-width local artifacts (never committed)
+.phase13_local_artifacts/
+.phase13_export_tmp/

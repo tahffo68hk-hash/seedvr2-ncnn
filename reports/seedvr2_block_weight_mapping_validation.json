@@ -1,0 +1,45 @@
+{
+  "phase": "phase13",
+  "target": "realwidth_weight_mapping_tests",
+  "repetitions": 5,
+  "runs": [
+    {
+      "repetition": 1,
+      "overall_pass": true,
+      "mapped_numel": 158633493,
+      "source_numel": 158633493
+    },
+    {
+      "repetition": 2,
+      "overall_pass": true,
+      "mapped_numel": 158633493,
+      "source_numel": 158633493
+    },
+    {
+      "repetition": 3,
+      "overall_pass": true,
+      "mapped_numel": 158633493,
+      "source_numel": 158633493
+    },
+    {
+      "repetition": 4,
+      "overall_pass": true,
+      "mapped_numel": 158633493,
+      "source_numel": 158633493
+    },
+    {
+      "repetition": 5,
+      "overall_pass": true,
+      "mapped_numel": 158633493,
+      "source_numel": 158633493
+    }
+  ],
+  "overall_pass": true,
+  "overall_status": "PASS",
+  "real_seedvr2_weights": false,
+  "realwidth_block": true,
+  "full_32_block_dit": false,
+  "android_vulkan": false,
+  "large_artifacts_committed": false,
+  "determinism_stable_across_runs": true
+}

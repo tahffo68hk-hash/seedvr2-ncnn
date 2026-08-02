@@ -30,6 +30,16 @@ final vid/txt < 1e-4, A->B->C->D->A bit-identical, last-layer vid_only PASS,
 registry/cache 19, negatives 24+7+registry, and Phase 9.5/10/11 regressions
 PASS (batch>1 txt indexing quirk of the real `repeat_concat_idx` reproduced
 exactly). See [synthetic-seedvr2-dit-block-ncnn-report.md](D:/AIProjects/seedvr2-ncnn/docs/synthetic-seedvr2-dit-block-ncnn-report.md).
+Phase 13 real-width single-block feasibility + weight mapping is READY: the real
+`NaMMSRTransformerBlock` at C=2560/H=20/HD=128 (MLP 6912, seed 20260803, random
+weights) is exported to 19 FP32 ncnn stage models (`pnnx fp16=0`) and passes the
+minimal RW-A profile end-to-end on the existing `HybridDiTBlockRuntime`
+(final vid/txt ~1e-5, bit-identical determinism, cache 19, peak working set
+~685 MB, cached forward ~31 ms), with a full committed state_dict->ncnn weight
+mapping contract (29/29, AdaSingle runtime-only, qk-norm all-ones folded,
+last-layer reuses all 19 models). See
+[realwidth-seedvr2-block-feasibility-report.md](D:/AIProjects/seedvr2-ncnn/docs/realwidth-seedvr2-block-feasibility-report.md)
+and [seedvr2-block-weight-mapping-report.md](D:/AIProjects/seedvr2-ncnn/docs/seedvr2-block-weight-mapping-report.md).
 This is not a complete SeedVR2 port.
 
 ```mermaid
@@ -122,4 +132,17 @@ All FP32 parity/reference artifacts must use `pnnx fp16=0`. After public C++ typ
 
 Phase 7.5-B LayerNorm Hybrid Runtime = READY; Phase 8 RMSNorm Hybrid Runtime = READY; Phase 8.1 FP32 conversion precision fix = READY; Phase 9.1 DynamicAttentionContract = READY; Phase 9.2 Dynamic padding mask = READY; Phase 9.3 Dynamic MM-RoPE3D = READY; Phase 9.4 Typed auxiliary metadata/runtime routing = READY; Phase 9.5 Dynamic multi-shape RMS Hybrid Runtime = READY; Phase 10 head_dim=128 = READY (real SeedVR2 MM-RoPE3D contract confirmed from rotary-embedding-torch==0.5.3 and validated; synthetic contract kept as historical regression).
 
-TODO: integrate the real DiT block (video T-axis text-length offset l, text token RoPE), real SeedVR2 weights, profiles beyond A/B/C/HD128, Vulkan, VAE/full video restoration, and direct Apex fused-RMSNorm parity.
+Phase 13 real-width validation (clean build `build/phase13-real-width-release`):
+
+```text
+build/phase13-real-width-release/realwidth_dit_block_validation.exe .phase13_local_artifacts reports/realwidth_seedvr2_block_feasibility.json
+build/phase13-real-width-release/realwidth_artifact_inventory_tests.exe .phase13_local_artifacts reports/realwidth_artifact_inventory.json
+conda run -n seedvr2-block-probe python tests/seedvr2_weight_mapping/aggregate_realwidth_feasibility.py
+```
+
+Heavy real-width artifacts stay in the git-ignored `.phase13_local_artifacts/`
+directory; only manifests, the mapping contract, scripts, tests and reports are
+committed (see `tests/seedvr2_weight_mapping/check_no_large_tracked_artifacts.py`).
+
+TODO: real SeedVR2 weights (Phase 14, upon authorization), 32-block DiT, Vulkan,
+VAE/full video restoration, and direct Apex fused-RMSNorm parity.
