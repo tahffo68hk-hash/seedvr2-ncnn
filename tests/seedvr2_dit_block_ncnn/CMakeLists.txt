@@ -55,3 +55,8 @@ target_compile_options(real_block_adapter PRIVATE /EHsc /UNDEBUG)
 add_executable(multiblock_streaming_adapter multiblock_streaming_adapter.cpp)
 target_link_libraries(multiblock_streaming_adapter PRIVATE hybrid_dit_block_runtime_lib)
 target_compile_options(multiblock_streaming_adapter PRIVATE /EHsc /UNDEBUG)
+
+# Phase 16: full SeedVR2 DiT streaming adapter (8/16/full 0..31 incl. last layer).
+add_executable(full_dit_streaming_adapter full_dit_streaming_adapter.cpp)
+target_link_libraries(full_dit_streaming_adapter PRIVATE hybrid_dit_block_runtime_lib)
+target_compile_options(full_dit_streaming_adapter PRIVATE /EHsc /UNDEBUG)

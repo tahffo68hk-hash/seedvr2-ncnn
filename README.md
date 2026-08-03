@@ -70,9 +70,29 @@ the required 32-block strategy); negatives 48/48; regressions 27/27; git
 protection PASS. See [multiblock-streaming-hybrid-report.md](D:/AIProjects/seedvr2-ncnn/docs/multiblock-streaming-hybrid-report.md)
 and [multiblock-error-growth-report.md](D:/AIProjects/seedvr2-ncnn/docs/multiblock-error-growth-report.md).
 
-This is a SeedVR2-style attention subsystem with a single or small multi-block
-(1/2/4 contiguous real-weight blocks) ncnn runtime, not a complete SeedVR2
-port.
+Phase 16 full SeedVR2 DiT streaming is **READY**: all 32 real blocks 0..31
+(including the unique last layer 31) run through ncnn in strict per-block
+streaming mode (`LOAD -> EXECUTE -> UNLOAD`, `max_resident_weighted_blocks=1`;
+per block the runtime is destroyed, the model cache cleared to 0, resident
+bytes 0, and artifact file rename-probes pass). Blocks 0..9 use the split
+29-key layout, blocks 10..31 the shared 15-key `.all.` layout - both derived
+from the checkpoint, never hardcoded. All 32/32 artifacts verified
+(`reports/phase16_artifact_inventory.json`, logical 13.32 GB with physical
+dedup; blocks 15-18 hardlink-reused from Phase 15). Chain parity
+(streaming == FP32 reference, fresh build `build/phase16-full-dit-release`):
+chain_8 rel 5.6465e-4 (limit 1e-2), chain_16 2.0992e-3 (2e-2), chain_full
+5.0234e-3 (5e-2), NaN/Inf=0, 3x bit-identical; last-layer standalone parity
+combined rel 4.05e-6 (limit 1e-3). Official-pipeline visual with 8/16/all-32
+blocks swapped to ONE strict ncnn adapter call per run: pixel PSNR
+51.336/52.551/51.050 dB (>=34), SSIM 0.9974/0.9976/0.9972 (>=0.95), adapter
+evidence ncnn=8/16/32, original=0, silent_fallback=false,
+`max_resident_weighted_blocks=1`; negatives 80/80; regressions 27/27; git
+protection PASS. See [full-dit-streaming-report.md](D:/AIProjects/seedvr2-ncnn/docs/full-dit-streaming-report.md)
+and [full-dit-error-growth-report.md](D:/AIProjects/seedvr2-ncnn/docs/full-dit-error-growth-report.md).
+
+This is a SeedVR2-style attention subsystem with a single-block, small
+multi-block (1/2/4), and full 32-block (8/16/all) streaming ncnn runtime,
+not a complete SeedVR2 port.
 
 ```mermaid
 flowchart LR
@@ -178,4 +198,10 @@ Heavy real-width artifacts stay in the git-ignored `.phase13_local_artifacts/`
 directory; only manifests, the mapping contract, scripts, tests and reports are
 committed (see `tests/seedvr2_weight_mapping/check_no_large_tracked_artifacts.py`).
 
-TODO (Phase 15, not started - explicit authorization required): full 32-block real-weight DiT streaming on ncnn, Android/Vulkan targets, VAE/full video restoration in ncnn, and direct fused-kernel parity. Phase 14 committed evidence: real-weight single-block RW-A parity (final vid/txt < 2e-4) and official-context block-16 parity (rel < 1e-3), hybrid visual milestone (pixel PSNR 52.5 dB, SSIM 0.9975), negatives 29/29, regressions 22/22, git protection 8/8.
+TODO (Phase 17, not started - explicit authorization required): VAE-in-ncnn /
+full video restoration, Android/Vulkan targets (Pad 7 Pro NOT validated), and
+direct fused-kernel parity. Phase 16 committed evidence: full 32-block
+real-weight DiT streaming chain parity (chain_8 5.65e-4 / chain_16 2.10e-3 /
+chain_full 5.02e-3 relative, limits 1e-2/2e-2/5e-2), official-pipeline visual
+8/16/full (pixel PSNR 51.05..52.55 dB, SSIM 0.9972..0.9976), negatives 80/80,
+regressions 27/27, git protection PASS.

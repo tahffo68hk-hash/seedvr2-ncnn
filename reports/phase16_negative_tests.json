@@ -1,0 +1,411 @@
+{
+  "phase": 16,
+  "milestone": "full SeedVR2 DiT streaming negative tests",
+  "total": 80,
+  "passed": 80,
+  "failed": 0,
+  "overall_pass": true,
+  "overall_status": "PASS",
+  "tests": [
+    {
+      "name": "range_duplicate_rejected",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "range_out_of_bounds_32_rejected",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "range_negative_rejected",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "range_not_ascending_rejected",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "range_non_contiguous_rejected",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "range_empty_rejected",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "range_last_layer_duplicated_rejected",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "range_last_layer_not_final_rejected",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "range_last_layer_mid_chain_rejected",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "range_last_layer_final_accepted",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "range_last_layer_alone_accepted",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "range_full_accepted",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "range_8_accepted",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "range_16_accepted",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "schedule_reports_32_blocks",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "schedule_last_layer_31",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "schedule_range_8",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "schedule_range_16",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "schedule_range_full",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "inventory_all_blocks_present",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "inventory_no_missing",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "inventory_no_large_committed",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "inventory_metadata_and_stage_counts_ok",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "mapping_overall_pass",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "mapping_covers_32_blocks",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "mapping_no_unmapped",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "mapping_no_duplicates",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "mapping_all_qk_rmsnorm_real_affine",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "mapping_all_expected_equals_consumed",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "mapping_all_qkv_split_concat_bit_exact",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "event_load_b_before_unload_a_rejected",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "event_reversed_order_rejected",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "event_execute_before_load_rejected",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "event_chain_ends_loaded_rejected",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "event_unload_wrong_block_rejected",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "event_strict_order_accepted",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "event_last_layer_strict_order_accepted",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "cache_not_cleared_detected",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "resident_bytes_not_zero_detected",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "state_machine_not_idle_detected",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "expected_next_progression_valid",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "adapter_streaming_block9_rc0",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "adapter_last_layer_alone_rc0",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "adapter_last_layer_report_is_last",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "adapter_last_layer_final_rc0",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "adapter_rejects_unknown_variant",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "adapter_rejects_missing_input",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "adapter_rejects_out_of_range_block",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "adapter_rejects_last_layer_not_final",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "adapter_rejects_last_layer_duplicate",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "adapter_rejects_out_of_order",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "silent_fallback_zero_calls_detected",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "original_block_executed_detected",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "adapter_call_count_too_few_detected",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "adapter_call_count_too_many_detected",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "adapter_evidence_ok_criterion",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "full_adapter_report_no_fallback",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "chain_parity_all_chains_pass",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "chain_parity_chain_8_under_limit",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "chain_parity_chain_16_under_limit",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "chain_parity_chain_full_under_limit",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "chain_parity_no_nan_inf",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "nan_output_detected",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "inf_output_detected",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "error_over_limit_detected",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "error_under_limit_accepted",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "visual_full_psnr_ge_34",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "visual_full_ssim_ge_095",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "visual_full_no_nan_inf",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "visual_verdict_pass",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "error_growth_present",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "constant_frames_detected",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "frame_count_mismatch_detected",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "visual_modes_all_present",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "visual_hybrid_non_constant",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "no_heavy_binary_tracked",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "no_phase16_heavy_dirs_tracked",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "no_phase16_bin_tracked",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "gitignore_covers_phase16_dirs",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "git_diff_check_clean",
+      "pass": true,
+      "detail": ""
+    }
+  ]
+}

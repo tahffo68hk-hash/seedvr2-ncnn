@@ -1,0 +1,127 @@
+{
+  "phase": 16,
+  "block_index": 31,
+  "is_last_layer": true,
+  "real_seedvr2_weights": true,
+  "checkpoint_sha256": "6bcc5ac59447e97b100477480aebb01be2ec724c8340bb83faae21f64848604b",
+  "input_source": "official_context_capture/block_31",
+  "reference_path": "PyTorch real block 31 (fp32, bf16-cast patched to identity, TF32 off)",
+  "relative_limit": 0.001,
+  "per_repeat": {
+    "rep0": {
+      "rc": 0,
+      "final_vid": {
+        "max_abs_error": 0.05755043029785156,
+        "mean_abs_error": 0.0015507061506554454,
+        "rmse": 0.0021121876556693007,
+        "relative_max_error": 0.0032417454908011054,
+        "nan_count": 0,
+        "inf_count": 0
+      },
+      "final_txt": {
+        "max_abs_error": 0.22481727600097656,
+        "mean_abs_error": 0.01388279401733849,
+        "rmse": 0.020050977745269916,
+        "relative_max_error": 4.0470063994847404e-06,
+        "nan_count": 0,
+        "inf_count": 0
+      },
+      "combined": {
+        "max_abs_error": 0.22481727600097656,
+        "mean_abs_error": 0.005396195915535105,
+        "rmse": 0.011333049535995138,
+        "relative_max_error": 4.0470063994847404e-06,
+        "nan_count": 0,
+        "inf_count": 0
+      },
+      "ncnn_adapter_call_count": 1,
+      "original_block_call_count": 0,
+      "silent_fallback": false,
+      "max_resident_weighted_blocks": 1,
+      "streaming_mode_validated": true,
+      "state_machine_valid": true,
+      "hybrid_marker": true,
+      "is_last_layer": true
+    },
+    "rep1": {
+      "rc": 0,
+      "final_vid": {
+        "max_abs_error": 0.05755043029785156,
+        "mean_abs_error": 0.0015507061506554454,
+        "rmse": 0.0021121876556693007,
+        "relative_max_error": 0.0032417454908011054,
+        "nan_count": 0,
+        "inf_count": 0
+      },
+      "final_txt": {
+        "max_abs_error": 0.22481727600097656,
+        "mean_abs_error": 0.01388279401733849,
+        "rmse": 0.020050977745269916,
+        "relative_max_error": 4.0470063994847404e-06,
+        "nan_count": 0,
+        "inf_count": 0
+      },
+      "combined": {
+        "max_abs_error": 0.22481727600097656,
+        "mean_abs_error": 0.005396195915535105,
+        "rmse": 0.011333049535995138,
+        "relative_max_error": 4.0470063994847404e-06,
+        "nan_count": 0,
+        "inf_count": 0
+      },
+      "ncnn_adapter_call_count": 1,
+      "original_block_call_count": 0,
+      "silent_fallback": false,
+      "max_resident_weighted_blocks": 1,
+      "streaming_mode_validated": true,
+      "state_machine_valid": true,
+      "hybrid_marker": true,
+      "is_last_layer": true
+    },
+    "rep2": {
+      "rc": 0,
+      "final_vid": {
+        "max_abs_error": 0.05755043029785156,
+        "mean_abs_error": 0.0015507061506554454,
+        "rmse": 0.0021121876556693007,
+        "relative_max_error": 0.0032417454908011054,
+        "nan_count": 0,
+        "inf_count": 0
+      },
+      "final_txt": {
+        "max_abs_error": 0.22481727600097656,
+        "mean_abs_error": 0.01388279401733849,
+        "rmse": 0.020050977745269916,
+        "relative_max_error": 4.0470063994847404e-06,
+        "nan_count": 0,
+        "inf_count": 0
+      },
+      "combined": {
+        "max_abs_error": 0.22481727600097656,
+        "mean_abs_error": 0.005396195915535105,
+        "rmse": 0.011333049535995138,
+        "relative_max_error": 4.0470063994847404e-06,
+        "nan_count": 0,
+        "inf_count": 0
+      },
+      "ncnn_adapter_call_count": 1,
+      "original_block_call_count": 0,
+      "silent_fallback": false,
+      "max_resident_weighted_blocks": 1,
+      "streaming_mode_validated": true,
+      "state_machine_valid": true,
+      "hybrid_marker": true,
+      "is_last_layer": true
+    }
+  },
+  "combined_min_max_abs": 0.22481727600097656,
+  "combined_max_relative": 4.0470063994847404e-06,
+  "nan_count_total": 0,
+  "inf_count_total": 0,
+  "deterministic_ncnn": true,
+  "ncnn_adapter_call_count": 1,
+  "original_block_call_count": 0,
+  "silent_fallback": false,
+  "max_resident_weighted_blocks": 1,
+  "pass": true
+}

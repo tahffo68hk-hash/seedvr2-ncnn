@@ -1,0 +1,2780 @@
+{
+  "phase": 16,
+  "checkpoint_sha256": "6bcc5ac59447e97b100477480aebb01be2ec724c8340bb83faae21f64848604b",
+  "real_seedvr2_weights": true,
+  "actual_block_count": 32,
+  "block_indices": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31
+  ],
+  "last_layer_index": 31,
+  "split_blocks": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+  ],
+  "shared_blocks": [
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31
+  ],
+  "per_block": {
+    "0": {
+      "block_index": 0,
+      "layout": "split_vid_txt",
+      "is_last_layer": false,
+      "prefix": "blocks.0.",
+      "key_count": 29,
+      "source_numel": 158633493,
+      "mapped_key_count": 29,
+      "mapped_numel": 158633493,
+      "expected_keys_equals_consumed_keys": true,
+      "unmapped_keys": [],
+      "duplicate_keys": [],
+      "shape_mismatches": [],
+      "qkv_split_concat_bit_exact": true,
+      "qkv_per_side": {
+        "vid": true,
+        "txt": true
+      },
+      "qkv_slice_rows": {
+        "q": [
+          0,
+          2560
+        ],
+        "k": [
+          2560,
+          5120
+        ],
+        "v": [
+          5120,
+          7680
+        ]
+      },
+      "swiglu_mapping_ok": true,
+      "swiglu_per_side": {
+        "vid": true,
+        "txt": true
+      },
+      "vid_txt_weights_distinct": {
+        "proj_qkv": true,
+        "proj_out": true,
+        "mlp_proj_in": true
+      },
+      "ada_single_runtime_only": true,
+      "qk_rmsnorm_affine": {
+        "norm_q.vid.weight": {
+          "min": -0.07512938231229782,
+          "max": 0.9816974997520447,
+          "mean": 0.1273270845413208,
+          "std": 0.24512268602848053,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "34e7dca3a1f3b975619a839cbdb7e23442d7eeb67cdc41d907d7488e42dc61e6"
+        },
+        "norm_q.txt.weight": {
+          "min": -0.01168129500001669,
+          "max": 0.5192672610282898,
+          "mean": 0.09869149327278137,
+          "std": 0.1265328824520111,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "6d57ec20005403a42719cd3311e5750fb2e3ed063494716fa69394f199973faa"
+        },
+        "norm_k.vid.weight": {
+          "min": -0.10095841437578201,
+          "max": 0.9528495669364929,
+          "mean": 0.12881554663181305,
+          "std": 0.22443796694278717,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "cdb981e2f92a7cfdbf9ffc25257e2c36161107f1095cd99ca8c3f51f5d93b5e2"
+        },
+        "norm_k.txt.weight": {
+          "min": -0.024134621024131775,
+          "max": 0.8427520990371704,
+          "mean": 0.13354775309562683,
+          "std": 0.17864824831485748,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "1747c59bd8a620a428447f0b8fa3b3d169ea3621f4c22731f908ed444ee8bf10"
+        }
+      },
+      "qk_affine_all_ones": {
+        "norm_q.vid.weight": false,
+        "norm_q.txt.weight": false,
+        "norm_k.vid.weight": false,
+        "norm_k.txt.weight": false
+      },
+      "real_affine_required": true
+    },
+    "1": {
+      "block_index": 1,
+      "layout": "split_vid_txt",
+      "is_last_layer": false,
+      "prefix": "blocks.1.",
+      "key_count": 29,
+      "source_numel": 158633493,
+      "mapped_key_count": 29,
+      "mapped_numel": 158633493,
+      "expected_keys_equals_consumed_keys": true,
+      "unmapped_keys": [],
+      "duplicate_keys": [],
+      "shape_mismatches": [],
+      "qkv_split_concat_bit_exact": true,
+      "qkv_per_side": {
+        "vid": true,
+        "txt": true
+      },
+      "qkv_slice_rows": {
+        "q": [
+          0,
+          2560
+        ],
+        "k": [
+          2560,
+          5120
+        ],
+        "v": [
+          5120,
+          7680
+        ]
+      },
+      "swiglu_mapping_ok": true,
+      "swiglu_per_side": {
+        "vid": true,
+        "txt": true
+      },
+      "vid_txt_weights_distinct": {
+        "proj_qkv": true,
+        "proj_out": true,
+        "mlp_proj_in": true
+      },
+      "ada_single_runtime_only": true,
+      "qk_rmsnorm_affine": {
+        "norm_q.vid.weight": {
+          "min": -0.019679270684719086,
+          "max": 1.8410147428512573,
+          "mean": 0.3324313461780548,
+          "std": 0.40038496255874634,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "a459a3c89d772d7750ab63896c842886c576eb526397e87cb854fc28e63187d3"
+        },
+        "norm_q.txt.weight": {
+          "min": -0.03394739702343941,
+          "max": 0.8301286101341248,
+          "mean": 0.1932048499584198,
+          "std": 0.21926349401474,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "859786a8930bf396a7242e96807b8666434e9d1f4f98087eb84e53e1975c5e60"
+        },
+        "norm_k.vid.weight": {
+          "min": -0.8597944974899292,
+          "max": 1.7243212461471558,
+          "mean": 0.2945866882801056,
+          "std": 0.4111729562282562,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "e2d44d3b5150d839381c084d69e9c5b744d9163735b91f02c20a89c9ade93d4a"
+        },
+        "norm_k.txt.weight": {
+          "min": 0.001947983866557479,
+          "max": 0.8282967209815979,
+          "mean": 0.2502340078353882,
+          "std": 0.19695959985256195,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "f84edfc725a777e738b5dc21acd7f183c994ea1bd5cfc2a21171f661aac70636"
+        }
+      },
+      "qk_affine_all_ones": {
+        "norm_q.vid.weight": false,
+        "norm_q.txt.weight": false,
+        "norm_k.vid.weight": false,
+        "norm_k.txt.weight": false
+      },
+      "real_affine_required": true
+    },
+    "2": {
+      "block_index": 2,
+      "layout": "split_vid_txt",
+      "is_last_layer": false,
+      "prefix": "blocks.2.",
+      "key_count": 29,
+      "source_numel": 158633493,
+      "mapped_key_count": 29,
+      "mapped_numel": 158633493,
+      "expected_keys_equals_consumed_keys": true,
+      "unmapped_keys": [],
+      "duplicate_keys": [],
+      "shape_mismatches": [],
+      "qkv_split_concat_bit_exact": true,
+      "qkv_per_side": {
+        "vid": true,
+        "txt": true
+      },
+      "qkv_slice_rows": {
+        "q": [
+          0,
+          2560
+        ],
+        "k": [
+          2560,
+          5120
+        ],
+        "v": [
+          5120,
+          7680
+        ]
+      },
+      "swiglu_mapping_ok": true,
+      "swiglu_per_side": {
+        "vid": true,
+        "txt": true
+      },
+      "vid_txt_weights_distinct": {
+        "proj_qkv": true,
+        "proj_out": true,
+        "mlp_proj_in": true
+      },
+      "ada_single_runtime_only": true,
+      "qk_rmsnorm_affine": {
+        "norm_q.vid.weight": {
+          "min": 0.011096645146608353,
+          "max": 1.9394581317901611,
+          "mean": 0.5908417105674744,
+          "std": 0.42752695083618164,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "5c22e52581aa814c3f7935664430d7b195c70f09fe46eb7b110ec7a96b4a7bee"
+        },
+        "norm_q.txt.weight": {
+          "min": -0.048335641622543335,
+          "max": 1.0862479209899902,
+          "mean": 0.2971453070640564,
+          "std": 0.22720825672149658,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "1f7b00c933f35aea68948caa6c0dffe510a3dc9f26b8f28f5560f481791d6286"
+        },
+        "norm_k.vid.weight": {
+          "min": 0.003581420285627246,
+          "max": 1.7763346433639526,
+          "mean": 0.5339802503585815,
+          "std": 0.4392981231212616,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "715569eeead0e4282c35a7120da7e9c9d8e9aa9a100c9f2b4fb1c527b5d4f0a0"
+        },
+        "norm_k.txt.weight": {
+          "min": 0.015523574315011501,
+          "max": 0.9510411024093628,
+          "mean": 0.3316493034362793,
+          "std": 0.18195980787277222,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "eba85dad39adfc7b056818fb8ef124cf7de8f46561bc877423d77c7a4d1e43fc"
+        }
+      },
+      "qk_affine_all_ones": {
+        "norm_q.vid.weight": false,
+        "norm_q.txt.weight": false,
+        "norm_k.vid.weight": false,
+        "norm_k.txt.weight": false
+      },
+      "real_affine_required": true
+    },
+    "3": {
+      "block_index": 3,
+      "layout": "split_vid_txt",
+      "is_last_layer": false,
+      "prefix": "blocks.3.",
+      "key_count": 29,
+      "source_numel": 158633493,
+      "mapped_key_count": 29,
+      "mapped_numel": 158633493,
+      "expected_keys_equals_consumed_keys": true,
+      "unmapped_keys": [],
+      "duplicate_keys": [],
+      "shape_mismatches": [],
+      "qkv_split_concat_bit_exact": true,
+      "qkv_per_side": {
+        "vid": true,
+        "txt": true
+      },
+      "qkv_slice_rows": {
+        "q": [
+          0,
+          2560
+        ],
+        "k": [
+          2560,
+          5120
+        ],
+        "v": [
+          5120,
+          7680
+        ]
+      },
+      "swiglu_mapping_ok": true,
+      "swiglu_per_side": {
+        "vid": true,
+        "txt": true
+      },
+      "vid_txt_weights_distinct": {
+        "proj_qkv": true,
+        "proj_out": true,
+        "mlp_proj_in": true
+      },
+      "ada_single_runtime_only": true,
+      "qk_rmsnorm_affine": {
+        "norm_q.vid.weight": {
+          "min": 0.14432916045188904,
+          "max": 2.0728046894073486,
+          "mean": 0.7766290903091431,
+          "std": 0.4182257354259491,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "92016d34854b85ffc0a872e9db8406aba7d8697e7ed72b3fa5fcb0e405548b9f"
+        },
+        "norm_q.txt.weight": {
+          "min": -0.0423462837934494,
+          "max": 1.1990679502487183,
+          "mean": 0.3508305549621582,
+          "std": 0.23976722359657288,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "061ee46d8601321ffd9e6d7fbf4edbfde4d874c05a991209e3d8f9b9076fb3ea"
+        },
+        "norm_k.vid.weight": {
+          "min": 0.08428367972373962,
+          "max": 1.81760573387146,
+          "mean": 0.7337092757225037,
+          "std": 0.4233277440071106,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "2c14711544861128d9b91ee7127b301066b25db1c7672842c212c31dbb5a45ef"
+        },
+        "norm_k.txt.weight": {
+          "min": -0.006869804579764605,
+          "max": 0.7227348685264587,
+          "mean": 0.37880679965019226,
+          "std": 0.1780843287706375,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "9adac048098ab6aa847fcf17d126aa8ab6a378a622e58a23d7ca7e8d5a7e6cd9"
+        }
+      },
+      "qk_affine_all_ones": {
+        "norm_q.vid.weight": false,
+        "norm_q.txt.weight": false,
+        "norm_k.vid.weight": false,
+        "norm_k.txt.weight": false
+      },
+      "real_affine_required": true
+    },
+    "4": {
+      "block_index": 4,
+      "layout": "split_vid_txt",
+      "is_last_layer": false,
+      "prefix": "blocks.4.",
+      "key_count": 29,
+      "source_numel": 158633493,
+      "mapped_key_count": 29,
+      "mapped_numel": 158633493,
+      "expected_keys_equals_consumed_keys": true,
+      "unmapped_keys": [],
+      "duplicate_keys": [],
+      "shape_mismatches": [],
+      "qkv_split_concat_bit_exact": true,
+      "qkv_per_side": {
+        "vid": true,
+        "txt": true
+      },
+      "qkv_slice_rows": {
+        "q": [
+          0,
+          2560
+        ],
+        "k": [
+          2560,
+          5120
+        ],
+        "v": [
+          5120,
+          7680
+        ]
+      },
+      "swiglu_mapping_ok": true,
+      "swiglu_per_side": {
+        "vid": true,
+        "txt": true
+      },
+      "vid_txt_weights_distinct": {
+        "proj_qkv": true,
+        "proj_out": true,
+        "mlp_proj_in": true
+      },
+      "ada_single_runtime_only": true,
+      "qk_rmsnorm_affine": {
+        "norm_q.vid.weight": {
+          "min": 0.15827356278896332,
+          "max": 2.0175929069519043,
+          "mean": 0.8919682502746582,
+          "std": 0.40242063999176025,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "c64a9f8a09f3d463ed5b86dfdbfee20f9d001fb084d8dc26bdc08fb9be7f8a6a"
+        },
+        "norm_q.txt.weight": {
+          "min": -0.014551743865013123,
+          "max": 1.3422183990478516,
+          "mean": 0.4456963539123535,
+          "std": 0.3031843900680542,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "56215a35b27946c7859d86027993b11c6408e80e5b12773773a1f547c7ad11ab"
+        },
+        "norm_k.vid.weight": {
+          "min": 0.07635252177715302,
+          "max": 1.8687325716018677,
+          "mean": 0.9263124465942383,
+          "std": 0.39068570733070374,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "b671bc071b069c86e2bfc0100f0e86d581e5fccef99b70e86bf5b2aae303b1c8"
+        },
+        "norm_k.txt.weight": {
+          "min": -0.059016332030296326,
+          "max": 0.897729218006134,
+          "mean": 0.3572375774383545,
+          "std": 0.19080452620983124,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "c2b876c23574003deea3c0df4349cab16100f0cf176b847fbc4c254bb2d38945"
+        }
+      },
+      "qk_affine_all_ones": {
+        "norm_q.vid.weight": false,
+        "norm_q.txt.weight": false,
+        "norm_k.vid.weight": false,
+        "norm_k.txt.weight": false
+      },
+      "real_affine_required": true
+    },
+    "5": {
+      "block_index": 5,
+      "layout": "split_vid_txt",
+      "is_last_layer": false,
+      "prefix": "blocks.5.",
+      "key_count": 29,
+      "source_numel": 158633493,
+      "mapped_key_count": 29,
+      "mapped_numel": 158633493,
+      "expected_keys_equals_consumed_keys": true,
+      "unmapped_keys": [],
+      "duplicate_keys": [],
+      "shape_mismatches": [],
+      "qkv_split_concat_bit_exact": true,
+      "qkv_per_side": {
+        "vid": true,
+        "txt": true
+      },
+      "qkv_slice_rows": {
+        "q": [
+          0,
+          2560
+        ],
+        "k": [
+          2560,
+          5120
+        ],
+        "v": [
+          5120,
+          7680
+        ]
+      },
+      "swiglu_mapping_ok": true,
+      "swiglu_per_side": {
+        "vid": true,
+        "txt": true
+      },
+      "vid_txt_weights_distinct": {
+        "proj_qkv": true,
+        "proj_out": true,
+        "mlp_proj_in": true
+      },
+      "ada_single_runtime_only": true,
+      "qk_rmsnorm_affine": {
+        "norm_q.vid.weight": {
+          "min": 0.15262261033058167,
+          "max": 1.6186994314193726,
+          "mean": 1.0036976337432861,
+          "std": 0.31789496541023254,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "3b617e3ad90d6ffb87cd3efc4ec65187ea94a5f58ddd9e191f18f8c0a8460e90"
+        },
+        "norm_q.txt.weight": {
+          "min": -0.032710861414670944,
+          "max": 1.4507286548614502,
+          "mean": 0.5123478174209595,
+          "std": 0.3114774525165558,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "982307bcc2d8e3c9e9bd96e471bc1fc9cd293262cbe63109acf76cdf5d5bf782"
+        },
+        "norm_k.vid.weight": {
+          "min": 0.058285459876060486,
+          "max": 1.707663893699646,
+          "mean": 0.9763876795768738,
+          "std": 0.31215590238571167,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "447d86544727bb7b8a0fb4c0169b2696bfe823ce393838e45b372599d22d9210"
+        },
+        "norm_k.txt.weight": {
+          "min": -0.005493741016834974,
+          "max": 0.8650668263435364,
+          "mean": 0.4378759264945984,
+          "std": 0.21780048310756683,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "c64d23adf257d26a8b1f2429bf391beadcc794534c7ebd9dd543ca65ef7e7fa5"
+        }
+      },
+      "qk_affine_all_ones": {
+        "norm_q.vid.weight": false,
+        "norm_q.txt.weight": false,
+        "norm_k.vid.weight": false,
+        "norm_k.txt.weight": false
+      },
+      "real_affine_required": true
+    },
+    "6": {
+      "block_index": 6,
+      "layout": "split_vid_txt",
+      "is_last_layer": false,
+      "prefix": "blocks.6.",
+      "key_count": 29,
+      "source_numel": 158633493,
+      "mapped_key_count": 29,
+      "mapped_numel": 158633493,
+      "expected_keys_equals_consumed_keys": true,
+      "unmapped_keys": [],
+      "duplicate_keys": [],
+      "shape_mismatches": [],
+      "qkv_split_concat_bit_exact": true,
+      "qkv_per_side": {
+        "vid": true,
+        "txt": true
+      },
+      "qkv_slice_rows": {
+        "q": [
+          0,
+          2560
+        ],
+        "k": [
+          2560,
+          5120
+        ],
+        "v": [
+          5120,
+          7680
+        ]
+      },
+      "swiglu_mapping_ok": true,
+      "swiglu_per_side": {
+        "vid": true,
+        "txt": true
+      },
+      "vid_txt_weights_distinct": {
+        "proj_qkv": true,
+        "proj_out": true,
+        "mlp_proj_in": true
+      },
+      "ada_single_runtime_only": true,
+      "qk_rmsnorm_affine": {
+        "norm_q.vid.weight": {
+          "min": 0.19697807729244232,
+          "max": 2.0213463306427,
+          "mean": 1.0482563972473145,
+          "std": 0.3076631724834442,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "3672b02e9cd52a8c3c86cf7ed7cf0298740b691b43721d2140c235856bb7eba6"
+        },
+        "norm_q.txt.weight": {
+          "min": -0.03855080157518387,
+          "max": 1.5010656118392944,
+          "mean": 0.5540924072265625,
+          "std": 0.34513869881629944,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "1de9d245790bbe5175618932e7bfee8551dc3d9fc96d28737ad4865e5b473287"
+        },
+        "norm_k.vid.weight": {
+          "min": 0.13265317678451538,
+          "max": 1.8915859460830688,
+          "mean": 1.024359941482544,
+          "std": 0.30580708384513855,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "4e76c5ae5db61077b2fee47762a66ded24c184e25c30ef43d67e88a9a68112f2"
+        },
+        "norm_k.txt.weight": {
+          "min": -0.020847264677286148,
+          "max": 0.868708074092865,
+          "mean": 0.4766795337200165,
+          "std": 0.24472582340240479,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "4242424039fd8446be368fc618a48772c3d9333ac53ecf94307d6f2c19f06d7f"
+        }
+      },
+      "qk_affine_all_ones": {
+        "norm_q.vid.weight": false,
+        "norm_q.txt.weight": false,
+        "norm_k.vid.weight": false,
+        "norm_k.txt.weight": false
+      },
+      "real_affine_required": true
+    },
+    "7": {
+      "block_index": 7,
+      "layout": "split_vid_txt",
+      "is_last_layer": false,
+      "prefix": "blocks.7.",
+      "key_count": 29,
+      "source_numel": 158633493,
+      "mapped_key_count": 29,
+      "mapped_numel": 158633493,
+      "expected_keys_equals_consumed_keys": true,
+      "unmapped_keys": [],
+      "duplicate_keys": [],
+      "shape_mismatches": [],
+      "qkv_split_concat_bit_exact": true,
+      "qkv_per_side": {
+        "vid": true,
+        "txt": true
+      },
+      "qkv_slice_rows": {
+        "q": [
+          0,
+          2560
+        ],
+        "k": [
+          2560,
+          5120
+        ],
+        "v": [
+          5120,
+          7680
+        ]
+      },
+      "swiglu_mapping_ok": true,
+      "swiglu_per_side": {
+        "vid": true,
+        "txt": true
+      },
+      "vid_txt_weights_distinct": {
+        "proj_qkv": true,
+        "proj_out": true,
+        "mlp_proj_in": true
+      },
+      "ada_single_runtime_only": true,
+      "qk_rmsnorm_affine": {
+        "norm_q.vid.weight": {
+          "min": 0.2594940960407257,
+          "max": 1.9534109830856323,
+          "mean": 1.0238938331604004,
+          "std": 0.31433773040771484,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "ecdadf5d4d8bd9ebc909d284e2e676fb9b6ff85e2dc8053726daa492366f4cba"
+        },
+        "norm_q.txt.weight": {
+          "min": -0.035460907965898514,
+          "max": 1.8168230056762695,
+          "mean": 0.5241289138793945,
+          "std": 0.36278608441352844,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "480647b497ee8e6e7b3f4da9f1477854f4a30fad54941e512b22dae1bfe4d6be"
+        },
+        "norm_k.vid.weight": {
+          "min": 0.08760455250740051,
+          "max": 1.7499173879623413,
+          "mean": 0.9862483143806458,
+          "std": 0.301344096660614,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "e788caaf030470a545fee0940710eaa29895e2accada7da3fce7f1fc8bae0b0e"
+        },
+        "norm_k.txt.weight": {
+          "min": -0.05410533398389816,
+          "max": 0.9419617056846619,
+          "mean": 0.5123351812362671,
+          "std": 0.2567025423049927,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "89d114acfe697c1bff6a405186a93484255117268e42df21f9bdd3853a95d3d7"
+        }
+      },
+      "qk_affine_all_ones": {
+        "norm_q.vid.weight": false,
+        "norm_q.txt.weight": false,
+        "norm_k.vid.weight": false,
+        "norm_k.txt.weight": false
+      },
+      "real_affine_required": true
+    },
+    "8": {
+      "block_index": 8,
+      "layout": "split_vid_txt",
+      "is_last_layer": false,
+      "prefix": "blocks.8.",
+      "key_count": 29,
+      "source_numel": 158633493,
+      "mapped_key_count": 29,
+      "mapped_numel": 158633493,
+      "expected_keys_equals_consumed_keys": true,
+      "unmapped_keys": [],
+      "duplicate_keys": [],
+      "shape_mismatches": [],
+      "qkv_split_concat_bit_exact": true,
+      "qkv_per_side": {
+        "vid": true,
+        "txt": true
+      },
+      "qkv_slice_rows": {
+        "q": [
+          0,
+          2560
+        ],
+        "k": [
+          2560,
+          5120
+        ],
+        "v": [
+          5120,
+          7680
+        ]
+      },
+      "swiglu_mapping_ok": true,
+      "swiglu_per_side": {
+        "vid": true,
+        "txt": true
+      },
+      "vid_txt_weights_distinct": {
+        "proj_qkv": true,
+        "proj_out": true,
+        "mlp_proj_in": true
+      },
+      "ada_single_runtime_only": true,
+      "qk_rmsnorm_affine": {
+        "norm_q.vid.weight": {
+          "min": 0.27996301651000977,
+          "max": 1.9333492517471313,
+          "mean": 1.1465928554534912,
+          "std": 0.33031705021858215,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "1e6faf97f833b6bac537935e665685a53706c706b9bfd54321397572a87c0bbc"
+        },
+        "norm_q.txt.weight": {
+          "min": -0.02011800743639469,
+          "max": 1.349534273147583,
+          "mean": 0.40144285559654236,
+          "std": 0.32059717178344727,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "dbfd2e5b10e3a9bf92578e0d44c9dbeb6aa0e56f7cc23d3a2957680d73dbfdc8"
+        },
+        "norm_k.vid.weight": {
+          "min": -0.0004153817717451602,
+          "max": 1.7413963079452515,
+          "mean": 0.9603748321533203,
+          "std": 0.2937937080860138,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "f22e5cc64edfcd7e1314773098060bd327e01f2285692a6da9cada16cbb98ea4"
+        },
+        "norm_k.txt.weight": {
+          "min": -0.013027106411755085,
+          "max": 1.0779175758361816,
+          "mean": 0.5461696982383728,
+          "std": 0.3061627447605133,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "0c4da2b3aaecccfcb48c06bd19260a70f45beb13119252e0815805b66d705e8c"
+        }
+      },
+      "qk_affine_all_ones": {
+        "norm_q.vid.weight": false,
+        "norm_q.txt.weight": false,
+        "norm_k.vid.weight": false,
+        "norm_k.txt.weight": false
+      },
+      "real_affine_required": true
+    },
+    "9": {
+      "block_index": 9,
+      "layout": "split_vid_txt",
+      "is_last_layer": false,
+      "prefix": "blocks.9.",
+      "key_count": 29,
+      "source_numel": 158633493,
+      "mapped_key_count": 29,
+      "mapped_numel": 158633493,
+      "expected_keys_equals_consumed_keys": true,
+      "unmapped_keys": [],
+      "duplicate_keys": [],
+      "shape_mismatches": [],
+      "qkv_split_concat_bit_exact": true,
+      "qkv_per_side": {
+        "vid": true,
+        "txt": true
+      },
+      "qkv_slice_rows": {
+        "q": [
+          0,
+          2560
+        ],
+        "k": [
+          2560,
+          5120
+        ],
+        "v": [
+          5120,
+          7680
+        ]
+      },
+      "swiglu_mapping_ok": true,
+      "swiglu_per_side": {
+        "vid": true,
+        "txt": true
+      },
+      "vid_txt_weights_distinct": {
+        "proj_qkv": true,
+        "proj_out": true,
+        "mlp_proj_in": true
+      },
+      "ada_single_runtime_only": true,
+      "qk_rmsnorm_affine": {
+        "norm_q.vid.weight": {
+          "min": 0.24570752680301666,
+          "max": 1.9569121599197388,
+          "mean": 1.0297297239303589,
+          "std": 0.36317554116249084,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "5b6008efdfa8c793e22c1ca57608950edab7f2f03e084f0cf3e46c67df59fcc4"
+        },
+        "norm_q.txt.weight": {
+          "min": -0.02570580691099167,
+          "max": 1.1925104856491089,
+          "mean": 0.43992123007774353,
+          "std": 0.2895735800266266,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "06a070f7aee88aa507ff018036c58c107409c75cf88ae0a75cff330f94b2688b"
+        },
+        "norm_k.vid.weight": {
+          "min": 0.12009728699922562,
+          "max": 1.7542988061904907,
+          "mean": 0.9184644222259521,
+          "std": 0.30473780632019043,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "cf6832ac6c1ab03fddd1862f1f36498b441eb89e58bf4cb78cd4da4a06789f07"
+        },
+        "norm_k.txt.weight": {
+          "min": -0.028199193999171257,
+          "max": 0.9624146819114685,
+          "mean": 0.5327064990997314,
+          "std": 0.28493088483810425,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "a5d62ed7cdb27e05e22e82cac0c4fbe3d5cc0d056b1a2cd58a7473ecaa4097be"
+        }
+      },
+      "qk_affine_all_ones": {
+        "norm_q.vid.weight": false,
+        "norm_q.txt.weight": false,
+        "norm_k.vid.weight": false,
+        "norm_k.txt.weight": false
+      },
+      "real_affine_required": true
+    },
+    "10": {
+      "block_index": 10,
+      "layout": "shared_all",
+      "is_last_layer": false,
+      "prefix": "blocks.10.",
+      "key_count": 15,
+      "source_numel": 79316757,
+      "mapped_key_count": 15,
+      "mapped_numel": 79316757,
+      "expected_keys_equals_consumed_keys": true,
+      "unmapped_keys": [],
+      "duplicate_keys": [],
+      "shape_mismatches": [],
+      "qkv_split_concat_bit_exact": true,
+      "qkv_slice_rows": {
+        "q": [
+          0,
+          2560
+        ],
+        "k": [
+          2560,
+          5120
+        ],
+        "v": [
+          5120,
+          7680
+        ]
+      },
+      "swiglu_mapping_ok": true,
+      "ada_single_runtime_only": true,
+      "qk_rmsnorm_affine": {
+        "norm_q.all.weight": {
+          "min": 0.19393883645534515,
+          "max": 1.748081088066101,
+          "mean": 0.9332359433174133,
+          "std": 0.39136210083961487,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "5a60a71f63779301cd0632e82539e48c5a364d74934364810b6ce1bc291f9cdd"
+        },
+        "norm_k.all.weight": {
+          "min": 0.11635728925466537,
+          "max": 1.7777118682861328,
+          "mean": 0.9305483102798462,
+          "std": 0.3773444592952728,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "d00189cb733f10176d13e4b24c36c562893da8416452e9b476a6e8b462e6a474"
+        }
+      },
+      "qk_affine_all_ones": {
+        "norm_q.all.weight": false,
+        "norm_k.all.weight": false
+      },
+      "real_affine_required": true,
+      "mlp_params_present": true,
+      "txt_mlp_semantics": "real_execution",
+      "txt_attention_semantics": "real_execution"
+    },
+    "11": {
+      "block_index": 11,
+      "layout": "shared_all",
+      "is_last_layer": false,
+      "prefix": "blocks.11.",
+      "key_count": 15,
+      "source_numel": 79316757,
+      "mapped_key_count": 15,
+      "mapped_numel": 79316757,
+      "expected_keys_equals_consumed_keys": true,
+      "unmapped_keys": [],
+      "duplicate_keys": [],
+      "shape_mismatches": [],
+      "qkv_split_concat_bit_exact": true,
+      "qkv_slice_rows": {
+        "q": [
+          0,
+          2560
+        ],
+        "k": [
+          2560,
+          5120
+        ],
+        "v": [
+          5120,
+          7680
+        ]
+      },
+      "swiglu_mapping_ok": true,
+      "ada_single_runtime_only": true,
+      "qk_rmsnorm_affine": {
+        "norm_q.all.weight": {
+          "min": 0.23978060483932495,
+          "max": 1.623288631439209,
+          "mean": 1.2003226280212402,
+          "std": 0.1765965074300766,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "9df3e20b0034cc61b48c85214ba94ac651963d106c0643f09daf89e61f39ee22"
+        },
+        "norm_k.all.weight": {
+          "min": 0.2771204710006714,
+          "max": 1.7477654218673706,
+          "mean": 1.2025562524795532,
+          "std": 0.1730361133813858,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "42c80de6c24daa90c9c0f4c68bfe07bf78fe9654457ba802be6cfa251ae764ff"
+        }
+      },
+      "qk_affine_all_ones": {
+        "norm_q.all.weight": false,
+        "norm_k.all.weight": false
+      },
+      "real_affine_required": true,
+      "mlp_params_present": true,
+      "txt_mlp_semantics": "real_execution",
+      "txt_attention_semantics": "real_execution"
+    },
+    "12": {
+      "block_index": 12,
+      "layout": "shared_all",
+      "is_last_layer": false,
+      "prefix": "blocks.12.",
+      "key_count": 15,
+      "source_numel": 79316757,
+      "mapped_key_count": 15,
+      "mapped_numel": 79316757,
+      "expected_keys_equals_consumed_keys": true,
+      "unmapped_keys": [],
+      "duplicate_keys": [],
+      "shape_mismatches": [],
+      "qkv_split_concat_bit_exact": true,
+      "qkv_slice_rows": {
+        "q": [
+          0,
+          2560
+        ],
+        "k": [
+          2560,
+          5120
+        ],
+        "v": [
+          5120,
+          7680
+        ]
+      },
+      "swiglu_mapping_ok": true,
+      "ada_single_runtime_only": true,
+      "qk_rmsnorm_affine": {
+        "norm_q.all.weight": {
+          "min": 0.34480559825897217,
+          "max": 1.7994205951690674,
+          "mean": 1.2856547832489014,
+          "std": 0.22899185121059418,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "d3d8043f8e7f1b80fbbb1db02b0ae158f0718dc0640c7a3a4fd13b6f075864ca"
+        },
+        "norm_k.all.weight": {
+          "min": 0.34292182326316833,
+          "max": 1.7764943838119507,
+          "mean": 1.2892968654632568,
+          "std": 0.21453070640563965,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "b746babd2cd2230273f110d00f6fcc63553b5c932de24d71e64c46f594bc4276"
+        }
+      },
+      "qk_affine_all_ones": {
+        "norm_q.all.weight": false,
+        "norm_k.all.weight": false
+      },
+      "real_affine_required": true,
+      "mlp_params_present": true,
+      "txt_mlp_semantics": "real_execution",
+      "txt_attention_semantics": "real_execution"
+    },
+    "13": {
+      "block_index": 13,
+      "layout": "shared_all",
+      "is_last_layer": false,
+      "prefix": "blocks.13.",
+      "key_count": 15,
+      "source_numel": 79316757,
+      "mapped_key_count": 15,
+      "mapped_numel": 79316757,
+      "expected_keys_equals_consumed_keys": true,
+      "unmapped_keys": [],
+      "duplicate_keys": [],
+      "shape_mismatches": [],
+      "qkv_split_concat_bit_exact": true,
+      "qkv_slice_rows": {
+        "q": [
+          0,
+          2560
+        ],
+        "k": [
+          2560,
+          5120
+        ],
+        "v": [
+          5120,
+          7680
+        ]
+      },
+      "swiglu_mapping_ok": true,
+      "ada_single_runtime_only": true,
+      "qk_rmsnorm_affine": {
+        "norm_q.all.weight": {
+          "min": 0.2125503271818161,
+          "max": 1.8212425708770752,
+          "mean": 1.3553904294967651,
+          "std": 0.18576276302337646,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "37e4ae6c9b6a6305f07a30798b69730f8bdc9282ed047653c9a9fee418248cda"
+        },
+        "norm_k.all.weight": {
+          "min": 0.2561599314212799,
+          "max": 1.6051661968231201,
+          "mean": 1.3569786548614502,
+          "std": 0.17263983190059662,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "cdd75f5923e8e1faa3448c7d2493fdd9087825c05ebb0deadced394b21b148bd"
+        }
+      },
+      "qk_affine_all_ones": {
+        "norm_q.all.weight": false,
+        "norm_k.all.weight": false
+      },
+      "real_affine_required": true,
+      "mlp_params_present": true,
+      "txt_mlp_semantics": "real_execution",
+      "txt_attention_semantics": "real_execution"
+    },
+    "14": {
+      "block_index": 14,
+      "layout": "shared_all",
+      "is_last_layer": false,
+      "prefix": "blocks.14.",
+      "key_count": 15,
+      "source_numel": 79316757,
+      "mapped_key_count": 15,
+      "mapped_numel": 79316757,
+      "expected_keys_equals_consumed_keys": true,
+      "unmapped_keys": [],
+      "duplicate_keys": [],
+      "shape_mismatches": [],
+      "qkv_split_concat_bit_exact": true,
+      "qkv_slice_rows": {
+        "q": [
+          0,
+          2560
+        ],
+        "k": [
+          2560,
+          5120
+        ],
+        "v": [
+          5120,
+          7680
+        ]
+      },
+      "swiglu_mapping_ok": true,
+      "ada_single_runtime_only": true,
+      "qk_rmsnorm_affine": {
+        "norm_q.all.weight": {
+          "min": 0.010916520841419697,
+          "max": 1.7787710428237915,
+          "mean": 1.3028143644332886,
+          "std": 0.2264043688774109,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "0e558219b038a3e635c3780edbe6f53f9d84d0aa5d6e0a403209054298f531df"
+        },
+        "norm_k.all.weight": {
+          "min": 0.0035462493542581797,
+          "max": 1.8551474809646606,
+          "mean": 1.3066874742507935,
+          "std": 0.2306378185749054,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "c7ca4e091b6b93641a4205e73c252dd83dc0c4907e870d0b1cc44049796ded59"
+        }
+      },
+      "qk_affine_all_ones": {
+        "norm_q.all.weight": false,
+        "norm_k.all.weight": false
+      },
+      "real_affine_required": true,
+      "mlp_params_present": true,
+      "txt_mlp_semantics": "real_execution",
+      "txt_attention_semantics": "real_execution"
+    },
+    "15": {
+      "block_index": 15,
+      "layout": "shared_all",
+      "is_last_layer": false,
+      "prefix": "blocks.15.",
+      "key_count": 15,
+      "source_numel": 79316757,
+      "mapped_key_count": 15,
+      "mapped_numel": 79316757,
+      "expected_keys_equals_consumed_keys": true,
+      "unmapped_keys": [],
+      "duplicate_keys": [],
+      "shape_mismatches": [],
+      "qkv_split_concat_bit_exact": true,
+      "qkv_slice_rows": {
+        "q": [
+          0,
+          2560
+        ],
+        "k": [
+          2560,
+          5120
+        ],
+        "v": [
+          5120,
+          7680
+        ]
+      },
+      "swiglu_mapping_ok": true,
+      "ada_single_runtime_only": true,
+      "qk_rmsnorm_affine": {
+        "norm_q.all.weight": {
+          "min": 0.01654120907187462,
+          "max": 1.750303864479065,
+          "mean": 1.3898907899856567,
+          "std": 0.21367403864860535,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "71edb638cafe4bff762ec35084f3c3430a85434bae04ea4a87560e8e9b23631e"
+        },
+        "norm_k.all.weight": {
+          "min": 0.012740752659738064,
+          "max": 1.8614871501922607,
+          "mean": 1.392351746559143,
+          "std": 0.2192743867635727,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "097f5686cfbcf1bff8a5aae134a72b267cea1654bee455e9cee35bcea032aeeb"
+        }
+      },
+      "qk_affine_all_ones": {
+        "norm_q.all.weight": false,
+        "norm_k.all.weight": false
+      },
+      "real_affine_required": true,
+      "mlp_params_present": true,
+      "txt_mlp_semantics": "real_execution",
+      "txt_attention_semantics": "real_execution"
+    },
+    "16": {
+      "block_index": 16,
+      "layout": "shared_all",
+      "is_last_layer": false,
+      "prefix": "blocks.16.",
+      "key_count": 15,
+      "source_numel": 79316757,
+      "mapped_key_count": 15,
+      "mapped_numel": 79316757,
+      "expected_keys_equals_consumed_keys": true,
+      "unmapped_keys": [],
+      "duplicate_keys": [],
+      "shape_mismatches": [],
+      "qkv_split_concat_bit_exact": true,
+      "qkv_slice_rows": {
+        "q": [
+          0,
+          2560
+        ],
+        "k": [
+          2560,
+          5120
+        ],
+        "v": [
+          5120,
+          7680
+        ]
+      },
+      "swiglu_mapping_ok": true,
+      "ada_single_runtime_only": true,
+      "qk_rmsnorm_affine": {
+        "norm_q.all.weight": {
+          "min": 0.7623492479324341,
+          "max": 1.6977627277374268,
+          "mean": 1.4038362503051758,
+          "std": 0.19021059572696686,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "99c5742e5e2659a5a3ce0ad1b0ff4b38b6088de90ca88951f7987d2aae37fe66"
+        },
+        "norm_k.all.weight": {
+          "min": 0.7658812999725342,
+          "max": 1.7889069318771362,
+          "mean": 1.4272979497909546,
+          "std": 0.18802060186862946,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "02cae8eb344193c497a8ac461e2b5803767de0b9f18cd77bcfc761822f624567"
+        }
+      },
+      "qk_affine_all_ones": {
+        "norm_q.all.weight": false,
+        "norm_k.all.weight": false
+      },
+      "real_affine_required": true,
+      "mlp_params_present": true,
+      "txt_mlp_semantics": "real_execution",
+      "txt_attention_semantics": "real_execution"
+    },
+    "17": {
+      "block_index": 17,
+      "layout": "shared_all",
+      "is_last_layer": false,
+      "prefix": "blocks.17.",
+      "key_count": 15,
+      "source_numel": 79316757,
+      "mapped_key_count": 15,
+      "mapped_numel": 79316757,
+      "expected_keys_equals_consumed_keys": true,
+      "unmapped_keys": [],
+      "duplicate_keys": [],
+      "shape_mismatches": [],
+      "qkv_split_concat_bit_exact": true,
+      "qkv_slice_rows": {
+        "q": [
+          0,
+          2560
+        ],
+        "k": [
+          2560,
+          5120
+        ],
+        "v": [
+          5120,
+          7680
+        ]
+      },
+      "swiglu_mapping_ok": true,
+      "ada_single_runtime_only": true,
+      "qk_rmsnorm_affine": {
+        "norm_q.all.weight": {
+          "min": 0.5231637954711914,
+          "max": 1.7077769041061401,
+          "mean": 1.3915119171142578,
+          "std": 0.17563150823116302,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "6e71aef4904a8cd75eb66af886ea6d947fb85108d68efdc230f8b79870d457de"
+        },
+        "norm_k.all.weight": {
+          "min": 0.5361014604568481,
+          "max": 1.848151445388794,
+          "mean": 1.4076814651489258,
+          "std": 0.19165034592151642,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "530a2d34d282cfc3c2b1ac1c649c77f05c43765b43786912ead2cc61fea2145f"
+        }
+      },
+      "qk_affine_all_ones": {
+        "norm_q.all.weight": false,
+        "norm_k.all.weight": false
+      },
+      "real_affine_required": true,
+      "mlp_params_present": true,
+      "txt_mlp_semantics": "real_execution",
+      "txt_attention_semantics": "real_execution"
+    },
+    "18": {
+      "block_index": 18,
+      "layout": "shared_all",
+      "is_last_layer": false,
+      "prefix": "blocks.18.",
+      "key_count": 15,
+      "source_numel": 79316757,
+      "mapped_key_count": 15,
+      "mapped_numel": 79316757,
+      "expected_keys_equals_consumed_keys": true,
+      "unmapped_keys": [],
+      "duplicate_keys": [],
+      "shape_mismatches": [],
+      "qkv_split_concat_bit_exact": true,
+      "qkv_slice_rows": {
+        "q": [
+          0,
+          2560
+        ],
+        "k": [
+          2560,
+          5120
+        ],
+        "v": [
+          5120,
+          7680
+        ]
+      },
+      "swiglu_mapping_ok": true,
+      "ada_single_runtime_only": true,
+      "qk_rmsnorm_affine": {
+        "norm_q.all.weight": {
+          "min": 0.09258856624364853,
+          "max": 1.6991467475891113,
+          "mean": 1.345270037651062,
+          "std": 0.21704065799713135,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "f2e449a6ab2b8ae3d54c56842cbf025a24d60a60fe981752c5277a1cfcafbf52"
+        },
+        "norm_k.all.weight": {
+          "min": 0.09369481354951859,
+          "max": 1.7026211023330688,
+          "mean": 1.3491500616073608,
+          "std": 0.21237996220588684,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "e8afc4bd499152192465f486350cd9e8b42172256b30acd23e9c8c86f3c088ac"
+        }
+      },
+      "qk_affine_all_ones": {
+        "norm_q.all.weight": false,
+        "norm_k.all.weight": false
+      },
+      "real_affine_required": true,
+      "mlp_params_present": true,
+      "txt_mlp_semantics": "real_execution",
+      "txt_attention_semantics": "real_execution"
+    },
+    "19": {
+      "block_index": 19,
+      "layout": "shared_all",
+      "is_last_layer": false,
+      "prefix": "blocks.19.",
+      "key_count": 15,
+      "source_numel": 79316757,
+      "mapped_key_count": 15,
+      "mapped_numel": 79316757,
+      "expected_keys_equals_consumed_keys": true,
+      "unmapped_keys": [],
+      "duplicate_keys": [],
+      "shape_mismatches": [],
+      "qkv_split_concat_bit_exact": true,
+      "qkv_slice_rows": {
+        "q": [
+          0,
+          2560
+        ],
+        "k": [
+          2560,
+          5120
+        ],
+        "v": [
+          5120,
+          7680
+        ]
+      },
+      "swiglu_mapping_ok": true,
+      "ada_single_runtime_only": true,
+      "qk_rmsnorm_affine": {
+        "norm_q.all.weight": {
+          "min": 0.6683862209320068,
+          "max": 2.1633341312408447,
+          "mean": 1.3847835063934326,
+          "std": 0.23012027144432068,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "da4e9ee8cfea04b1b4fc6caebb6e03c9c62d3d370eabcb94fd1fc113dc118734"
+        },
+        "norm_k.all.weight": {
+          "min": 0.6866560578346252,
+          "max": 2.0539209842681885,
+          "mean": 1.379346489906311,
+          "std": 0.22715863585472107,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "c87d14ae8f7e391b31a18d5429e7050ca2ba9de7725eabb6d73c5bd638b27743"
+        }
+      },
+      "qk_affine_all_ones": {
+        "norm_q.all.weight": false,
+        "norm_k.all.weight": false
+      },
+      "real_affine_required": true,
+      "mlp_params_present": true,
+      "txt_mlp_semantics": "real_execution",
+      "txt_attention_semantics": "real_execution"
+    },
+    "20": {
+      "block_index": 20,
+      "layout": "shared_all",
+      "is_last_layer": false,
+      "prefix": "blocks.20.",
+      "key_count": 15,
+      "source_numel": 79316757,
+      "mapped_key_count": 15,
+      "mapped_numel": 79316757,
+      "expected_keys_equals_consumed_keys": true,
+      "unmapped_keys": [],
+      "duplicate_keys": [],
+      "shape_mismatches": [],
+      "qkv_split_concat_bit_exact": true,
+      "qkv_slice_rows": {
+        "q": [
+          0,
+          2560
+        ],
+        "k": [
+          2560,
+          5120
+        ],
+        "v": [
+          5120,
+          7680
+        ]
+      },
+      "swiglu_mapping_ok": true,
+      "ada_single_runtime_only": true,
+      "qk_rmsnorm_affine": {
+        "norm_q.all.weight": {
+          "min": 0.3730267882347107,
+          "max": 1.985688328742981,
+          "mean": 1.3892762660980225,
+          "std": 0.2324911504983902,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "e3a87bcc38852fe06a3f7df82793a49d7c70c82aabb8e450619554cd7922bd7e"
+        },
+        "norm_k.all.weight": {
+          "min": 0.4099944233894348,
+          "max": 1.964383840560913,
+          "mean": 1.3906577825546265,
+          "std": 0.21572674810886383,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "613cff3b0a546c2467fc871a0cf46bfbf0aedcae92df1ced944b9caceef114d0"
+        }
+      },
+      "qk_affine_all_ones": {
+        "norm_q.all.weight": false,
+        "norm_k.all.weight": false
+      },
+      "real_affine_required": true,
+      "mlp_params_present": true,
+      "txt_mlp_semantics": "real_execution",
+      "txt_attention_semantics": "real_execution"
+    },
+    "21": {
+      "block_index": 21,
+      "layout": "shared_all",
+      "is_last_layer": false,
+      "prefix": "blocks.21.",
+      "key_count": 15,
+      "source_numel": 79316757,
+      "mapped_key_count": 15,
+      "mapped_numel": 79316757,
+      "expected_keys_equals_consumed_keys": true,
+      "unmapped_keys": [],
+      "duplicate_keys": [],
+      "shape_mismatches": [],
+      "qkv_split_concat_bit_exact": true,
+      "qkv_slice_rows": {
+        "q": [
+          0,
+          2560
+        ],
+        "k": [
+          2560,
+          5120
+        ],
+        "v": [
+          5120,
+          7680
+        ]
+      },
+      "swiglu_mapping_ok": true,
+      "ada_single_runtime_only": true,
+      "qk_rmsnorm_affine": {
+        "norm_q.all.weight": {
+          "min": 0.0055201249197125435,
+          "max": 2.070957660675049,
+          "mean": 1.3859833478927612,
+          "std": 0.2829437553882599,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "7a91328d18cae16bcbc656e8d9449d442766f4a25da35c8a054b3fb0cefcde47"
+        },
+        "norm_k.all.weight": {
+          "min": 0.014727432280778885,
+          "max": 2.0367162227630615,
+          "mean": 1.3962370157241821,
+          "std": 0.28442689776420593,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "e85e0fc4264e4f18e9ca5dfebb46f717e7aecf32abb50ea6b95a63bf52927d9a"
+        }
+      },
+      "qk_affine_all_ones": {
+        "norm_q.all.weight": false,
+        "norm_k.all.weight": false
+      },
+      "real_affine_required": true,
+      "mlp_params_present": true,
+      "txt_mlp_semantics": "real_execution",
+      "txt_attention_semantics": "real_execution"
+    },
+    "22": {
+      "block_index": 22,
+      "layout": "shared_all",
+      "is_last_layer": false,
+      "prefix": "blocks.22.",
+      "key_count": 15,
+      "source_numel": 79316757,
+      "mapped_key_count": 15,
+      "mapped_numel": 79316757,
+      "expected_keys_equals_consumed_keys": true,
+      "unmapped_keys": [],
+      "duplicate_keys": [],
+      "shape_mismatches": [],
+      "qkv_split_concat_bit_exact": true,
+      "qkv_slice_rows": {
+        "q": [
+          0,
+          2560
+        ],
+        "k": [
+          2560,
+          5120
+        ],
+        "v": [
+          5120,
+          7680
+        ]
+      },
+      "swiglu_mapping_ok": true,
+      "ada_single_runtime_only": true,
+      "qk_rmsnorm_affine": {
+        "norm_q.all.weight": {
+          "min": 0.20084361732006073,
+          "max": 2.0437862873077393,
+          "mean": 1.3423733711242676,
+          "std": 0.28561338782310486,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "1b24e286c761d55cbf22e01f7a61636b9015dc27ed4d673d0ba39137adffa192"
+        },
+        "norm_k.all.weight": {
+          "min": 0.13793249428272247,
+          "max": 1.964785099029541,
+          "mean": 1.3486864566802979,
+          "std": 0.2865251898765564,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 127,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "174f082a8b6cda64f3f034e6a669358bd403cc48702a8d5d1ebb165648a21b83"
+        }
+      },
+      "qk_affine_all_ones": {
+        "norm_q.all.weight": false,
+        "norm_k.all.weight": false
+      },
+      "real_affine_required": true,
+      "mlp_params_present": true,
+      "txt_mlp_semantics": "real_execution",
+      "txt_attention_semantics": "real_execution"
+    },
+    "23": {
+      "block_index": 23,
+      "layout": "shared_all",
+      "is_last_layer": false,
+      "prefix": "blocks.23.",
+      "key_count": 15,
+      "source_numel": 79316757,
+      "mapped_key_count": 15,
+      "mapped_numel": 79316757,
+      "expected_keys_equals_consumed_keys": true,
+      "unmapped_keys": [],
+      "duplicate_keys": [],
+      "shape_mismatches": [],
+      "qkv_split_concat_bit_exact": true,
+      "qkv_slice_rows": {
+        "q": [
+          0,
+          2560
+        ],
+        "k": [
+          2560,
+          5120
+        ],
+        "v": [
+          5120,
+          7680
+        ]
+      },
+      "swiglu_mapping_ok": true,
+      "ada_single_runtime_only": true,
+      "qk_rmsnorm_affine": {
+        "norm_q.all.weight": {
+          "min": 0.49880728125572205,
+          "max": 1.6659071445465088,
+          "mean": 1.2481348514556885,
+          "std": 0.16982001066207886,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "af93ea214c8482c7bef6808b8ee87c4da639ec56e06a6d33c1428dd6c961df9f"
+        },
+        "norm_k.all.weight": {
+          "min": 0.7134149670600891,
+          "max": 1.5862085819244385,
+          "mean": 1.2601509094238281,
+          "std": 0.16109156608581543,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "7dba8832fe25307cf798841fb331a79e715dedc505b83d21af59995e8c17b6fe"
+        }
+      },
+      "qk_affine_all_ones": {
+        "norm_q.all.weight": false,
+        "norm_k.all.weight": false
+      },
+      "real_affine_required": true,
+      "mlp_params_present": true,
+      "txt_mlp_semantics": "real_execution",
+      "txt_attention_semantics": "real_execution"
+    },
+    "24": {
+      "block_index": 24,
+      "layout": "shared_all",
+      "is_last_layer": false,
+      "prefix": "blocks.24.",
+      "key_count": 15,
+      "source_numel": 79316757,
+      "mapped_key_count": 15,
+      "mapped_numel": 79316757,
+      "expected_keys_equals_consumed_keys": true,
+      "unmapped_keys": [],
+      "duplicate_keys": [],
+      "shape_mismatches": [],
+      "qkv_split_concat_bit_exact": true,
+      "qkv_slice_rows": {
+        "q": [
+          0,
+          2560
+        ],
+        "k": [
+          2560,
+          5120
+        ],
+        "v": [
+          5120,
+          7680
+        ]
+      },
+      "swiglu_mapping_ok": true,
+      "ada_single_runtime_only": true,
+      "qk_rmsnorm_affine": {
+        "norm_q.all.weight": {
+          "min": 0.7186003923416138,
+          "max": 1.7259509563446045,
+          "mean": 1.278727650642395,
+          "std": 0.1549905240535736,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "e332a8ec25149dd344033a24a432f46cc17036dd62326bc9dcb5eeb42a82242f"
+        },
+        "norm_k.all.weight": {
+          "min": 0.7165316343307495,
+          "max": 1.7530207633972168,
+          "mean": 1.2841200828552246,
+          "std": 0.1516312211751938,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "93c592cfd3b78f11dea9cf7f8314aeebdb0a6e88360ce546d90f93f907789f40"
+        }
+      },
+      "qk_affine_all_ones": {
+        "norm_q.all.weight": false,
+        "norm_k.all.weight": false
+      },
+      "real_affine_required": true,
+      "mlp_params_present": true,
+      "txt_mlp_semantics": "real_execution",
+      "txt_attention_semantics": "real_execution"
+    },
+    "25": {
+      "block_index": 25,
+      "layout": "shared_all",
+      "is_last_layer": false,
+      "prefix": "blocks.25.",
+      "key_count": 15,
+      "source_numel": 79316757,
+      "mapped_key_count": 15,
+      "mapped_numel": 79316757,
+      "expected_keys_equals_consumed_keys": true,
+      "unmapped_keys": [],
+      "duplicate_keys": [],
+      "shape_mismatches": [],
+      "qkv_split_concat_bit_exact": true,
+      "qkv_slice_rows": {
+        "q": [
+          0,
+          2560
+        ],
+        "k": [
+          2560,
+          5120
+        ],
+        "v": [
+          5120,
+          7680
+        ]
+      },
+      "swiglu_mapping_ok": true,
+      "ada_single_runtime_only": true,
+      "qk_rmsnorm_affine": {
+        "norm_q.all.weight": {
+          "min": 0.7146673798561096,
+          "max": 2.4356842041015625,
+          "mean": 1.2834563255310059,
+          "std": 0.2666569650173187,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "c597f3662514816817fb19da7500b58715bc7ca7c15186c83741fa294fb62b85"
+        },
+        "norm_k.all.weight": {
+          "min": 0.41011297702789307,
+          "max": 2.455030679702759,
+          "mean": 1.2801594734191895,
+          "std": 0.2749330997467041,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "73e12d8d145bd2da43a35b5dd3cbd16909771c4821a5faace76a26143830799a"
+        }
+      },
+      "qk_affine_all_ones": {
+        "norm_q.all.weight": false,
+        "norm_k.all.weight": false
+      },
+      "real_affine_required": true,
+      "mlp_params_present": true,
+      "txt_mlp_semantics": "real_execution",
+      "txt_attention_semantics": "real_execution"
+    },
+    "26": {
+      "block_index": 26,
+      "layout": "shared_all",
+      "is_last_layer": false,
+      "prefix": "blocks.26.",
+      "key_count": 15,
+      "source_numel": 79316757,
+      "mapped_key_count": 15,
+      "mapped_numel": 79316757,
+      "expected_keys_equals_consumed_keys": true,
+      "unmapped_keys": [],
+      "duplicate_keys": [],
+      "shape_mismatches": [],
+      "qkv_split_concat_bit_exact": true,
+      "qkv_slice_rows": {
+        "q": [
+          0,
+          2560
+        ],
+        "k": [
+          2560,
+          5120
+        ],
+        "v": [
+          5120,
+          7680
+        ]
+      },
+      "swiglu_mapping_ok": true,
+      "ada_single_runtime_only": true,
+      "qk_rmsnorm_affine": {
+        "norm_q.all.weight": {
+          "min": 0.03517726808786392,
+          "max": 2.0666027069091797,
+          "mean": 1.4059054851531982,
+          "std": 0.36510011553764343,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "e558ebcf866f2393d8aaa98b4186b7209641ce8c20757d4f37ef31df03e1c272"
+        },
+        "norm_k.all.weight": {
+          "min": 0.06130095571279526,
+          "max": 1.9691011905670166,
+          "mean": 1.410278081893921,
+          "std": 0.35667499899864197,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "f08881bbfbb91b73754e01001fa7783be3cec52dc7d6508e9394831097127d94"
+        }
+      },
+      "qk_affine_all_ones": {
+        "norm_q.all.weight": false,
+        "norm_k.all.weight": false
+      },
+      "real_affine_required": true,
+      "mlp_params_present": true,
+      "txt_mlp_semantics": "real_execution",
+      "txt_attention_semantics": "real_execution"
+    },
+    "27": {
+      "block_index": 27,
+      "layout": "shared_all",
+      "is_last_layer": false,
+      "prefix": "blocks.27.",
+      "key_count": 15,
+      "source_numel": 79316757,
+      "mapped_key_count": 15,
+      "mapped_numel": 79316757,
+      "expected_keys_equals_consumed_keys": true,
+      "unmapped_keys": [],
+      "duplicate_keys": [],
+      "shape_mismatches": [],
+      "qkv_split_concat_bit_exact": true,
+      "qkv_slice_rows": {
+        "q": [
+          0,
+          2560
+        ],
+        "k": [
+          2560,
+          5120
+        ],
+        "v": [
+          5120,
+          7680
+        ]
+      },
+      "swiglu_mapping_ok": true,
+      "ada_single_runtime_only": true,
+      "qk_rmsnorm_affine": {
+        "norm_q.all.weight": {
+          "min": 0.0698678269982338,
+          "max": 3.4162790775299072,
+          "mean": 1.2976973056793213,
+          "std": 0.39368852972984314,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "e831dea0fea34d8cf08eb9e1094d58c08beaa60767021e240630656426e3dc0c"
+        },
+        "norm_k.all.weight": {
+          "min": 0.030607938766479492,
+          "max": 3.55586576461792,
+          "mean": 1.3074747323989868,
+          "std": 0.42886024713516235,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "253862d90614e7524938e00761fabe39cb7a8ed6be7c1605011adc91328159f7"
+        }
+      },
+      "qk_affine_all_ones": {
+        "norm_q.all.weight": false,
+        "norm_k.all.weight": false
+      },
+      "real_affine_required": true,
+      "mlp_params_present": true,
+      "txt_mlp_semantics": "real_execution",
+      "txt_attention_semantics": "real_execution"
+    },
+    "28": {
+      "block_index": 28,
+      "layout": "shared_all",
+      "is_last_layer": false,
+      "prefix": "blocks.28.",
+      "key_count": 15,
+      "source_numel": 79316757,
+      "mapped_key_count": 15,
+      "mapped_numel": 79316757,
+      "expected_keys_equals_consumed_keys": true,
+      "unmapped_keys": [],
+      "duplicate_keys": [],
+      "shape_mismatches": [],
+      "qkv_split_concat_bit_exact": true,
+      "qkv_slice_rows": {
+        "q": [
+          0,
+          2560
+        ],
+        "k": [
+          2560,
+          5120
+        ],
+        "v": [
+          5120,
+          7680
+        ]
+      },
+      "swiglu_mapping_ok": true,
+      "ada_single_runtime_only": true,
+      "qk_rmsnorm_affine": {
+        "norm_q.all.weight": {
+          "min": 0.09727621078491211,
+          "max": 1.9067438840866089,
+          "mean": 1.211978793144226,
+          "std": 0.18424531817436218,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "d63b34e205741ce1f2a73cd3c44bcf01a9cc0b6f291d022c8e70b7e994064851"
+        },
+        "norm_k.all.weight": {
+          "min": 0.1028151661157608,
+          "max": 1.9128715991973877,
+          "mean": 1.2170864343643188,
+          "std": 0.18063019216060638,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "69c2d8adfe06e9f8a289ab35da1bb0c44be02845fdcf46cd1458544246aaf577"
+        }
+      },
+      "qk_affine_all_ones": {
+        "norm_q.all.weight": false,
+        "norm_k.all.weight": false
+      },
+      "real_affine_required": true,
+      "mlp_params_present": true,
+      "txt_mlp_semantics": "real_execution",
+      "txt_attention_semantics": "real_execution"
+    },
+    "29": {
+      "block_index": 29,
+      "layout": "shared_all",
+      "is_last_layer": false,
+      "prefix": "blocks.29.",
+      "key_count": 15,
+      "source_numel": 79316757,
+      "mapped_key_count": 15,
+      "mapped_numel": 79316757,
+      "expected_keys_equals_consumed_keys": true,
+      "unmapped_keys": [],
+      "duplicate_keys": [],
+      "shape_mismatches": [],
+      "qkv_split_concat_bit_exact": true,
+      "qkv_slice_rows": {
+        "q": [
+          0,
+          2560
+        ],
+        "k": [
+          2560,
+          5120
+        ],
+        "v": [
+          5120,
+          7680
+        ]
+      },
+      "swiglu_mapping_ok": true,
+      "ada_single_runtime_only": true,
+      "qk_rmsnorm_affine": {
+        "norm_q.all.weight": {
+          "min": 0.10244648903608322,
+          "max": 2.102344274520874,
+          "mean": 1.2809134721755981,
+          "std": 0.3881104290485382,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "80d47fb8a179a761d2d6510de4c161337626f8b2923b5702cf045fc4185290bb"
+        },
+        "norm_k.all.weight": {
+          "min": 0.045557137578725815,
+          "max": 2.0456955432891846,
+          "mean": 1.2836458683013916,
+          "std": 0.3820100426673889,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "41c0e04a4d37458ef8d6d9a29b3fb96659d3dfc95c01f40b0b47157719ef261d"
+        }
+      },
+      "qk_affine_all_ones": {
+        "norm_q.all.weight": false,
+        "norm_k.all.weight": false
+      },
+      "real_affine_required": true,
+      "mlp_params_present": true,
+      "txt_mlp_semantics": "real_execution",
+      "txt_attention_semantics": "real_execution"
+    },
+    "30": {
+      "block_index": 30,
+      "layout": "shared_all",
+      "is_last_layer": false,
+      "prefix": "blocks.30.",
+      "key_count": 15,
+      "source_numel": 79316757,
+      "mapped_key_count": 15,
+      "mapped_numel": 79316757,
+      "expected_keys_equals_consumed_keys": true,
+      "unmapped_keys": [],
+      "duplicate_keys": [],
+      "shape_mismatches": [],
+      "qkv_split_concat_bit_exact": true,
+      "qkv_slice_rows": {
+        "q": [
+          0,
+          2560
+        ],
+        "k": [
+          2560,
+          5120
+        ],
+        "v": [
+          5120,
+          7680
+        ]
+      },
+      "swiglu_mapping_ok": true,
+      "ada_single_runtime_only": true,
+      "qk_rmsnorm_affine": {
+        "norm_q.all.weight": {
+          "min": 0.1145673543214798,
+          "max": 2.3764355182647705,
+          "mean": 1.1514238119125366,
+          "std": 0.384117066860199,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "248a1a5f520c698ac5519927445835480baf0714b984490c45a905161976f48b"
+        },
+        "norm_k.all.weight": {
+          "min": 0.11279167979955673,
+          "max": 2.391160726547241,
+          "mean": 1.1793965101242065,
+          "std": 0.39442452788352966,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "35d83d6aa1dec2fb574f3bf7f9ded78c02445c0f9747ac382e84259e9779ba4b"
+        }
+      },
+      "qk_affine_all_ones": {
+        "norm_q.all.weight": false,
+        "norm_k.all.weight": false
+      },
+      "real_affine_required": true,
+      "mlp_params_present": true,
+      "txt_mlp_semantics": "real_execution",
+      "txt_attention_semantics": "real_execution"
+    },
+    "31": {
+      "block_index": 31,
+      "layout": "shared_all",
+      "is_last_layer": true,
+      "prefix": "blocks.31.",
+      "key_count": 15,
+      "source_numel": 79316757,
+      "mapped_key_count": 15,
+      "mapped_numel": 79316757,
+      "expected_keys_equals_consumed_keys": true,
+      "unmapped_keys": [],
+      "duplicate_keys": [],
+      "shape_mismatches": [],
+      "qkv_split_concat_bit_exact": true,
+      "qkv_slice_rows": {
+        "q": [
+          0,
+          2560
+        ],
+        "k": [
+          2560,
+          5120
+        ],
+        "v": [
+          5120,
+          7680
+        ]
+      },
+      "swiglu_mapping_ok": true,
+      "ada_single_runtime_only": true,
+      "qk_rmsnorm_affine": {
+        "norm_q.all.weight": {
+          "min": 0.0494171641767025,
+          "max": 2.2408571243286133,
+          "mean": 0.9916342496871948,
+          "std": 0.37161147594451904,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "19eb8969a196f551318e45b154da9ce146517312bd66bc8b02f46b86f12739e7"
+        },
+        "norm_k.all.weight": {
+          "min": 0.022139688953757286,
+          "max": 2.560814142227173,
+          "mean": 1.0249141454696655,
+          "std": 0.41541779041290283,
+          "all_ones": false,
+          "all_zero": false,
+          "finite": true,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "5bc2246fa6d950549b93b3e8ba8c9eb273329c56cbf311e2b8cabd0e844532c9"
+        }
+      },
+      "qk_affine_all_ones": {
+        "norm_q.all.weight": false,
+        "norm_k.all.weight": false
+      },
+      "real_affine_required": true,
+      "mlp_params_present": true,
+      "txt_mlp_semantics": "vid_only_passthrough",
+      "txt_attention_semantics": "real_execution"
+    }
+  },
+  "overall": true,
+  "coverage": {
+    "mapped": 32,
+    "expected": 32,
+    "unmapped_blocks": [],
+    "duplicate_blocks": []
+  },
+  "conclusion": "ALL_32_BLOCKS_MAPPED",
+  "note": "blocks 0..9 use the 29-key split .vid./.txt. contract (shared_weights=False, mm_layers=10); blocks 10..31 use the 15-key shared .all. contract; block 31 is the unique last layer (is_last_layer=true, vid_only MLP passthrough, txt attention still executes with shared .all. weights)."
+}

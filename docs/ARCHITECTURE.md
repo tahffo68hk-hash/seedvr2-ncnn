@@ -20,10 +20,33 @@ git-ignored (`.phase13_local_artifacts/`); the committed inventory manifest and
 weight-mapping contract describe them. Last-layer reuses the same 19 models
 (vid_only control flow).
 
-Phase 14 real-weight single-block hybrid visual milestone (BLOCKED_CHECKPOINT_REQUIRED):
-intends to keep the official PyTorch SeedVR2 pipeline and replace exactly one real
-`NaMMSRTransformerBlock` (middle block `floor(N/2)`) with the Phase 13 `HybridDiTBlockRuntime`
-via a host adapter (`tests/seedvr2_real_weight_hybrid/real_block_adapter.py` planned;
-modes capture/pytorch/ncnn; `ncnn_adapter_call_count>0`, `original_block_call_count==0`).
-Real-weight stage artifacts live in git-ignored `.phase14_local_artifacts/`; visual outputs
-in `.phase14_visual_outputs/`. Blocked on the official checkpoint input (no download).
+Phase 14 real-weight single-block hybrid visual milestone (READY): keeps the
+official PyTorch SeedVR2 pipeline and replaces exactly one real
+`NaMMSRTransformerBlock` (middle block `floor(32/2)` = 16) with the
+`HybridDiTBlockRuntime` via a host adapter
+(`tests/seedvr2_real_weight_hybrid/real_block_adapter.cpp`, modes
+capture/pytorch/ncnn; `ncnn_adapter_call_count>0`, `original_block_call_count==0`,
+no silent fallback). Real-weight stage artifacts live in git-ignored
+`.phase14_local_artifacts/`; visual outputs in `.phase14_visual_outputs/`.
+
+Phase 15 real-weight multi-block streaming hybrid (READY): a streaming adapter
+(`multiblock_streaming_adapter`) replaces 1/2/4 contiguous real blocks
+(`[16]` / `[16,17]` / `[15..18]`) with the ncnn `HybridDiTBlockRuntime` under a
+strict per-block lifecycle `LOAD -> EXECUTE -> UNLOAD`: after each block the
+runtime is destroyed, the model cache cleared to 0, resident bytes 0, and the
+artifact files rename-probed (no leaked handles). `max_resident_weighted_blocks=1`
+for every streaming run; resident mode is diagnostic only.
+
+Phase 16 full SeedVR2 DiT streaming (READY): the streaming adapter
+(`full_dit_streaming_adapter`, range 0..31) replaces the WHOLE 32-block DiT body
+with ncnn, still one block resident at a time
+(`max_resident_weighted_blocks=1`). Blocks 0..9 use the split 29-key layout
+(separate `.vid.` / `.txt.` weights); blocks 10..31 use the shared 15-key
+`.all.` layout; the last layer 31 runs at most once as the final block. The
+adapter writes per-block outputs so the ncnn chain result can be replayed
+through the official pipeline (visual harness `run_phase16_visual.py`,
+`ChainHybrid`); a single strict adapter call replaces the whole chain with
+`original_block_call_count=0` and no silent fallback. One gotcha: the official
+`vid_out_ada` head modulation reuses the shared cache key `emb_repeat_0_vid`
+(cache keys carry only idx + branch_tag, not layer/mode), so the visual harness
+rebuilds that weight-independent entry exactly before the head executes.

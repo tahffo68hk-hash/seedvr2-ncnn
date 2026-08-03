@@ -51,3 +51,11 @@ toolchain-test/*.exe
 .phase15_visual_outputs/
 .phase15_runtime_traces/
 .phase15_diag/
+
+# Phase 16 full DiT streaming (never commit)
+.phase16_local_artifacts/
+.phase16_export_tmp/
+.phase16_visual_outputs/
+.phase16_runtime_traces/
+.phase16_diag/
+.phase16_memory_profiles/

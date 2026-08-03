@@ -1,0 +1,441 @@
+{
+  "phase": 16,
+  "checkpoint_sha256": "6bcc5ac59447e97b100477480aebb01be2ec724c8340bb83faae21f64848604b",
+  "real_seedvr2_weights": true,
+  "actual_block_count": 32,
+  "block_indices": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31
+  ],
+  "normal_block_indices": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30
+  ],
+  "last_layer_index": 31,
+  "split_layout_blocks": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+  ],
+  "shared_layout_blocks": [
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31
+  ],
+  "mm_layers_from_config": 10,
+  "ranges": {
+    "range_8": [
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16
+    ],
+    "range_16": [
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23
+    ],
+    "range_full": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31
+    ]
+  },
+  "range_8": [
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16
+  ],
+  "range_16": [
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23
+  ],
+  "range_full": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31
+  ],
+  "selection_reason": "range_8 = [9..16] and range_16 = [8..23] are contiguous normal blocks centered on the Phase 14/15 anchor 16 (floor(32/2)) and exclude the last layer 31; range_full = all derived block indices 0..31 in strict model forward order including the unique last layer.",
+  "continuous": true,
+  "complete_coverage": true,
+  "no_duplicates": true,
+  "no_missing_indices": true,
+  "last_layer_only_at_end": true,
+  "last_layer_excluded_from_8_16": true,
+  "per_block": {
+    "0": {
+      "key_count": 29,
+      "numel": 158633493,
+      "layout": "split_vid_txt",
+      "is_last_layer": false
+    },
+    "1": {
+      "key_count": 29,
+      "numel": 158633493,
+      "layout": "split_vid_txt",
+      "is_last_layer": false
+    },
+    "2": {
+      "key_count": 29,
+      "numel": 158633493,
+      "layout": "split_vid_txt",
+      "is_last_layer": false
+    },
+    "3": {
+      "key_count": 29,
+      "numel": 158633493,
+      "layout": "split_vid_txt",
+      "is_last_layer": false
+    },
+    "4": {
+      "key_count": 29,
+      "numel": 158633493,
+      "layout": "split_vid_txt",
+      "is_last_layer": false
+    },
+    "5": {
+      "key_count": 29,
+      "numel": 158633493,
+      "layout": "split_vid_txt",
+      "is_last_layer": false
+    },
+    "6": {
+      "key_count": 29,
+      "numel": 158633493,
+      "layout": "split_vid_txt",
+      "is_last_layer": false
+    },
+    "7": {
+      "key_count": 29,
+      "numel": 158633493,
+      "layout": "split_vid_txt",
+      "is_last_layer": false
+    },
+    "8": {
+      "key_count": 29,
+      "numel": 158633493,
+      "layout": "split_vid_txt",
+      "is_last_layer": false
+    },
+    "9": {
+      "key_count": 29,
+      "numel": 158633493,
+      "layout": "split_vid_txt",
+      "is_last_layer": false
+    },
+    "10": {
+      "key_count": 15,
+      "numel": 79316757,
+      "layout": "shared_all",
+      "is_last_layer": false
+    },
+    "11": {
+      "key_count": 15,
+      "numel": 79316757,
+      "layout": "shared_all",
+      "is_last_layer": false
+    },
+    "12": {
+      "key_count": 15,
+      "numel": 79316757,
+      "layout": "shared_all",
+      "is_last_layer": false
+    },
+    "13": {
+      "key_count": 15,
+      "numel": 79316757,
+      "layout": "shared_all",
+      "is_last_layer": false
+    },
+    "14": {
+      "key_count": 15,
+      "numel": 79316757,
+      "layout": "shared_all",
+      "is_last_layer": false
+    },
+    "15": {
+      "key_count": 15,
+      "numel": 79316757,
+      "layout": "shared_all",
+      "is_last_layer": false
+    },
+    "16": {
+      "key_count": 15,
+      "numel": 79316757,
+      "layout": "shared_all",
+      "is_last_layer": false
+    },
+    "17": {
+      "key_count": 15,
+      "numel": 79316757,
+      "layout": "shared_all",
+      "is_last_layer": false
+    },
+    "18": {
+      "key_count": 15,
+      "numel": 79316757,
+      "layout": "shared_all",
+      "is_last_layer": false
+    },
+    "19": {
+      "key_count": 15,
+      "numel": 79316757,
+      "layout": "shared_all",
+      "is_last_layer": false
+    },
+    "20": {
+      "key_count": 15,
+      "numel": 79316757,
+      "layout": "shared_all",
+      "is_last_layer": false
+    },
+    "21": {
+      "key_count": 15,
+      "numel": 79316757,
+      "layout": "shared_all",
+      "is_last_layer": false
+    },
+    "22": {
+      "key_count": 15,
+      "numel": 79316757,
+      "layout": "shared_all",
+      "is_last_layer": false
+    },
+    "23": {
+      "key_count": 15,
+      "numel": 79316757,
+      "layout": "shared_all",
+      "is_last_layer": false
+    },
+    "24": {
+      "key_count": 15,
+      "numel": 79316757,
+      "layout": "shared_all",
+      "is_last_layer": false
+    },
+    "25": {
+      "key_count": 15,
+      "numel": 79316757,
+      "layout": "shared_all",
+      "is_last_layer": false
+    },
+    "26": {
+      "key_count": 15,
+      "numel": 79316757,
+      "layout": "shared_all",
+      "is_last_layer": false
+    },
+    "27": {
+      "key_count": 15,
+      "numel": 79316757,
+      "layout": "shared_all",
+      "is_last_layer": false
+    },
+    "28": {
+      "key_count": 15,
+      "numel": 79316757,
+      "layout": "shared_all",
+      "is_last_layer": false
+    },
+    "29": {
+      "key_count": 15,
+      "numel": 79316757,
+      "layout": "shared_all",
+      "is_last_layer": false
+    },
+    "30": {
+      "key_count": 15,
+      "numel": 79316757,
+      "layout": "shared_all",
+      "is_last_layer": false
+    },
+    "31": {
+      "key_count": 15,
+      "numel": 79316757,
+      "layout": "shared_all",
+      "is_last_layer": true
+    }
+  },
+  "full_32_block_ncnn": false,
+  "full_pipeline_pytorch": true,
+  "android_vulkan": false
+}

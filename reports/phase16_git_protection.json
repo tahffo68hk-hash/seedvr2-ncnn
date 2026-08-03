@@ -1,0 +1,25 @@
+{
+  "phase": "phase16",
+  "target": "git_protection",
+  "large_binary_threshold_bytes": 10485760,
+  "checks": {
+    "no_phase16_phase15_phase14_phase13_tracked": true,
+    "no_build_third_party_env_tracked": true,
+    "no_weight_files_tracked": true,
+    "no_large_binary_tracked": true,
+    "phase16_local_dirs_ignored": true,
+    "no_conflict_markers": true,
+    "no_secrets_in_reports_docs_tests": true,
+    "phase16_reports_json_finite": true
+  },
+  "details": {
+    "no_phase16_phase15_phase14_phase13_tracked": "tracked=1520",
+    "no_large_binary_tracked": "threshold=10485760"
+  },
+  "overall_pass": true,
+  "overall_status": "PASS",
+  "real_seedvr2_weights": true,
+  "full_32_block_dit": true,
+  "android_vulkan": false,
+  "large_artifacts_committed": false
+}
