@@ -1,0 +1,54 @@
+{
+  "phase": 14,
+  "title": "Real-Weight Single-Block Hybrid Visual Milestone - checkpoint acquisition manifest",
+  "status": "BLOCKED_CHECKPOINT_REQUIRED",
+  "updated": "2026-08-03",
+  "checkpoint": {
+    "placeholder": "<LOCAL_SEEDVR2_CHECKPOINT>",
+    "resolved_path": null,
+    "exists": false,
+    "download_authorized": false,
+    "expected_local_path": "D:/AIProjects/seedvr2-ncnn/.phase14_local_checkpoint/seedvr2_ema_3b.pth",
+    "expected_filenames": [
+      "seedvr2_ema_3b.pth",
+      "ema_vae.pth"
+    ],
+    "official_source": {
+      "repo_id": "ByteDance-Seed/SeedVR2-3B",
+      "hub": "huggingface.co",
+      "official_reference": "SeedVR2 projects/inference_seedvr2_3b.py: configure_dit_model(device='cuda', checkpoint='./ckpts/seedvr2_ema_3b.pth')",
+      "vae_reference": "configs_3b/main.yaml checkpoint: ./ckpts/ema_vae.pth",
+      "snapshot_allow_patterns": [
+        "*.json",
+        "*.safetensors",
+        "*.pth",
+        "*.bin",
+        "*.py",
+        "*.md",
+        "*.txt"
+      ]
+    },
+    "license": {
+      "code_license": "Apache-2.0 (SeedVR repo LICENSE)",
+      "model_license": "HF ByteDance-Seed/SeedVR2-3B model card license - acceptance NOT authorized by this task",
+      "notes": "No download, no HF/ModelScope login, no new license acceptance, no unofficial mirrors, no unknown-source weights."
+    }
+  },
+  "sha256_fields": {
+    "seedvr2_ema_3b_pth": null,
+    "ema_vae_pth": null,
+    "model_index_json": null,
+    "safetensors_index_json": null
+  },
+  "hash_policy": "sha256 of the full checkpoint file must be recorded before use; empty (null) means not yet provided.",
+  "loader_preflight_contract": [
+    "path must exist and be a regular file",
+    "filename must match an official expected filename",
+    "size must exceed the documented minimum (3B DiT checkpoint, >= 1 GB)",
+    "sha256 must match the recorded hash when provided",
+    "no network access, no download, no login, no license acceptance",
+    "schema probe (keys, nesting, shapes, dtype) is optional and requires torch; never loads weights into GPU"
+  ],
+  "blocked_reason": "No real SeedVR2 checkpoint exists at the placeholder path and none is downloaded/obtained.",
+  "required_single_input": "Place the official ByteDance-Seed/SeedVR2-3B checkpoint at the expected local path and provide its sha256 (or explicitly authorize download)."
+}

@@ -61,3 +61,12 @@ conda run -n seedvr2-block-probe python tests/seedvr2_weight_mapping/check_no_la
 ```
 
 Acceptance (Phase 13 READY): RW-A->RW-A final vid/txt < 2e-4 (measured ~1e-5), all stages within thresholds, bit-identical across 3 processes, zero NaN/Inf; 19 models / cache 19; mapping contract 29/29 mapped_numel==source_numel with 0 unmapped/duplicates (12 checks x5 PASS); inventory 38 entries x3 PASS; negatives 25/25; last-layer reuse PASS (20 keys, txt MLP/ada absent, all 19 models reused); regressions 21/21 PASS; git protection PASS; flags `real_seedvr2_weights=false`, `full_32_block_dit=false`, `android_vulkan=false`, `overall_status=PASS`. Historical report baselines must be restored after regression runs (`git restore`).
+
+Phase 14 real-weight milestone (BLOCKED_CHECKPOINT_REQUIRED - prep only, no checkpoint):
+
+```text
+.conda-cuda\python.exe tests\seedvr2_real_weight_hybrid\checkpoint_loader_preflight.py --report reports\phase14_checkpoint_preflight.json
+.conda-cuda\python.exe tests\seedvr2_real_weight_hybrid\test_checkpoint_preflight.py
+```
+
+Acceptance (prep): preflight reports `overall_status=BLOCKED_CHECKPOINT_REQUIRED`, `download_attempted=false`, `no_network=true`, exit code 2; preflight tests 11/11 PASS (missing path, directory, wrong filename, too-small, sha mismatch, valid match, expected-filename contract, no-network source audit, CLI flags, manifest consistency). Full Phase 14 acceptance (when the checkpoint lands): real checkpoint SHA recorded; schema vs Phase 13 mapping contract (29 keys, mapped_numel==source_numel, real qk-norm all-ones gate); real-weight 19-stage FP32 export (`pnnx fp16=0`) into ignored `.phase14_local_artifacts/`; real-context block parity (norm/ada-in <1e-5, qkv/qk-norm/rope <2e-5, packed attention/projection <1e-4, SwiGLU/residuals/finals <2e-4, NaN/Inf=0, final vid/txt <2e-4); single-block adapter (capture/pytorch/ncnn, `ncnn_adapter_call_count>0`, `original_block_call_count==0`, `HYBRID BLOCK EXECUTED`); visible PNG/MP4 outputs under `.phase14_visual_outputs/`; latent/pixel/PSNR/SSIM comparison; Phase 14 negatives; Phase 13/12/core/Phase 11 regressions; flags `real_seedvr2_weights=true`, `single_ncnn_block=true`, `full_32_block_ncnn=false`, `full_pipeline_pytorch=true`, `visible_output_generated=true`, `android_vulkan=false`, `checkpoint_downloaded_by_task=false`, `large_artifacts_committed=false`.

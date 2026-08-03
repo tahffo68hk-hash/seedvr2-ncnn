@@ -28,3 +28,17 @@ toolchain-test/*.exe
 # Phase 13 real-width local artifacts (never committed)
 .phase13_local_artifacts/
 .phase13_export_tmp/
+
+
+# Phase 14 real-weight integration (never commit; requires explicit authorization)
+.phase14_local_checkpoint/
+.phase14_local_artifacts/
+.phase14_visual_outputs/
+.phase14_export_tmp/
+*.safetensors
+*.ckpt
+*.pth
+*.pt
+*.mp4
+*.avi
+*.mov

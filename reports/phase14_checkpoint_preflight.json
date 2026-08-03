@@ -1,0 +1,37 @@
+{
+  "overall_status": "BLOCKED_CHECKPOINT_REQUIRED",
+  "path": "D:\\AIProjects\\seedvr2-ncnn\\.phase14_local_checkpoint\\seedvr2_ema_3b.pth",
+  "checks": [
+    {
+      "check": "path_exists",
+      "passed": false,
+      "detail": "D:\\AIProjects\\seedvr2-ncnn\\.phase14_local_checkpoint\\seedvr2_ema_3b.pth"
+    },
+    {
+      "check": "is_regular_file",
+      "passed": false,
+      "detail": "missing path"
+    },
+    {
+      "check": "expected_filename",
+      "passed": false,
+      "detail": "missing path"
+    },
+    {
+      "check": "size_ok",
+      "passed": false,
+      "detail": "missing path"
+    },
+    {
+      "check": "sha256_match",
+      "passed": false,
+      "detail": "missing path"
+    }
+  ],
+  "no_network": true,
+  "download_attempted": false,
+  "expected_filenames": [
+    "seedvr2_ema_3b.pth",
+    "ema_vae.pth"
+  ]
+}

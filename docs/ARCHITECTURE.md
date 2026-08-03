@@ -19,3 +19,11 @@ all-ones RMSNorm affine weights are folded by pnnx. Heavy artifacts are
 git-ignored (`.phase13_local_artifacts/`); the committed inventory manifest and
 weight-mapping contract describe them. Last-layer reuses the same 19 models
 (vid_only control flow).
+
+Phase 14 real-weight single-block hybrid visual milestone (BLOCKED_CHECKPOINT_REQUIRED):
+intends to keep the official PyTorch SeedVR2 pipeline and replace exactly one real
+`NaMMSRTransformerBlock` (middle block `floor(N/2)`) with the Phase 13 `HybridDiTBlockRuntime`
+via a host adapter (`tests/seedvr2_real_weight_hybrid/real_block_adapter.py` planned;
+modes capture/pytorch/ncnn; `ncnn_adapter_call_count>0`, `original_block_call_count==0`).
+Real-weight stage artifacts live in git-ignored `.phase14_local_artifacts/`; visual outputs
+in `.phase14_visual_outputs/`. Blocked on the official checkpoint input (no download).

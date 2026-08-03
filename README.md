@@ -40,6 +40,15 @@ mapping contract (29/29, AdaSingle runtime-only, qk-norm all-ones folded,
 last-layer reuses all 19 models). See
 [realwidth-seedvr2-block-feasibility-report.md](D:/AIProjects/seedvr2-ncnn/docs/realwidth-seedvr2-block-feasibility-report.md)
 and [seedvr2-block-weight-mapping-report.md](D:/AIProjects/seedvr2-ncnn/docs/seedvr2-block-weight-mapping-report.md).
+Phase 14 real-weight single-block hybrid visual milestone is
+**BLOCKED_CHECKPOINT_REQUIRED**: the real SeedVR2 3B checkpoint is not present
+locally and this task does not authorize downloading, logging in, accepting a
+model license, or using unknown-source weights. Checkpoint acquisition manifest,
+expected filenames (`seedvr2_ema_3b.pth` from `ByteDance-Seed/SeedVR2-3B`,
+`ema_vae.pth`), sha256 fields and a non-downloading loader preflight are
+committed under `tests/seedvr2_real_weight_hybrid/`; random weights will not be
+used to claim Phase 14 READY. See
+[real-weight-single-block-prep](D:/AIProjects/seedvr2-ncnn/tests/seedvr2_real_weight_hybrid/README.md).
 This is not a complete SeedVR2 port.
 
 ```mermaid
@@ -132,6 +141,8 @@ All FP32 parity/reference artifacts must use `pnnx fp16=0`. After public C++ typ
 
 Phase 7.5-B LayerNorm Hybrid Runtime = READY; Phase 8 RMSNorm Hybrid Runtime = READY; Phase 8.1 FP32 conversion precision fix = READY; Phase 9.1 DynamicAttentionContract = READY; Phase 9.2 Dynamic padding mask = READY; Phase 9.3 Dynamic MM-RoPE3D = READY; Phase 9.4 Typed auxiliary metadata/runtime routing = READY; Phase 9.5 Dynamic multi-shape RMS Hybrid Runtime = READY; Phase 10 head_dim=128 = READY (real SeedVR2 MM-RoPE3D contract confirmed from rotary-embedding-torch==0.5.3 and validated; synthetic contract kept as historical regression).
 
+Phase 14 = BLOCKED_CHECKPOINT_REQUIRED (real SeedVR2 checkpoint not present; prep committed; no download).
+
 Phase 13 real-width validation (clean build `build/phase13-real-width-release`):
 
 ```text
@@ -144,5 +155,4 @@ Heavy real-width artifacts stay in the git-ignored `.phase13_local_artifacts/`
 directory; only manifests, the mapping contract, scripts, tests and reports are
 committed (see `tests/seedvr2_weight_mapping/check_no_large_tracked_artifacts.py`).
 
-TODO: real SeedVR2 weights (Phase 14, upon authorization), 32-block DiT, Vulkan,
-VAE/full video restoration, and direct Apex fused-RMSNorm parity.
+TODO: Phase 14 is blocked on the real SeedVR2 3B checkpoint (`ByteDance-Seed/SeedVR2-3B`, `seedvr2_ema_3b.pth` + sha256 at `.phase14_local_checkpoint/`, or explicit download authorization); then real-weight block parity, single-block hybrid adapter, visible output milestone, 32-block DiT, Vulkan, VAE/full video restoration, and direct Apex fused-RMSNorm parity.
