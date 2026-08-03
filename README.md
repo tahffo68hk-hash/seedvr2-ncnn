@@ -40,16 +40,22 @@ mapping contract (29/29, AdaSingle runtime-only, qk-norm all-ones folded,
 last-layer reuses all 19 models). See
 [realwidth-seedvr2-block-feasibility-report.md](D:/AIProjects/seedvr2-ncnn/docs/realwidth-seedvr2-block-feasibility-report.md)
 and [seedvr2-block-weight-mapping-report.md](D:/AIProjects/seedvr2-ncnn/docs/seedvr2-block-weight-mapping-report.md).
-Phase 14 real-weight single-block hybrid visual milestone is
-**BLOCKED_CHECKPOINT_REQUIRED**: the real SeedVR2 3B checkpoint is not present
-locally and this task does not authorize downloading, logging in, accepting a
-model license, or using unknown-source weights. Checkpoint acquisition manifest,
-expected filenames (`seedvr2_ema_3b.pth` from `ByteDance-Seed/SeedVR2-3B`,
-`ema_vae.pth`), sha256 fields and a non-downloading loader preflight are
-committed under `tests/seedvr2_real_weight_hybrid/`; random weights will not be
-used to claim Phase 14 READY. See
-[real-weight-single-block-prep](D:/AIProjects/seedvr2-ncnn/tests/seedvr2_real_weight_hybrid/README.md).
-This is not a complete SeedVR2 port.
+Phase 14 real-weight single-block hybrid visual milestone is **READY**: the
+official `ByteDance-Seed/SeedVR2-3B` checkpoint (5/5 sha256 verified, official
+source only) is safely loaded (`weights_only=True`), schema-validated (32 blocks,
+block 16 = floor(32/2) middle, 635 fp32 keys), q/k RMSNorm forced real-affine
+(not all-ones; Phase 13 0-byte reuse forbidden), mapped via the 15-key
+state_dict->ncnn contract (mapped_numel == source_numel, QKV/SwiGLU bit-exact),
+exported to 19 FP32 stages (`pnnx fp16=0`, git-ignored `.phase14_local_artifacts/`),
+and the ncnn `HybridDiTBlockRuntime` with real weights passes the RW-A O(1)
+fixture (final vid/txt < 2e-4) and the official-context block-16 parity
+(rel < 1e-3), plus a hybrid visual milestone: 4-frame 128x128 official pipeline
+with one block replaced by ncnn, pixel PSNR 52.5 dB / SSIM 0.9975, adapter
+evidence (ncnn=1, original=0, no silent fallback), negatives 29/29, regressions
+22/22. See [real-weight-single-block-report.md](D:/AIProjects/seedvr2-ncnn/docs/real-weight-single-block-report.md)
+and [hybrid-visual-milestone-report.md](D:/AIProjects/seedvr2-ncnn/docs/hybrid-visual-milestone-report.md).
+This is a SeedVR2-style attention subsystem with a single ncnn block, not a
+complete SeedVR2 port.
 
 ```mermaid
 flowchart LR
@@ -141,7 +147,7 @@ All FP32 parity/reference artifacts must use `pnnx fp16=0`. After public C++ typ
 
 Phase 7.5-B LayerNorm Hybrid Runtime = READY; Phase 8 RMSNorm Hybrid Runtime = READY; Phase 8.1 FP32 conversion precision fix = READY; Phase 9.1 DynamicAttentionContract = READY; Phase 9.2 Dynamic padding mask = READY; Phase 9.3 Dynamic MM-RoPE3D = READY; Phase 9.4 Typed auxiliary metadata/runtime routing = READY; Phase 9.5 Dynamic multi-shape RMS Hybrid Runtime = READY; Phase 10 head_dim=128 = READY (real SeedVR2 MM-RoPE3D contract confirmed from rotary-embedding-torch==0.5.3 and validated; synthetic contract kept as historical regression).
 
-Phase 14 = BLOCKED_CHECKPOINT_REQUIRED (real SeedVR2 checkpoint not present; prep committed; no download).
+Phase 14 = READY (real SeedVR2 3B checkpoint, real-weight single-block hybrid visual milestone; see reports above).
 
 Phase 13 real-width validation (clean build `build/phase13-real-width-release`):
 
@@ -155,4 +161,4 @@ Heavy real-width artifacts stay in the git-ignored `.phase13_local_artifacts/`
 directory; only manifests, the mapping contract, scripts, tests and reports are
 committed (see `tests/seedvr2_weight_mapping/check_no_large_tracked_artifacts.py`).
 
-TODO: Phase 14 is blocked on the real SeedVR2 3B checkpoint (`ByteDance-Seed/SeedVR2-3B`, `seedvr2_ema_3b.pth` + sha256 at `.phase14_local_checkpoint/`, or explicit download authorization); then real-weight block parity, single-block hybrid adapter, visible output milestone, 32-block DiT, Vulkan, VAE/full video restoration, and direct Apex fused-RMSNorm parity.
+TODO (Phase 15, not started - explicit authorization required): full 32-block real-weight DiT streaming on ncnn, Android/Vulkan targets, VAE/full video restoration in ncnn, and direct fused-kernel parity. Phase 14 committed evidence: real-weight single-block RW-A parity (final vid/txt < 2e-4) and official-context block-16 parity (rel < 1e-3), hybrid visual milestone (pixel PSNR 52.5 dB, SSIM 0.9975), negatives 29/29, regressions 22/22, git protection 8/8.

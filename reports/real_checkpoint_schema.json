@@ -1,0 +1,280 @@
+{
+  "phase": 14,
+  "sha256": "6bcc5ac59447e97b100477480aebb01be2ec724c8340bb83faae21f64848604b",
+  "bytes": 13566090228,
+  "loading": {
+    "method": "torch.load(weights_only=True, mmap=True, map_location=cpu)",
+    "succeeded": true,
+    "fallback_used": false,
+    "error": null
+  },
+  "top_level_type": "dict",
+  "flat_key_count": 635,
+  "tensor_count": 635,
+  "dtype_distribution": {
+    "torch.float32": 635
+  },
+  "total_numel": 3391476448,
+  "ema_structure": {
+    "file_is_ema_weights": true,
+    "ema_prefix_present": false,
+    "ema_prefix_keys": [],
+    "note": "seedvr2_ema_3b.pth is the EMA copy of the DiT state_dict; keys are unprefixed flat module paths (vid_in/txt_in/emb_in/blocks.<i>.*)."
+  },
+  "block_count": 32,
+  "block_indices": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31
+  ],
+  "block_prefix": "blocks.<i>.",
+  "per_block_key_count": {
+    "0": 29,
+    "1": 29,
+    "2": 29,
+    "3": 29,
+    "4": 29,
+    "5": 29,
+    "6": 29,
+    "7": 29,
+    "8": 29,
+    "9": 29,
+    "10": 15,
+    "11": 15,
+    "12": 15,
+    "13": 15,
+    "14": 15,
+    "15": 15,
+    "16": 15,
+    "17": 15,
+    "18": 15,
+    "19": 15,
+    "20": 15,
+    "21": 15,
+    "22": 15,
+    "23": 15,
+    "24": 15,
+    "25": 15,
+    "26": 15,
+    "27": 15,
+    "28": 15,
+    "29": 15,
+    "30": 15,
+    "31": 15
+  },
+  "target_block": {
+    "block_index": 16,
+    "selection_rule": "floor(actual_block_count / 2)",
+    "actual_block_count": 32,
+    "is_last_layer": false,
+    "last_block_index": 31,
+    "key_count": 15,
+    "numel": 79316757,
+    "prefix": "blocks.16.",
+    "keys": [
+      "blocks.16.ada.all.attn_gate",
+      "blocks.16.ada.all.attn_scale",
+      "blocks.16.ada.all.attn_shift",
+      "blocks.16.ada.all.mlp_gate",
+      "blocks.16.ada.all.mlp_scale",
+      "blocks.16.ada.all.mlp_shift",
+      "blocks.16.attn.norm_k.all.weight",
+      "blocks.16.attn.norm_q.all.weight",
+      "blocks.16.attn.proj_out.all.bias",
+      "blocks.16.attn.proj_out.all.weight",
+      "blocks.16.attn.proj_qkv.all.weight",
+      "blocks.16.attn.rope.rope.freqs",
+      "blocks.16.mlp.all.proj_in.weight",
+      "blocks.16.mlp.all.proj_in_gate.weight",
+      "blocks.16.mlp.all.proj_out.weight"
+    ]
+  },
+  "shape_checks": {
+    "qkv": {
+      "state_dict_key": "blocks.16.attn.proj_qkv.all.weight",
+      "shape": [
+        7680,
+        2560
+      ]
+    },
+    "proj_out": {
+      "state_dict_key": "blocks.16.attn.proj_out.all.weight",
+      "shape": [
+        2560,
+        2560
+      ],
+      "bias_shape": [
+        2560
+      ]
+    },
+    "mlp_proj_in": {
+      "state_dict_key": "blocks.16.mlp.all.proj_in.weight",
+      "shape": [
+        6912,
+        2560
+      ]
+    },
+    "mlp_proj_in_gate": {
+      "state_dict_key": "blocks.16.mlp.all.proj_in_gate.weight",
+      "shape": [
+        6912,
+        2560
+      ]
+    },
+    "mlp_proj_out": {
+      "state_dict_key": "blocks.16.mlp.all.proj_out.weight",
+      "shape": [
+        2560,
+        6912
+      ]
+    },
+    "norm_q": {
+      "state_dict_key": "blocks.16.attn.norm_q.all.weight",
+      "shape": [
+        128
+      ]
+    },
+    "norm_k": {
+      "state_dict_key": "blocks.16.attn.norm_k.all.weight",
+      "shape": [
+        128
+      ]
+    },
+    "rope_freqs": {
+      "state_dict_key": "blocks.16.attn.rope.rope.freqs",
+      "shape": [
+        21
+      ]
+    },
+    "ada_params": {
+      "blocks.16.ada.all.attn_gate": [
+        2560
+      ],
+      "blocks.16.ada.all.attn_scale": [
+        2560
+      ],
+      "blocks.16.ada.all.attn_shift": [
+        2560
+      ],
+      "blocks.16.ada.all.mlp_gate": [
+        2560
+      ],
+      "blocks.16.ada.all.mlp_scale": [
+        2560
+      ],
+      "blocks.16.ada.all.mlp_shift": [
+        2560
+      ]
+    }
+  },
+  "components": {
+    "vid_in": true,
+    "txt_in": true,
+    "emb_in": true,
+    "blocks": true,
+    "vid_out_norm": true,
+    "vid_out": true,
+    "vae_in_state_dict": false,
+    "components_note": "VAE weights are NOT in this pth; they live in the separate ema_vae.pth (official configs_3b/main.yaml vae.checkpoint)."
+  },
+  "qk_norm_forced_check": {
+    "checked_keys": [
+      "blocks.0.attn.norm_q.vid.weight",
+      "blocks.0.attn.norm_q.txt.weight",
+      "blocks.0.attn.norm_k.vid.weight",
+      "blocks.0.attn.norm_k.txt.weight",
+      "blocks.16.attn.norm_q.all.weight",
+      "blocks.16.attn.norm_k.all.weight"
+    ],
+    "entries": {
+      "blocks.0.attn.norm_q.vid.weight": {
+        "min": -0.07512938231229782,
+        "max": 0.9816974997520447,
+        "mean": 0.1273270845413208,
+        "std": 0.24512268602848053,
+        "all_ones": false,
+        "unique_count": 128,
+        "sha256": "34e7dca3a1f3b975619a839cbdb7e23442d7eeb67cdc41d907d7488e42dc61e6"
+      },
+      "blocks.0.attn.norm_q.txt.weight": {
+        "min": -0.01168129500001669,
+        "max": 0.5192672610282898,
+        "mean": 0.09869149327278137,
+        "std": 0.1265328824520111,
+        "all_ones": false,
+        "unique_count": 128,
+        "sha256": "6d57ec20005403a42719cd3311e5750fb2e3ed063494716fa69394f199973faa"
+      },
+      "blocks.0.attn.norm_k.vid.weight": {
+        "min": -0.10095841437578201,
+        "max": 0.9528495669364929,
+        "mean": 0.12881554663181305,
+        "std": 0.22443796694278717,
+        "all_ones": false,
+        "unique_count": 128,
+        "sha256": "cdb981e2f92a7cfdbf9ffc25257e2c36161107f1095cd99ca8c3f51f5d93b5e2"
+      },
+      "blocks.0.attn.norm_k.txt.weight": {
+        "min": -0.024134621024131775,
+        "max": 0.8427520990371704,
+        "mean": 0.13354775309562683,
+        "std": 0.17864824831485748,
+        "all_ones": false,
+        "unique_count": 128,
+        "sha256": "1747c59bd8a620a428447f0b8fa3b3d169ea3621f4c22731f908ed444ee8bf10"
+      },
+      "blocks.16.attn.norm_q.all.weight": {
+        "min": 0.7623492479324341,
+        "max": 1.6977627277374268,
+        "mean": 1.4038362503051758,
+        "std": 0.19021059572696686,
+        "all_ones": false,
+        "unique_count": 128,
+        "sha256": "99c5742e5e2659a5a3ce0ad1b0ff4b38b6088de90ca88951f7987d2aae37fe66"
+      },
+      "blocks.16.attn.norm_k.all.weight": {
+        "min": 0.7658812999725342,
+        "max": 1.7889069318771362,
+        "mean": 1.4272979497909546,
+        "std": 0.18802060186862946,
+        "all_ones": false,
+        "unique_count": 128,
+        "sha256": "02cae8eb344193c497a8ac461e2b5803767de0b9f18cd77bcfc761822f624567"
+      }
+    },
+    "all_ones": false,
+    "conclusion": "REAL_AFFINE_REQUIRED",
+    "phase13_zero_byte_bins_reuse": "FORBIDDEN",
+    "note": "q/k RMSNorm weights are NOT all-ones -> the Phase 13 0-byte folded bins (pnnx_folded_identity_weight) MUST NOT be reused; real affine RMSNorm weights must be exported for every q/k norm stage."
+  },
+  "block_count_source": "derived from state_dict keys (not hardcoded)"
+}

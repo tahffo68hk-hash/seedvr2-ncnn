@@ -45,3 +45,8 @@ target_compile_options(realwidth_dit_block_validation PRIVATE /EHsc /UNDEBUG)
 add_executable(realwidth_artifact_inventory_tests realwidth_artifact_inventory_tests.cpp)
 target_link_libraries(realwidth_artifact_inventory_tests PRIVATE artifact_registry_lib model_cache_lib ncnn bcrypt)
 target_compile_options(realwidth_artifact_inventory_tests PRIVATE /EHsc /UNDEBUG)
+
+# Phase 14: real-block ncnn adapter executable (official-context hybrid runs).
+add_executable(real_block_adapter real_block_adapter.cpp)
+target_link_libraries(real_block_adapter PRIVATE hybrid_dit_block_runtime_lib)
+target_compile_options(real_block_adapter PRIVATE /EHsc /UNDEBUG)

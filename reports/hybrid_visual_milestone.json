@@ -1,0 +1,95 @@
+{
+  "phase": "phase14",
+  "milestone": "real-weight hybrid visual (official SeedVR2 pipeline, block 16 replaced by ncnn)",
+  "verdict": "PASS",
+  "overall_pass": true,
+  "verdict_reasons": [
+    "block parity, adapter evidence, finite outputs and visual sanity all pass"
+  ],
+  "checkpoint": {
+    "sha256": "6bcc5ac59447e97b100477480aebb01be2ec724c8340bb83faae21f64848604b",
+    "official_source_only": true
+  },
+  "run": {
+    "seed": 20260803,
+    "steps": 1,
+    "cfg_scale": 1.0,
+    "git_head": "e7e24d043d8dbdcc5abb3567d2d15fb9f341c047",
+    "reference_elapsed_seconds": 35.118,
+    "hybrid_elapsed_seconds": 35.294
+  },
+  "block16": {
+    "variant": "real_seedvr2_block16_c2560_h20_hd128",
+    "block_index": 16,
+    "official_context_input_consistent": true,
+    "max_input_abs_diff": 0.0,
+    "input_hashes_identical": true,
+    "parity": {
+      "mode": "FP32 attention (torch.Tensor.bfloat16 identity patch, fixture-harness convention)",
+      "final_vid_max_abs_error": 5.14984130859375e-05,
+      "final_txt_max_abs_error": 0.000244140625,
+      "final_vid_max_rel_error": 1.3777726053376682e-06,
+      "final_txt_max_rel_error": 8.872485857125412e-09,
+      "final_vid_mean_abs_error": 3.7059834312458406e-07,
+      "final_txt_mean_abs_error": 3.2981660069708596e-07,
+      "nan_count": 0,
+      "inf_count": 0,
+      "abs_limit_fixture_o1": 0.0002,
+      "rel_limit": 0.001,
+      "pass": true
+    },
+    "fp32_reference_output_hashes": {
+      "output_vid_sha256": "5b8b63e5b031bb58214319bbf6702e0f6dface4352fd92ae9a8cebdfbd0e3f7c",
+      "output_txt_sha256": "f328fa0f0094f6087b460805d29740ae717d3114caa687231bb7ece97da9cda8"
+    }
+  },
+  "adapter": {
+    "ncnn_adapter_call_count": 1,
+    "original_block_call_count": 0,
+    "silent_fallback": false,
+    "stdout_has_hybrid_block_executed": true,
+    "latency_ms": 183.3028,
+    "evidence_ok": true
+  },
+  "latent": {
+    "label": "final_latent",
+    "max_abs_error": 0.328125,
+    "mean_abs_error": 0.008510016836225986,
+    "rmse": 0.015279901204195584,
+    "psnr_db": 36.31758907569271,
+    "nan_count": 0,
+    "inf_count": 0
+  },
+  "pixels": {
+    "max_abs_error": 0.054901957511901855,
+    "mean_abs_error": 0.0010983936954289675,
+    "rmse": 0.002365426361859435,
+    "psnr_db": 52.52181134872256,
+    "ssim": 0.997465930108274,
+    "nan_count": 0,
+    "inf_count": 0,
+    "ref_std": 0.19856862723827362,
+    "hybrid_std": 0.19877555966377258,
+    "output_shape": [
+      4,
+      128,
+      128,
+      3
+    ],
+    "frames": 4,
+    "non_constant_reference": true,
+    "non_constant_hybrid": true
+  },
+  "outputs": {
+    "diff_dir": ".phase14_visual_outputs\\04_abs_diff",
+    "side_dir": ".phase14_visual_outputs\\05_side_by_side",
+    "amplify_factor": 25.0
+  },
+  "thresholds": {
+    "block16_final_max_abs_limit_fixture_o1": 0.0002,
+    "block16_max_rel_limit": 0.001,
+    "pixel_max_abs_sanity": 0.1,
+    "latent_max_abs_sanity": 0.5,
+    "latent_mean_abs_sanity": 0.05
+  }
+}

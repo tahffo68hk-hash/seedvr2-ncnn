@@ -310,8 +310,21 @@ bool run_once(HybridDiTBlockRuntime& runtime, const ProfileRef& p, DiTBlockTrace
     check_rope_tables(trace.rope_cos_txt, trace.rope_sin_txt, p, "rope_freqs_txt", ok, out_json);
     JVal stages;
     stages.kind = JVal::Object;
-    for (const auto& s : kStages) compare_stage(s.name, trace.*(s.field), p, s.threshold, ok, stages);
+    bool all_below_2e4 = true;
+    double final_vid_max = 0.0, final_txt_max = 0.0;
+    for (const auto& s : kStages)
+    {
+        const bool st_ok = compare_stage(s.name, trace.*(s.field), p, s.threshold, ok, stages);
+        const double m = stages.obj.at(s.name).obj.at("max_abs_error").num;
+        if (m >= 2e-4) all_below_2e4 = false;
+        if (std::string(s.name) == "final_vid") final_vid_max = m;
+        if (std::string(s.name) == "final_txt") final_txt_max = m;
+        (void)st_ok;
+    }
     out_json.obj["stages"] = stages;
+    out_json.obj["all_stages_max_abs_below_2e4"] = boolean(all_below_2e4);
+    out_json.obj["final_vid_max_abs_error"] = number(final_vid_max);
+    out_json.obj["final_txt_max_abs_error"] = number(final_txt_max);
     out_json.obj["latency_ms"] = number(stats.total_ms);
     out_json.obj["cache_before"] = number(static_cast<double>(stats.cache_size_before));
     out_json.obj["cache_after"] = number(static_cast<double>(stats.cache_size_after));
@@ -335,6 +348,9 @@ int main(int argc, char** argv)
     // registry scans direct children of the root for metadata.json
     const fs::path artifacts_root = argc > 1 ? fs::path(argv[1]) : fs::path(".phase13_local_artifacts");
     const fs::path out_json = argc > 2 ? fs::path(argv[2]) : fs::path();
+    // Phase 14: optional --variant (default Phase 13 variant) and --profile (default "A")
+    const std::string variant_name = argc > 3 ? std::string(argv[3]) : kVariant;
+    const std::string profile_name = argc > 4 ? std::string(argv[4]) : "A";
 
     ArtifactRegistry registry;
     std::string error;
@@ -343,7 +359,7 @@ int main(int argc, char** argv)
         std::cerr << "registry scan failed: " << error << '\n';
         return 1;
     }
-    const CoreKey key{4, 3, 3, 1, 1, 1, kVariant};
+    const CoreKey key{4, 3, 3, 1, 1, 1, variant_name};
     const CoreInfo* core = registry.lookup(key);
     if (!core)
     {
@@ -364,14 +380,14 @@ int main(int argc, char** argv)
     const double init_ms = std::chrono::duration<double, std::milli>(t_init1 - t_init0).count();
     const std::size_t cache_after_init = cache.size();
     const double ws_after_load_mb = working_set_mb(false);
-    std::cout << "variant=" << core->name << " initialized in " << init_ms << " ms, cache="
+    std::cout << "variant=" << core->name << " profile=" << profile_name << " initialized in " << init_ms << " ms, cache="
               << cache_after_init << ", ws_before=" << ws_before_mb << " MB, ws_after_load="
               << ws_after_load_mb << " MB\n";
 
     ProfileRef profile;
-    if (!load_profile(core->directory / "reference" / "A", profile, error))
+    if (!load_profile(core->directory / "reference" / profile_name, profile, error))
     {
-        std::cerr << "load profile A: " << error << '\n';
+        std::cerr << "load profile " << profile_name << ": " << error << '\n';
         return 1;
     }
     std::cout << "profile A vid_shapes=[" << profile.vid_shapes[0].t << "," << profile.vid_shapes[0].h
@@ -385,7 +401,17 @@ int main(int argc, char** argv)
     run2.kind = JVal::Object;
     const bool ok1 = run_once(runtime, profile, trace1, run1, true);
     const bool ok2 = run_once(runtime, profile, trace2, run2, true);
-    const bool det = ok1 && ok2 && trace1.final_vid == trace2.final_vid && trace1.final_txt == trace2.final_txt;
+    const bool runs_bit_identical = trace1.final_vid == trace2.final_vid && trace1.final_txt == trace2.final_txt;
+    const bool det = runs_bit_identical;
+    const bool no_nan_inf = run1.obj.at("stages").obj.at("final_vid").obj.at("nan_count").num == 0
+        && run1.obj.at("stages").obj.at("final_vid").obj.at("inf_count").num == 0
+        && run1.obj.at("stages").obj.at("final_txt").obj.at("nan_count").num == 0
+        && run1.obj.at("stages").obj.at("final_txt").obj.at("inf_count").num == 0;
+    const bool phase14_final_pass = run1.obj.at("final_vid_max_abs_error").num < 2e-4
+        && run1.obj.at("final_txt_max_abs_error").num < 2e-4 && no_nan_inf;
+    const bool phase14_overall = phase14_final_pass && det
+        && run1.obj.at("all_stages_max_abs_below_2e4").b
+        && run2.obj.at("all_stages_max_abs_below_2e4").b;
     std::cout << "determinism RW-A->RW-A vid=" << (det ? "bit-identical" : "FAIL")
               << " txt=" << (det ? "bit-identical" : "FAIL") << '\n';
     const double ws_peak_mb = working_set_mb(true);
@@ -394,17 +420,25 @@ int main(int argc, char** argv)
     JVal report;
     report.kind = JVal::Object;
     report.obj["variant"] = text(core->name);
-    report.obj["sequence"] = text("RW-A,RW-A");
+    report.obj["sequence"] = text(profile_name + "," + profile_name);
     report.obj["run1"] = run1;
     report.obj["run2"] = run2;
     report.obj["determinism"] = boolean(det);
+    report.obj["runs_bit_identical"] = boolean(runs_bit_identical);
+    report.obj["phase14_final_pass"] = boolean(phase14_final_pass);
+    report.obj["phase14_no_nan_inf"] = boolean(no_nan_inf);
+    report.obj["phase14_overall_pass"] = boolean(phase14_overall);
+    report.obj["phase14_verdict"] = text(phase14_overall ? "PASS" : "FAIL");
     report.obj["init_ms_first_load"] = number(init_ms);
     report.obj["cache_size_after_init"] = number(static_cast<double>(cache_after_init));
     report.obj["working_set_mb_before"] = number(ws_before_mb);
     report.obj["working_set_mb_after_load"] = number(ws_after_load_mb);
     report.obj["peak_working_set_mb"] = number(ws_peak_mb);
     report.obj["working_set_mb_after_runs"] = number(ws_after_runs_mb);
-    report.obj["real_seedvr2_weights"] = boolean(false);
+    const bool real_weights = variant_name.find("real_seedvr2") == 0;
+    report.obj["real_seedvr2_weights"] = boolean(real_weights);
+    report.obj["variant_arg"] = text(variant_name);
+    report.obj["profile_arg"] = text(profile_name);
     report.obj["realwidth_block"] = boolean(true);
     report.obj["full_32_block_dit"] = boolean(false);
     report.obj["android_vulkan"] = boolean(false);
@@ -417,5 +451,5 @@ int main(int argc, char** argv)
         if (write_json_file(out_json, report)) return 1;
         std::cout << "report written: " << out_json << '\n';
     }
-    return (ok1 && ok2 && det) ? 0 : 1;
+    return (real_weights ? phase14_overall : (ok1 && ok2 && det)) ? 0 : 1;
 }

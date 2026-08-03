@@ -1,0 +1,55 @@
+{
+  "phase": 14,
+  "repo_id": "ByteDance-Seed/SeedVR2-3B",
+  "official_source_only": true,
+  "mirror_used": false,
+  "resume_supported": true,
+  "login_required": false,
+  "token_used": false,
+  "download_attempted": true,
+  "download_completed": true,
+  "checkpoint_downloaded_by_task": true,
+  "checkpoint_sha256": "6bcc5ac59447e97b100477480aebb01be2ec724c8340bb83faae21f64848604b",
+  "elapsed_seconds": 12.3,
+  "retry_required_after_first_run": true,
+  "retry_note": "ema_vae.pth first attempt hit a transient file lock (WinError 32); resume re-run completed and verified all files.",
+  "files": [
+    {
+      "filename": "seedvr2_ema_3b.pth",
+      "bytes": 13566090228,
+      "sha256": "6bcc5ac59447e97b100477480aebb01be2ec724c8340bb83faae21f64848604b",
+      "sha256_verified": true,
+      "download_completed": true
+    },
+    {
+      "filename": "ema_vae.pth",
+      "bytes": 1002691902,
+      "sha256": "c7df8a67e68b7f9aca3d5d2153d2ce8ab4373687741a0f9ce87cb356ace51cac",
+      "sha256_verified": true,
+      "download_completed": true
+    },
+    {
+      "filename": "pos_emb.pt",
+      "bytes": 595100,
+      "sha256": "fa07a14844314772266b66c3b95deb0027696d8fe7065721263db5176f45d799",
+      "sha256_verified": true,
+      "download_completed": true
+    },
+    {
+      "filename": "neg_emb.pt",
+      "bytes": 656540,
+      "sha256": "6a43e5800ef2354f1c156d27535834da055cbec8248298b8923492bba2076581",
+      "sha256_verified": true,
+      "download_completed": true
+    },
+    {
+      "filename": "README.md",
+      "bytes": 5250,
+      "sha256": "8f97c2751d9f73491fadbcc5a89862441e09de82730f1234e6db576bed2ae16b",
+      "sha256_verified": true,
+      "download_completed": true
+    }
+  ],
+  "absolute_paths_recorded": false,
+  "tokens_recorded": false
+}

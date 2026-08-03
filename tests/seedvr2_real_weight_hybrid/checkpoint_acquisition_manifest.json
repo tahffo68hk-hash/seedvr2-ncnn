@@ -1,13 +1,13 @@
 {
   "phase": 14,
   "title": "Real-Weight Single-Block Hybrid Visual Milestone - checkpoint acquisition manifest",
-  "status": "BLOCKED_CHECKPOINT_REQUIRED",
+  "status": "CHECKPOINT_AVAILABLE",
   "updated": "2026-08-03",
   "checkpoint": {
-    "placeholder": "<LOCAL_SEEDVR2_CHECKPOINT>",
+    "placeholder": null,
     "resolved_path": null,
-    "exists": false,
-    "download_authorized": false,
+    "exists": true,
+    "download_authorized": true,
     "expected_local_path": "D:/AIProjects/seedvr2-ncnn/.phase14_local_checkpoint/seedvr2_ema_3b.pth",
     "expected_filenames": [
       "seedvr2_ema_3b.pth",
@@ -35,8 +35,8 @@
     }
   },
   "sha256_fields": {
-    "seedvr2_ema_3b_pth": null,
-    "ema_vae_pth": null,
+    "seedvr2_ema_3b_pth": "6bcc5ac59447e97b100477480aebb01be2ec724c8340bb83faae21f64848604b",
+    "ema_vae_pth": "c7df8a67e68b7f9aca3d5d2153d2ce8ab4373687741a0f9ce87cb356ace51cac",
     "model_index_json": null,
     "safetensors_index_json": null
   },
@@ -49,6 +49,7 @@
     "no network access, no download, no login, no license acceptance",
     "schema probe (keys, nesting, shapes, dtype) is optional and requires torch; never loads weights into GPU"
   ],
-  "blocked_reason": "No real SeedVR2 checkpoint exists at the placeholder path and none is downloaded/obtained.",
-  "required_single_input": "Place the official ByteDance-Seed/SeedVR2-3B checkpoint at the expected local path and provide its sha256 (or explicitly authorize download)."
+  "blocked_reason": null,
+  "required_single_input": null,
+  "download_record": "reports/phase14_checkpoint_download.json"
 }

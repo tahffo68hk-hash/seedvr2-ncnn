@@ -35,6 +35,7 @@ toolchain-test/*.exe
 .phase14_local_artifacts/
 .phase14_visual_outputs/
 .phase14_export_tmp/
+.phase14_diag/
 *.safetensors
 *.ckpt
 *.pth

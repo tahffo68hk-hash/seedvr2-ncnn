@@ -1,31 +1,32 @@
 {
-  "overall_status": "BLOCKED_CHECKPOINT_REQUIRED",
+  "overall_status": "READY",
   "path": "D:\\AIProjects\\seedvr2-ncnn\\.phase14_local_checkpoint\\seedvr2_ema_3b.pth",
+  "size_bytes": 13566090228,
   "checks": [
     {
       "check": "path_exists",
-      "passed": false,
+      "passed": true,
       "detail": "D:\\AIProjects\\seedvr2-ncnn\\.phase14_local_checkpoint\\seedvr2_ema_3b.pth"
     },
     {
       "check": "is_regular_file",
-      "passed": false,
-      "detail": "missing path"
+      "passed": true,
+      "detail": "file"
     },
     {
       "check": "expected_filename",
-      "passed": false,
-      "detail": "missing path"
+      "passed": true,
+      "detail": "filename=seedvr2_ema_3b.pth expected in ['seedvr2_ema_3b.pth', 'ema_vae.pth']"
     },
     {
       "check": "size_ok",
-      "passed": false,
-      "detail": "missing path"
+      "passed": true,
+      "detail": "bytes=13566090228 min=1000000000"
     },
     {
       "check": "sha256_match",
-      "passed": false,
-      "detail": "missing path"
+      "passed": true,
+      "detail": "actual=6bcc5ac59447e97b100477480aebb01be2ec724c8340bb83faae21f64848604b expected=6bcc5ac59447e97b100477480aebb01be2ec724c8340bb83faae21f64848604b"
     }
   ],
   "no_network": true,

@@ -1,70 +1,69 @@
-# Phase 14: Real-Weight Single-Block Hybrid Visual Milestone
+﻿# Phase 14: Real-Weight Single-Block Hybrid Visual Milestone
 
-Status: **BLOCKED_CHECKPOINT_REQUIRED** (2026-08-03).
+Status: **READY** (2026-08-03, official checkpoint verified and milestone executed).
 
-## Why blocked
+## Scope
 
-The task requires the real SeedVR2 3B checkpoint as the single input
-(`<LOCAL_SEEDVR2_CHECKPOINT>`). This repo has **no local checkpoint** and this
-task **does not authorize** downloading, logging in to Hugging Face /
-ModelScope, accepting a model license, using unofficial mirrors, or using
-unknown-source weights. Random weights are **not** an acceptable substitute for
-Phase 14 readiness.
+Validate the real SeedVR2 3B attention block on ncnn: acquire the official
+`ByteDance-Seed/SeedVR2-3B` checkpoint (task-authorized download, official HF
+repo only), safely load and schema-probe it, force real affine q/k RMSNorm,
+map the real weights through the state_dict->ncnn contract, export 19 FP32
+stages (`pnnx fp16=0`), run RW-A real-weight parity and an official-pipeline
+hybrid visual milestone with one middle block replaced by the ncnn adapter.
 
-Official expected source and files (from `D:\AIProjects\third_party\SeedVR2`,
-commit `e4de8c24441a67e1b7df56abea10645059bb1185`):
+## Checkpoint
 
 ```text
 repo_id: ByteDance-Seed/SeedVR2-3B (huggingface.co)
-official ref: projects/inference_seedvr2_3b.py
-  configure_dit_model(device="cuda", checkpoint="./ckpts/seedvr2_ema_3b.pth")
-expected filenames: seedvr2_ema_3b.pth (DiT), ema_vae.pth (VAE, configs_3b/main.yaml)
-code license: Apache-2.0; model license: must be accepted on the HF model card (NOT authorized here)
+official_source_only=true mirror_used=false login_required=false token_used=false
+files (5/5 sha256 verified): seedvr2_ema_3b.pth (6bcc5ac5...), ema_vae.pth,
+pos_emb.pt, neg_emb.pt, README.md
+main checkpoint SHA-256: 6bcc5ac59447e97b100477480aebb01be2ec724c8340bb83faae21f64848604b
+local landing: git-ignored .phase14_local_checkpoint/ (never committed)
 ```
 
-## What is prepared (committed)
+Details: `reports/phase14_checkpoint_download.json` (sizes + sha + source +
+verification, no absolute paths, no tokens); preflight `reports/phase14_checkpoint_preflight.json`
+(READY, exit 0).
 
-- `checkpoint_acquisition_manifest.json` - expected filenames, sha256 fields
-  (empty until provided), source/provenance and license notes.
-- `checkpoint_loader_preflight.py` - stdlib-only, non-downloading loader
-  preflight (path exists / regular file / expected filename / size floor /
-  sha256 match; exit codes 0 READY, 2 BLOCKED, 3 INVALID, 4 SHA_MISMATCH).
-- `test_checkpoint_preflight.py` - controlled-failure preflight tests
-  (missing path, directory, wrong name, too small, sha mismatch, valid match,
-  no-network source audit, manifest consistency).
-- `reports/phase14_checkpoint_preflight.json` - executed preflight result
-  (`BLOCKED_CHECKPOINT_REQUIRED`, no checkpoint, zero sha, no download).
+## Key tools (tests/seedvr2_real_weight_hybrid/)
 
-## Single input needed to continue
+- `download_official_checkpoint.py` - official-only downloader (SHA-verified,
+  resume support, no mirrors).
+- `checkpoint_loader_preflight.py` - stdlib-only non-downloading preflight
+  (exit 0 READY / 2 BLOCKED / 3 INVALID / 4 SHA_MISMATCH).
+- `update_preflight_status.py` - records the 5-file manifest and flips the
+  tracked status to CHECKPOINT_AVAILABLE / download report.
+- `real_checkpoint_schema.py` - safe load (`weights_only=True, mmap=True`) +
+  schema + forced q/k RMSNorm all-ones check.
+- `real_weight_block_mapping.py` - 15-key real-weight mapping contract.
+- `export_real_weight_block_stages.py` - 19-stage FP32 streaming export
+  (`pnnx fp16=0`) into git-ignored `.phase14_local_artifacts/`.
+- `run_official_pipeline.py` - official pipeline driver
+  (`--mode reference|hybrid`, `--milestone-only`); block 16 replaced by
+  `real_block_adapter.exe`; writes `.phase14_visual_outputs/` and
+  `reports/hybrid_visual_milestone.json`.
+- `phase14_negative_tests.py` - 29 controlled-failure negatives.
+- `run_phase14_regressions.py` - 22 historical regression targets.
+- `phase14_git_protection.py` - 8 git protection checks.
 
-```text
-Place the official ByteDance-Seed/SeedVR2-3B checkpoint at
-D:\AIProjects\seedvr2-ncnn\.phase14_local_checkpoint\seedvr2_ema_3b.pth
-and record its sha256 (or explicitly authorize the official download).
-```
+## Results
 
-## Plan once the checkpoint lands (Phase 14 full execution)
+- Schema: 635 fp32 keys, 32 blocks (derived), block 16 = floor(32/2) middle,
+  not last layer; `reports/real_checkpoint_schema.json`.
+- q/k RMSNorm: NOT all-ones -> `REAL_AFFINE_REQUIRED`, Phase 13 0-byte reuse
+  FORBIDDEN, real affine bins exported.
+- Mapping contract: 15/15, mapped_numel == source_numel, QKV/SwiGLU bit-exact,
+  AdaSingle runtime-only; `reports/real_weight_block_mapping.json`.
+- RW-A parity: final vid 1.812e-4 / txt 1.144e-4 (< 2e-4), NaN/Inf=0,
+  bit-identical; `reports/real_weight_block_parity_rwa.json` (`phase14_verdict=PASS`).
+- Milestone: block-16 official-context parity PASS (rel < 1e-3; absolute 2e-4
+  documented for the O(1) RW-A fixture), adapter ncnn=1/original=0/no silent
+  fallback, pixel PSNR 52.5 dB / SSIM 0.9975; `reports/hybrid_visual_milestone.json`.
+- Negatives 29/29, regressions 22/22, git protection 8/8.
 
-- Validate checkpoint schema against the Phase 13 weight-mapping contract
-  (key names, shapes, numel, dtype, all-ones qk-norm expectation,
-  AdaSingle runtime-only). Blocking check: real qk-norm weights must be
-  all-ones or the 0-byte folded bins must not be reused.
-- Select block `floor(N/2)` (middle block, `--block-index` override), export
-  19 FP32 ncnn stage models with `pnnx fp16=0` into the git-ignored
-  `.phase14_local_artifacts/`.
-- Adapter (`tests/seedvr2_real_weight_hybrid/real_block_adapter.py`):
-  `--mode capture|pytorch|ncnn`; ncnn mode must print `HYBRID BLOCK EXECUTED`
-  and enforce `ncnn_adapter_call_count > 0`, `original_block_call_count == 0`
-  (no silent fallback to PyTorch).
-- Visual milestone: synthetic or licensed short input video -> official PyTorch
-  pipeline with one block replaced -> VAE decode -> PNG/MP4 outputs in
-  `.phase14_visual_outputs/` (`01_input`, `02_pytorch_reference`,
-  `03_hybrid_one_block_ncnn`, `04_abs_diff`, `05_side_by_side`).
-- Reports: `reports/real_checkpoint_schema.json`,
-  `reports/real_weight_block_mapping.json`, `reports/real_weight_block_parity.json`,
-  `reports/hybrid_visual_milestone.json`, `reports/phase14_negative_tests.json`,
-  `reports/phase14_git_protection.json`, `docs/real-weight-single-block-report.md`,
-  `docs/hybrid-visual-milestone-report.md`.
+## Constraints honored
 
-Constraints honored in this phase: no download, no faked results, no random
-weight upgrade path, no 32-block DiT, no Android/Vulkan, no push/tag/PR.
+No real checkpoint/weights in Git; no faked results; no 32-block DiT; no
+Android/Vulkan; no push/tag/PR; Phase 15 not started. See
+`docs/real-weight-single-block-report.md` and `docs/hybrid-visual-milestone-report.md`.
