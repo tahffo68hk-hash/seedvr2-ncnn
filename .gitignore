@@ -43,3 +43,11 @@ toolchain-test/*.exe
 *.mp4
 *.avi
 *.mov
+
+
+# Phase 15 multi-block streaming (never commit)
+.phase15_local_artifacts/
+.phase15_export_tmp/
+.phase15_visual_outputs/
+.phase15_runtime_traces/
+.phase15_diag/

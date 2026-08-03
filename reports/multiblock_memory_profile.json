@@ -1,0 +1,893 @@
+{
+  "phase": 15,
+  "milestone": "multi-block streaming hybrid memory profile",
+  "overall_pass": true,
+  "overall_status": "PASS",
+  "claim": "streaming process peak stays roughly constant (one block resident at a time); resident peak grows with block count",
+  "streaming_peak_rss_mb": {
+    "1": 474.1,
+    "2": 496.2,
+    "4": 476.2
+  },
+  "resident_peak_rss_mb": {
+    "1": 446.1,
+    "2": 839.1,
+    "4": 1530.0
+  },
+  "growth": {
+    "streaming_peak_4_over_1": 1.004,
+    "resident_peak_4_over_1": 3.43,
+    "streaming_peak_4_over_2": 0.96
+  },
+  "streaming_flat": true,
+  "resident_grows": true,
+  "runs": {
+    "n1_streaming": {
+      "block_count": 1,
+      "mode": "streaming",
+      "rc": 0,
+      "elapsed_s": 0.39,
+      "process_peak_rss_mb": 474.1,
+      "process_peak_vms_mb": 472.6,
+      "base_rss_mb": 2.4,
+      "adapter_report": {
+        "android_vulkan": false,
+        "block_indices": [
+          16
+        ],
+        "events": [
+          {
+            "block_index": 16,
+            "cache_size_after": 12,
+            "cache_size_before": 0,
+            "duration_ms": 123.7801,
+            "mem_peak_ws_mb": 383.257812,
+            "mem_private_mb": 313.148438,
+            "mem_working_set_mb": 315.761719,
+            "resident_bytes_after": 317205528,
+            "stage": "LOAD",
+            "t_ms": 123.7955,
+            "variant": "real_seedvr2_block16_c2560_h20_hd128"
+          },
+          {
+            "block_index": 16,
+            "cache_size_after": 12,
+            "cache_size_before": 12,
+            "duration_ms": 184.2958,
+            "stage": "EXECUTE",
+            "t_ms": 311.911,
+            "total_packed": 244,
+            "txt_hash": "0999bc28ed139f4a",
+            "variant": "real_seedvr2_block16_c2560_h20_hd128",
+            "vid_hash": "9c719b3a959bb75e"
+          },
+          {
+            "block_index": 16,
+            "cache_cleared": true,
+            "cache_size_after": 0,
+            "cache_size_before": 12,
+            "duration_ms": 9.3347,
+            "mem_private_mb": 77.4296875,
+            "mem_working_set_mb": 82.5078125,
+            "resident_bytes_after": 0,
+            "stage": "UNLOAD",
+            "t_ms": 324.1621,
+            "variant": "real_seedvr2_block16_c2560_h20_hd128"
+          },
+          {
+            "block_index": 16,
+            "files_probed": 48,
+            "handles_released": true,
+            "stage": "FILE_PROBE",
+            "t_ms": 351.1965
+          }
+        ],
+        "full_32_block_ncnn": false,
+        "full_pipeline_pytorch": true,
+        "max_resident_weighted_blocks": 1,
+        "mode": "streaming",
+        "ncnn_adapter_call_count": 1,
+        "order_ok": true,
+        "original_block_call_count": 0,
+        "per_block": [
+          {
+            "block_index": 16,
+            "execute_ms": 184.2958,
+            "load_ms": 0,
+            "txt_hash": "0999bc28ed139f4a",
+            "unload_ms": 0,
+            "variant": "real_seedvr2_block16_c2560_h20_hd128",
+            "vid_hash": "9c719b3a959bb75e"
+          }
+        ],
+        "silent_fallback": false,
+        "streaming_mode_validated": true,
+        "total_execute_ms": 184,
+        "total_load_ms": 123,
+        "total_unload_ms": 9,
+        "total_wall_ms": 356.2676
+      },
+      "stdout_tail": "LOAD block 16 variant=real_seedvr2_block16_c2560_h20_hd128 cache=12\nUNLOAD block 16 cache_after=0 resident_bytes_after=0\nFILE_PROBE block 16 files=48 handles_released=true\nHYBRID BLOCK EXECUTED block_index=16 runtime=real_seedvr2_block16_c2560_h20_hd128 vid_hash=9c719b3a959bb75e txt_hash=0999bc28ed139f4a ncnn_adapter_call_count=1 original_block_call_count=0 silent_fallback=false execute_ms=184.296\n",
+      "stderr_tail": ""
+    },
+    "n1_resident": {
+      "block_count": 1,
+      "mode": "resident",
+      "rc": 0,
+      "elapsed_s": 0.34,
+      "process_peak_rss_mb": 446.1,
+      "process_peak_vms_mb": 444.2,
+      "base_rss_mb": 2.4,
+      "adapter_report": {
+        "android_vulkan": false,
+        "block_indices": [
+          16
+        ],
+        "events": [
+          {
+            "block_index": 16,
+            "cache_size_after": 12,
+            "cache_size_before": 0,
+            "duration_ms": 115.6706,
+            "resident_bytes_after": 317205528,
+            "stage": "LOAD",
+            "t_ms": 115.6788,
+            "variant": "real_seedvr2_block16_c2560_h20_hd128"
+          },
+          {
+            "block_index": 16,
+            "cache_size_after": 12,
+            "cache_size_before": 12,
+            "duration_ms": 184.4215,
+            "stage": "EXECUTE",
+            "t_ms": 303.5192,
+            "total_packed": 244,
+            "txt_hash": "0999bc28ed139f4a",
+            "variant": "real_seedvr2_block16_c2560_h20_hd128",
+            "vid_hash": "9c719b3a959bb75e"
+          },
+          {
+            "block_index": 16,
+            "cache_size_after": 0,
+            "cache_size_before": 12,
+            "duration_ms": 9.2547,
+            "stage": "UNLOAD",
+            "t_ms": 321.1198
+          }
+        ],
+        "full_32_block_ncnn": false,
+        "full_pipeline_pytorch": true,
+        "max_resident_weighted_blocks": 1,
+        "mode": "resident",
+        "ncnn_adapter_call_count": 1,
+        "order_ok": true,
+        "original_block_call_count": 0,
+        "per_block": [
+          {
+            "block_index": 16,
+            "execute_ms": 184.4215,
+            "load_ms": 0,
+            "txt_hash": "0999bc28ed139f4a",
+            "unload_ms": 0,
+            "variant": "real_seedvr2_block16_c2560_h20_hd128",
+            "vid_hash": "9c719b3a959bb75e"
+          }
+        ],
+        "silent_fallback": false,
+        "streaming_mode_validated": false,
+        "total_execute_ms": 184,
+        "total_load_ms": 115,
+        "total_unload_ms": 9,
+        "total_wall_ms": 321.1502
+      },
+      "stdout_tail": "HYBRID BLOCK EXECUTED block_index=16 runtime=real_seedvr2_block16_c2560_h20_hd128 vid_hash=9c719b3a959bb75e txt_hash=0999bc28ed139f4a ncnn_adapter_call_count=1 original_block_call_count=0 silent_fallback=false execute_ms=184.422\n",
+      "stderr_tail": ""
+    },
+    "n2_streaming": {
+      "block_count": 2,
+      "mode": "streaming",
+      "rc": 0,
+      "elapsed_s": 0.77,
+      "process_peak_rss_mb": 496.2,
+      "process_peak_vms_mb": 494.4,
+      "base_rss_mb": 2.4,
+      "adapter_report": {
+        "android_vulkan": false,
+        "block_indices": [
+          16,
+          17
+        ],
+        "events": [
+          {
+            "block_index": 16,
+            "cache_size_after": 12,
+            "cache_size_before": 0,
+            "duration_ms": 126.2891,
+            "mem_peak_ws_mb": 383.085938,
+            "mem_private_mb": 313.148438,
+            "mem_working_set_mb": 315.601562,
+            "resident_bytes_after": 317205528,
+            "stage": "LOAD",
+            "t_ms": 126.3256,
+            "variant": "real_seedvr2_block16_c2560_h20_hd128"
+          },
+          {
+            "block_index": 16,
+            "cache_size_after": 12,
+            "cache_size_before": 12,
+            "duration_ms": 183.3828,
+            "stage": "EXECUTE",
+            "t_ms": 313.3368,
+            "total_packed": 244,
+            "txt_hash": "0999bc28ed139f4a",
+            "variant": "real_seedvr2_block16_c2560_h20_hd128",
+            "vid_hash": "9c719b3a959bb75e"
+          },
+          {
+            "block_index": 16,
+            "cache_cleared": true,
+            "cache_size_after": 0,
+            "cache_size_before": 12,
+            "duration_ms": 9.47,
+            "mem_private_mb": 77.421875,
+            "mem_working_set_mb": 82.5,
+            "resident_bytes_after": 0,
+            "stage": "UNLOAD",
+            "t_ms": 325.7558,
+            "variant": "real_seedvr2_block16_c2560_h20_hd128"
+          },
+          {
+            "block_index": 16,
+            "files_probed": 48,
+            "handles_released": true,
+            "stage": "FILE_PROBE",
+            "t_ms": 357.9122
+          },
+          {
+            "block_index": 17,
+            "cache_size_after": 12,
+            "cache_size_before": 0,
+            "duration_ms": 135.9471,
+            "mem_peak_ws_mb": 501.941406,
+            "mem_private_mb": 315.132812,
+            "mem_working_set_mb": 318.042969,
+            "resident_bytes_after": 317205528,
+            "stage": "LOAD",
+            "t_ms": 497.8459,
+            "variant": "real_seedvr2_block17_c2560_h20_hd128"
+          },
+          {
+            "block_index": 17,
+            "cache_size_after": 12,
+            "cache_size_before": 12,
+            "duration_ms": 198.1255,
+            "stage": "EXECUTE",
+            "t_ms": 701.1575,
+            "total_packed": 244,
+            "txt_hash": "549c1d2c957d1f26",
+            "variant": "real_seedvr2_block17_c2560_h20_hd128",
+            "vid_hash": "07a9b3f066f8dad9"
+          },
+          {
+            "block_index": 17,
+            "cache_cleared": true,
+            "cache_size_after": 0,
+            "cache_size_before": 12,
+            "duration_ms": 9.7715,
+            "mem_private_mb": 80.03125,
+            "mem_working_set_mb": 84.8789062,
+            "resident_bytes_after": 0,
+            "stage": "UNLOAD",
+            "t_ms": 713.8837,
+            "variant": "real_seedvr2_block17_c2560_h20_hd128"
+          },
+          {
+            "block_index": 17,
+            "files_probed": 48,
+            "handles_released": true,
+            "stage": "FILE_PROBE",
+            "t_ms": 744.4874
+          }
+        ],
+        "full_32_block_ncnn": false,
+        "full_pipeline_pytorch": true,
+        "max_resident_weighted_blocks": 1,
+        "mode": "streaming",
+        "ncnn_adapter_call_count": 2,
+        "order_ok": true,
+        "original_block_call_count": 0,
+        "per_block": [
+          {
+            "block_index": 16,
+            "execute_ms": 183.3828,
+            "load_ms": 0,
+            "txt_hash": "0999bc28ed139f4a",
+            "unload_ms": 0,
+            "variant": "real_seedvr2_block16_c2560_h20_hd128",
+            "vid_hash": "9c719b3a959bb75e"
+          },
+          {
+            "block_index": 17,
+            "execute_ms": 198.1255,
+            "load_ms": 0,
+            "txt_hash": "549c1d2c957d1f26",
+            "unload_ms": 0,
+            "variant": "real_seedvr2_block17_c2560_h20_hd128",
+            "vid_hash": "07a9b3f066f8dad9"
+          }
+        ],
+        "silent_fallback": false,
+        "streaming_mode_validated": true,
+        "total_execute_ms": 381,
+        "total_load_ms": 261,
+        "total_unload_ms": 18,
+        "total_wall_ms": 750.0779
+      },
+      "stdout_tail": "AD block 16 variant=real_seedvr2_block16_c2560_h20_hd128 cache=12\nUNLOAD block 16 cache_after=0 resident_bytes_after=0\nFILE_PROBE block 16 files=48 handles_released=true\nHYBRID BLOCK EXECUTED block_index=16 runtime=real_seedvr2_block16_c2560_h20_hd128 vid_hash=9c719b3a959bb75e txt_hash=0999bc28ed139f4a ncnn_adapter_call_count=1 original_block_call_count=0 silent_fallback=false execute_ms=183.383\nLOAD block 17 variant=real_seedvr2_block17_c2560_h20_hd128 cache=12\nUNLOAD block 17 cache_after=0 resident_bytes_after=0\nFILE_PROBE block 17 files=48 handles_released=true\nHYBRID BLOCK EXECUTED block_index=17 runtime=real_seedvr2_block17_c2560_h20_hd128 vid_hash=07a9b3f066f8dad9 txt_hash=549c1d2c957d1f26 ncnn_adapter_call_count=2 original_block_call_count=0 silent_fallback=false execute_ms=198.125\n",
+      "stderr_tail": ""
+    },
+    "n2_resident": {
+      "block_count": 2,
+      "mode": "resident",
+      "rc": 0,
+      "elapsed_s": 0.74,
+      "process_peak_rss_mb": 839.1,
+      "process_peak_vms_mb": 840.6,
+      "base_rss_mb": 2.4,
+      "adapter_report": {
+        "android_vulkan": false,
+        "block_indices": [
+          16,
+          17
+        ],
+        "events": [
+          {
+            "block_index": 16,
+            "cache_size_after": 12,
+            "cache_size_before": 0,
+            "duration_ms": 128.6689,
+            "resident_bytes_after": 317205528,
+            "stage": "LOAD",
+            "t_ms": 128.6806,
+            "variant": "real_seedvr2_block16_c2560_h20_hd128"
+          },
+          {
+            "block_index": 17,
+            "cache_size_after": 12,
+            "cache_size_before": 0,
+            "duration_ms": 159.1618,
+            "resident_bytes_after": 317205528,
+            "stage": "LOAD",
+            "t_ms": 287.8605,
+            "variant": "real_seedvr2_block17_c2560_h20_hd128"
+          },
+          {
+            "block_index": 16,
+            "cache_size_after": 12,
+            "cache_size_before": 12,
+            "duration_ms": 184.4218,
+            "stage": "EXECUTE",
+            "t_ms": 481.7932,
+            "total_packed": 244,
+            "txt_hash": "0999bc28ed139f4a",
+            "variant": "real_seedvr2_block16_c2560_h20_hd128",
+            "vid_hash": "9c719b3a959bb75e"
+          },
+          {
+            "block_index": 17,
+            "cache_size_after": 12,
+            "cache_size_before": 12,
+            "duration_ms": 190.1285,
+            "stage": "EXECUTE",
+            "t_ms": 683.6825,
+            "total_packed": 244,
+            "txt_hash": "549c1d2c957d1f26",
+            "variant": "real_seedvr2_block17_c2560_h20_hd128",
+            "vid_hash": "07a9b3f066f8dad9"
+          },
+          {
+            "block_index": 16,
+            "cache_size_after": 0,
+            "cache_size_before": 12,
+            "duration_ms": 10.6101,
+            "stage": "UNLOAD",
+            "t_ms": 705.3741
+          },
+          {
+            "block_index": 17,
+            "cache_size_after": 0,
+            "cache_size_before": 12,
+            "duration_ms": 11.4454,
+            "stage": "UNLOAD",
+            "t_ms": 716.8552
+          }
+        ],
+        "full_32_block_ncnn": false,
+        "full_pipeline_pytorch": true,
+        "max_resident_weighted_blocks": 2,
+        "mode": "resident",
+        "ncnn_adapter_call_count": 2,
+        "order_ok": true,
+        "original_block_call_count": 0,
+        "per_block": [
+          {
+            "block_index": 16,
+            "execute_ms": 184.4218,
+            "load_ms": 0,
+            "txt_hash": "0999bc28ed139f4a",
+            "unload_ms": 0,
+            "variant": "real_seedvr2_block16_c2560_h20_hd128",
+            "vid_hash": "9c719b3a959bb75e"
+          },
+          {
+            "block_index": 17,
+            "execute_ms": 190.1285,
+            "load_ms": 0,
+            "txt_hash": "549c1d2c957d1f26",
+            "unload_ms": 0,
+            "variant": "real_seedvr2_block17_c2560_h20_hd128",
+            "vid_hash": "07a9b3f066f8dad9"
+          }
+        ],
+        "silent_fallback": false,
+        "streaming_mode_validated": false,
+        "total_execute_ms": 374,
+        "total_load_ms": 287,
+        "total_unload_ms": 21,
+        "total_wall_ms": 716.9005
+      },
+      "stdout_tail": "HYBRID BLOCK EXECUTED block_index=16 runtime=real_seedvr2_block16_c2560_h20_hd128 vid_hash=9c719b3a959bb75e txt_hash=0999bc28ed139f4a ncnn_adapter_call_count=1 original_block_call_count=0 silent_fallback=false execute_ms=184.422\nHYBRID BLOCK EXECUTED block_index=17 runtime=real_seedvr2_block17_c2560_h20_hd128 vid_hash=07a9b3f066f8dad9 txt_hash=549c1d2c957d1f26 ncnn_adapter_call_count=2 original_block_call_count=0 silent_fallback=false execute_ms=190.129\n",
+      "stderr_tail": ""
+    },
+    "n4_streaming": {
+      "block_count": 4,
+      "mode": "streaming",
+      "rc": 0,
+      "elapsed_s": 1.52,
+      "process_peak_rss_mb": 476.2,
+      "process_peak_vms_mb": 474.4,
+      "base_rss_mb": 2.4,
+      "adapter_report": {
+        "android_vulkan": false,
+        "block_indices": [
+          15,
+          16,
+          17,
+          18
+        ],
+        "events": [
+          {
+            "block_index": 15,
+            "cache_size_after": 12,
+            "cache_size_before": 0,
+            "duration_ms": 129.7576,
+            "mem_peak_ws_mb": 383.257812,
+            "mem_private_mb": 313.160156,
+            "mem_working_set_mb": 315.773438,
+            "resident_bytes_after": 317205528,
+            "stage": "LOAD",
+            "t_ms": 129.782,
+            "variant": "real_seedvr2_block15_c2560_h20_hd128"
+          },
+          {
+            "block_index": 15,
+            "cache_size_after": 12,
+            "cache_size_before": 12,
+            "duration_ms": 200.7484,
+            "stage": "EXECUTE",
+            "t_ms": 335.2041,
+            "total_packed": 244,
+            "txt_hash": "5ed82a9ce22d6797",
+            "variant": "real_seedvr2_block15_c2560_h20_hd128",
+            "vid_hash": "f254376c8c1453b2"
+          },
+          {
+            "block_index": 15,
+            "cache_cleared": true,
+            "cache_size_after": 0,
+            "cache_size_before": 12,
+            "duration_ms": 10.1716,
+            "mem_private_mb": 77.5898438,
+            "mem_working_set_mb": 82.6367188,
+            "resident_bytes_after": 0,
+            "stage": "UNLOAD",
+            "t_ms": 348.5232,
+            "variant": "real_seedvr2_block15_c2560_h20_hd128"
+          },
+          {
+            "block_index": 15,
+            "files_probed": 48,
+            "handles_released": true,
+            "stage": "FILE_PROBE",
+            "t_ms": 381.2506
+          },
+          {
+            "block_index": 16,
+            "cache_size_after": 12,
+            "cache_size_before": 0,
+            "duration_ms": 157.1907,
+            "mem_peak_ws_mb": 502.078125,
+            "mem_private_mb": 315.191406,
+            "mem_working_set_mb": 317.921875,
+            "resident_bytes_after": 317205528,
+            "stage": "LOAD",
+            "t_ms": 542.6915,
+            "variant": "real_seedvr2_block16_c2560_h20_hd128"
+          },
+          {
+            "block_index": 16,
+            "cache_size_after": 12,
+            "cache_size_before": 12,
+            "duration_ms": 181.1953,
+            "stage": "EXECUTE",
+            "t_ms": 727.727,
+            "total_packed": 244,
+            "txt_hash": "bc297f9966ef4d76",
+            "variant": "real_seedvr2_block16_c2560_h20_hd128",
+            "vid_hash": "b6ab0aa9869be03a"
+          },
+          {
+            "block_index": 16,
+            "cache_cleared": true,
+            "cache_size_after": 0,
+            "cache_size_before": 12,
+            "duration_ms": 9.2591,
+            "mem_private_mb": 79.4375,
+            "mem_working_set_mb": 84.4140625,
+            "resident_bytes_after": 0,
+            "stage": "UNLOAD",
+            "t_ms": 739.9374,
+            "variant": "real_seedvr2_block16_c2560_h20_hd128"
+          },
+          {
+            "block_index": 16,
+            "files_probed": 48,
+            "handles_released": true,
+            "stage": "FILE_PROBE",
+            "t_ms": 769.8128
+          },
+          {
+            "block_index": 17,
+            "cache_size_after": 12,
+            "cache_size_before": 0,
+            "duration_ms": 114.0308,
+            "mem_peak_ws_mb": 503.949219,
+            "mem_private_mb": 315.730469,
+            "mem_working_set_mb": 318.667969,
+            "resident_bytes_after": 317205528,
+            "stage": "LOAD",
+            "t_ms": 887.5565,
+            "variant": "real_seedvr2_block17_c2560_h20_hd128"
+          },
+          {
+            "block_index": 17,
+            "cache_size_after": 12,
+            "cache_size_before": 12,
+            "duration_ms": 189.855,
+            "stage": "EXECUTE",
+            "t_ms": 1080.6126,
+            "total_packed": 244,
+            "txt_hash": "00384bc7280064db",
+            "variant": "real_seedvr2_block17_c2560_h20_hd128",
+            "vid_hash": "0481d0c2d6ed30af"
+          },
+          {
+            "block_index": 17,
+            "cache_cleared": true,
+            "cache_size_after": 0,
+            "cache_size_before": 12,
+            "duration_ms": 9.7547,
+            "mem_private_mb": 80.7265625,
+            "mem_working_set_mb": 84.7851562,
+            "resident_bytes_after": 0,
+            "stage": "UNLOAD",
+            "t_ms": 1093.4515,
+            "variant": "real_seedvr2_block17_c2560_h20_hd128"
+          },
+          {
+            "block_index": 17,
+            "files_probed": 48,
+            "handles_released": true,
+            "stage": "FILE_PROBE",
+            "t_ms": 1124.1331
+          },
+          {
+            "block_index": 18,
+            "cache_size_after": 12,
+            "cache_size_before": 0,
+            "duration_ms": 117.7876,
+            "mem_peak_ws_mb": 504.078125,
+            "mem_private_mb": 315.78125,
+            "mem_working_set_mb": 318.765625,
+            "resident_bytes_after": 317205528,
+            "stage": "LOAD",
+            "t_ms": 1245.7919,
+            "variant": "real_seedvr2_block18_c2560_h20_hd128"
+          },
+          {
+            "block_index": 18,
+            "cache_size_after": 12,
+            "cache_size_before": 12,
+            "duration_ms": 206.7036,
+            "stage": "EXECUTE",
+            "t_ms": 1455.3752,
+            "total_packed": 244,
+            "txt_hash": "2223705b2a74a4e7",
+            "variant": "real_seedvr2_block18_c2560_h20_hd128",
+            "vid_hash": "e2f393b32e97b902"
+          },
+          {
+            "block_index": 18,
+            "cache_cleared": true,
+            "cache_size_after": 0,
+            "cache_size_before": 12,
+            "duration_ms": 9.8357,
+            "mem_private_mb": 80.0390625,
+            "mem_working_set_mb": 85.0742188,
+            "resident_bytes_after": 0,
+            "stage": "UNLOAD",
+            "t_ms": 1468.4282,
+            "variant": "real_seedvr2_block18_c2560_h20_hd128"
+          },
+          {
+            "block_index": 18,
+            "files_probed": 48,
+            "handles_released": true,
+            "stage": "FILE_PROBE",
+            "t_ms": 1498.0198
+          }
+        ],
+        "full_32_block_ncnn": false,
+        "full_pipeline_pytorch": true,
+        "max_resident_weighted_blocks": 1,
+        "mode": "streaming",
+        "ncnn_adapter_call_count": 4,
+        "order_ok": true,
+        "original_block_call_count": 0,
+        "per_block": [
+          {
+            "block_index": 15,
+            "execute_ms": 200.7484,
+            "load_ms": 0,
+            "txt_hash": "5ed82a9ce22d6797",
+            "unload_ms": 0,
+            "variant": "real_seedvr2_block15_c2560_h20_hd128",
+            "vid_hash": "f254376c8c1453b2"
+          },
+          {
+            "block_index": 16,
+            "execute_ms": 181.1953,
+            "load_ms": 0,
+            "txt_hash": "bc297f9966ef4d76",
+            "unload_ms": 0,
+            "variant": "real_seedvr2_block16_c2560_h20_hd128",
+            "vid_hash": "b6ab0aa9869be03a"
+          },
+          {
+            "block_index": 17,
+            "execute_ms": 189.855,
+            "load_ms": 0,
+            "txt_hash": "00384bc7280064db",
+            "unload_ms": 0,
+            "variant": "real_seedvr2_block17_c2560_h20_hd128",
+            "vid_hash": "0481d0c2d6ed30af"
+          },
+          {
+            "block_index": 18,
+            "execute_ms": 206.7036,
+            "load_ms": 0,
+            "txt_hash": "2223705b2a74a4e7",
+            "unload_ms": 0,
+            "variant": "real_seedvr2_block18_c2560_h20_hd128",
+            "vid_hash": "e2f393b32e97b902"
+          }
+        ],
+        "silent_fallback": false,
+        "streaming_mode_validated": true,
+        "total_execute_ms": 776,
+        "total_load_ms": 517,
+        "total_unload_ms": 37,
+        "total_wall_ms": 1503.658
+      },
+      "stdout_tail": "AD block 17 variant=real_seedvr2_block17_c2560_h20_hd128 cache=12\nUNLOAD block 17 cache_after=0 resident_bytes_after=0\nFILE_PROBE block 17 files=48 handles_released=true\nHYBRID BLOCK EXECUTED block_index=17 runtime=real_seedvr2_block17_c2560_h20_hd128 vid_hash=0481d0c2d6ed30af txt_hash=00384bc7280064db ncnn_adapter_call_count=3 original_block_call_count=0 silent_fallback=false execute_ms=189.855\nLOAD block 18 variant=real_seedvr2_block18_c2560_h20_hd128 cache=12\nUNLOAD block 18 cache_after=0 resident_bytes_after=0\nFILE_PROBE block 18 files=48 handles_released=true\nHYBRID BLOCK EXECUTED block_index=18 runtime=real_seedvr2_block18_c2560_h20_hd128 vid_hash=e2f393b32e97b902 txt_hash=2223705b2a74a4e7 ncnn_adapter_call_count=4 original_block_call_count=0 silent_fallback=false execute_ms=206.704\n",
+      "stderr_tail": ""
+    },
+    "n4_resident": {
+      "block_count": 4,
+      "mode": "resident",
+      "rc": 0,
+      "elapsed_s": 1.31,
+      "process_peak_rss_mb": 1530.0,
+      "process_peak_vms_mb": 1536.9,
+      "base_rss_mb": 2.4,
+      "adapter_report": {
+        "android_vulkan": false,
+        "block_indices": [
+          15,
+          16,
+          17,
+          18
+        ],
+        "events": [
+          {
+            "block_index": 15,
+            "cache_size_after": 12,
+            "cache_size_before": 0,
+            "duration_ms": 119.1009,
+            "resident_bytes_after": 317205528,
+            "stage": "LOAD",
+            "t_ms": 119.1119,
+            "variant": "real_seedvr2_block15_c2560_h20_hd128"
+          },
+          {
+            "block_index": 16,
+            "cache_size_after": 12,
+            "cache_size_before": 0,
+            "duration_ms": 120.74,
+            "resident_bytes_after": 317205528,
+            "stage": "LOAD",
+            "t_ms": 239.8628,
+            "variant": "real_seedvr2_block16_c2560_h20_hd128"
+          },
+          {
+            "block_index": 17,
+            "cache_size_after": 12,
+            "cache_size_before": 0,
+            "duration_ms": 118.0787,
+            "resident_bytes_after": 317205528,
+            "stage": "LOAD",
+            "t_ms": 357.9639,
+            "variant": "real_seedvr2_block17_c2560_h20_hd128"
+          },
+          {
+            "block_index": 18,
+            "cache_size_after": 12,
+            "cache_size_before": 0,
+            "duration_ms": 118.4194,
+            "resident_bytes_after": 317205528,
+            "stage": "LOAD",
+            "t_ms": 476.4007,
+            "variant": "real_seedvr2_block18_c2560_h20_hd128"
+          },
+          {
+            "block_index": 15,
+            "cache_size_after": 12,
+            "cache_size_before": 12,
+            "duration_ms": 185.5906,
+            "stage": "EXECUTE",
+            "t_ms": 665.926,
+            "total_packed": 244,
+            "txt_hash": "5ed82a9ce22d6797",
+            "variant": "real_seedvr2_block15_c2560_h20_hd128",
+            "vid_hash": "f254376c8c1453b2"
+          },
+          {
+            "block_index": 16,
+            "cache_size_after": 12,
+            "cache_size_before": 12,
+            "duration_ms": 173.4711,
+            "stage": "EXECUTE",
+            "t_ms": 849.8356,
+            "total_packed": 244,
+            "txt_hash": "bc297f9966ef4d76",
+            "variant": "real_seedvr2_block16_c2560_h20_hd128",
+            "vid_hash": "b6ab0aa9869be03a"
+          },
+          {
+            "block_index": 17,
+            "cache_size_after": 12,
+            "cache_size_before": 12,
+            "duration_ms": 183.8347,
+            "stage": "EXECUTE",
+            "t_ms": 1045.6652,
+            "total_packed": 244,
+            "txt_hash": "00384bc7280064db",
+            "variant": "real_seedvr2_block17_c2560_h20_hd128",
+            "vid_hash": "0481d0c2d6ed30af"
+          },
+          {
+            "block_index": 18,
+            "cache_size_after": 12,
+            "cache_size_before": 12,
+            "duration_ms": 179.0909,
+            "stage": "EXECUTE",
+            "t_ms": 1243.7954,
+            "total_packed": 244,
+            "txt_hash": "2223705b2a74a4e7",
+            "variant": "real_seedvr2_block18_c2560_h20_hd128",
+            "vid_hash": "e2f393b32e97b902"
+          },
+          {
+            "block_index": 15,
+            "cache_size_after": 0,
+            "cache_size_before": 12,
+            "duration_ms": 9.365,
+            "stage": "UNLOAD",
+            "t_ms": 1261.7078
+          },
+          {
+            "block_index": 16,
+            "cache_size_after": 0,
+            "cache_size_before": 12,
+            "duration_ms": 9.5282,
+            "stage": "UNLOAD",
+            "t_ms": 1271.2433
+          },
+          {
+            "block_index": 17,
+            "cache_size_after": 0,
+            "cache_size_before": 12,
+            "duration_ms": 9.1964,
+            "stage": "UNLOAD",
+            "t_ms": 1280.4967
+          },
+          {
+            "block_index": 18,
+            "cache_size_after": 0,
+            "cache_size_before": 12,
+            "duration_ms": 9.4089,
+            "stage": "UNLOAD",
+            "t_ms": 1289.9138
+          }
+        ],
+        "full_32_block_ncnn": false,
+        "full_pipeline_pytorch": true,
+        "max_resident_weighted_blocks": 4,
+        "mode": "resident",
+        "ncnn_adapter_call_count": 4,
+        "order_ok": true,
+        "original_block_call_count": 0,
+        "per_block": [
+          {
+            "block_index": 15,
+            "execute_ms": 185.5906,
+            "load_ms": 0,
+            "txt_hash": "5ed82a9ce22d6797",
+            "unload_ms": 0,
+            "variant": "real_seedvr2_block15_c2560_h20_hd128",
+            "vid_hash": "f254376c8c1453b2"
+          },
+          {
+            "block_index": 16,
+            "execute_ms": 173.4711,
+            "load_ms": 0,
+            "txt_hash": "bc297f9966ef4d76",
+            "unload_ms": 0,
+            "variant": "real_seedvr2_block16_c2560_h20_hd128",
+            "vid_hash": "b6ab0aa9869be03a"
+          },
+          {
+            "block_index": 17,
+            "execute_ms": 183.8347,
+            "load_ms": 0,
+            "txt_hash": "00384bc7280064db",
+            "unload_ms": 0,
+            "variant": "real_seedvr2_block17_c2560_h20_hd128",
+            "vid_hash": "0481d0c2d6ed30af"
+          },
+          {
+            "block_index": 18,
+            "execute_ms": 179.0909,
+            "load_ms": 0,
+            "txt_hash": "2223705b2a74a4e7",
+            "unload_ms": 0,
+            "variant": "real_seedvr2_block18_c2560_h20_hd128",
+            "vid_hash": "e2f393b32e97b902"
+          }
+        ],
+        "silent_fallback": false,
+        "streaming_mode_validated": false,
+        "total_execute_ms": 720,
+        "total_load_ms": 475,
+        "total_unload_ms": 36,
+        "total_wall_ms": 1289.975
+      },
+      "stdout_tail": "=5ed82a9ce22d6797 ncnn_adapter_call_count=1 original_block_call_count=0 silent_fallback=false execute_ms=185.591\nHYBRID BLOCK EXECUTED block_index=16 runtime=real_seedvr2_block16_c2560_h20_hd128 vid_hash=b6ab0aa9869be03a txt_hash=bc297f9966ef4d76 ncnn_adapter_call_count=2 original_block_call_count=0 silent_fallback=false execute_ms=173.471\nHYBRID BLOCK EXECUTED block_index=17 runtime=real_seedvr2_block17_c2560_h20_hd128 vid_hash=0481d0c2d6ed30af txt_hash=00384bc7280064db ncnn_adapter_call_count=3 original_block_call_count=0 silent_fallback=false execute_ms=183.835\nHYBRID BLOCK EXECUTED block_index=18 runtime=real_seedvr2_block18_c2560_h20_hd128 vid_hash=e2f393b32e97b902 txt_hash=2223705b2a74a4e7 ncnn_adapter_call_count=4 original_block_call_count=0 silent_fallback=false execute_ms=179.091\n",
+      "stderr_tail": ""
+    }
+  },
+  "notes": [
+    "process peak RSS sampled with psutil at 10 ms intervals; adapter --memory-profile snapshots (private/working set) are in adapter_report per run",
+    "streaming loads/executes/unloads one block at a time (max_resident_weighted_blocks=1)"
+  ]
+}

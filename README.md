@@ -54,8 +54,25 @@ with one block replaced by ncnn, pixel PSNR 52.5 dB / SSIM 0.9975, adapter
 evidence (ncnn=1, original=0, no silent fallback), negatives 29/29, regressions
 22/22. See [real-weight-single-block-report.md](D:/AIProjects/seedvr2-ncnn/docs/real-weight-single-block-report.md)
 and [hybrid-visual-milestone-report.md](D:/AIProjects/seedvr2-ncnn/docs/hybrid-visual-milestone-report.md).
-This is a SeedVR2-style attention subsystem with a single ncnn block, not a
-complete SeedVR2 port.
+Phase 15 real-weight multi-block streaming hybrid is **READY**: blocks
+15/16/17/18 of the official `ByteDance-Seed/SeedVR2-3B` checkpoint run through
+ncnn in strict streaming mode (`LOAD -> EXECUTE -> UNLOAD` per block; runtime
+destroyed, model cache cleared to 0, resident bytes 0, file handles released;
+`max_resident_weighted_blocks=1` always). Chain parity (streaming == resident,
+fresh clean build `build/phase15-multiblock-release`) PASS: chain_1 rel
+8.872e-9 (limit 1e-3), chain_2 2.835e-6 (2e-3), chain_4 3.777e-6 (5e-3),
+NaN/Inf=0; official-pipeline visual with 1/2/4 blocks swapped: pixel PSNR
+53.65/52.72/52.90 dB (>=38), SSIM 0.9978/0.9978/0.9977 (>=0.98), per-block
+parity 1.8e-8..3.8e-6 (limit 1e-3), adapter evidence per block
+(ncnn=1 / original=0 / silent_fallback=false); memory profile: streaming peak
+flat 474/496/476 MB vs resident linear 446/839/1530 MB (per-block streaming is
+the required 32-block strategy); negatives 48/48; regressions 27/27; git
+protection PASS. See [multiblock-streaming-hybrid-report.md](D:/AIProjects/seedvr2-ncnn/docs/multiblock-streaming-hybrid-report.md)
+and [multiblock-error-growth-report.md](D:/AIProjects/seedvr2-ncnn/docs/multiblock-error-growth-report.md).
+
+This is a SeedVR2-style attention subsystem with a single or small multi-block
+(1/2/4 contiguous real-weight blocks) ncnn runtime, not a complete SeedVR2
+port.
 
 ```mermaid
 flowchart LR

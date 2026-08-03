@@ -1,0 +1,96 @@
+{
+  "phase": 15,
+  "chains": {
+    "chain_1": {
+      "total_load_ms": 205,
+      "total_execute_ms": 194,
+      "total_unload_ms": 18,
+      "total_wall_ms": 464.286,
+      "per_block": [
+        {
+          "block_index": 16,
+          "execute_ms": 194.9911,
+          "load_ms": 0,
+          "txt_hash": "f22b7252e2c4f51b",
+          "unload_ms": 0,
+          "variant": "real_seedvr2_block16_c2560_h20_hd128",
+          "vid_hash": "693e4310e6165d8f"
+        }
+      ],
+      "ref_elapsed_s": 34.223
+    },
+    "chain_2": {
+      "total_load_ms": 519,
+      "total_execute_ms": 399,
+      "total_unload_ms": 36,
+      "total_wall_ms": 1047.3492,
+      "per_block": [
+        {
+          "block_index": 16,
+          "execute_ms": 199.3697,
+          "load_ms": 0,
+          "txt_hash": "f22b7252e2c4f51b",
+          "unload_ms": 0,
+          "variant": "real_seedvr2_block16_c2560_h20_hd128",
+          "vid_hash": "693e4310e6165d8f"
+        },
+        {
+          "block_index": 17,
+          "execute_ms": 200.3551,
+          "load_ms": 0,
+          "txt_hash": "02c850c189ed6e2e",
+          "unload_ms": 0,
+          "variant": "real_seedvr2_block17_c2560_h20_hd128",
+          "vid_hash": "b57a60521ffb5b03"
+        }
+      ],
+      "ref_elapsed_s": 29.75
+    },
+    "chain_4": {
+      "total_load_ms": 1182,
+      "total_execute_ms": 814,
+      "total_unload_ms": 68,
+      "total_wall_ms": 2260.2855,
+      "per_block": [
+        {
+          "block_index": 15,
+          "execute_ms": 207.5099,
+          "load_ms": 0,
+          "txt_hash": "5ed82a9ce22d6797",
+          "unload_ms": 0,
+          "variant": "real_seedvr2_block15_c2560_h20_hd128",
+          "vid_hash": "f254376c8c1453b2"
+        },
+        {
+          "block_index": 16,
+          "execute_ms": 192.0427,
+          "load_ms": 0,
+          "txt_hash": "bc297f9966ef4d76",
+          "unload_ms": 0,
+          "variant": "real_seedvr2_block16_c2560_h20_hd128",
+          "vid_hash": "b6ab0aa9869be03a"
+        },
+        {
+          "block_index": 17,
+          "execute_ms": 187.2298,
+          "load_ms": 0,
+          "txt_hash": "00384bc7280064db",
+          "unload_ms": 0,
+          "variant": "real_seedvr2_block17_c2560_h20_hd128",
+          "vid_hash": "0481d0c2d6ed30af"
+        },
+        {
+          "block_index": 18,
+          "execute_ms": 228.4065,
+          "load_ms": 0,
+          "txt_hash": "2223705b2a74a4e7",
+          "unload_ms": 0,
+          "variant": "real_seedvr2_block18_c2560_h20_hd128",
+          "vid_hash": "e2f393b32e97b902"
+        }
+      ],
+      "ref_elapsed_s": 33.115
+    }
+  },
+  "note": "chain adapter latency; full-pipeline latency in multiblock_visual_comparison.json"
+}

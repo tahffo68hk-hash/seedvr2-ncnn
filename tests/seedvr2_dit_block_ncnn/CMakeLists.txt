@@ -1,4 +1,4 @@
-﻿cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.20)
 project(seedvr2_dit_block_ncnn LANGUAGES CXX)
 
 find_package(ncnn CONFIG REQUIRED PATHS "D:/AIProjects/seedvr2-ncnn/build/ncnn-cpu/install/lib/cmake/ncnn" NO_DEFAULT_PATH)
@@ -50,3 +50,8 @@ target_compile_options(realwidth_artifact_inventory_tests PRIVATE /EHsc /UNDEBUG
 add_executable(real_block_adapter real_block_adapter.cpp)
 target_link_libraries(real_block_adapter PRIVATE hybrid_dit_block_runtime_lib)
 target_compile_options(real_block_adapter PRIVATE /EHsc /UNDEBUG)
+
+# Phase 15: multi-block streaming hybrid adapter (1/2/4 contiguous blocks).
+add_executable(multiblock_streaming_adapter multiblock_streaming_adapter.cpp)
+target_link_libraries(multiblock_streaming_adapter PRIVATE hybrid_dit_block_runtime_lib)
+target_compile_options(multiblock_streaming_adapter PRIVATE /EHsc /UNDEBUG)

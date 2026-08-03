@@ -1,0 +1,251 @@
+{
+  "phase": 15,
+  "milestone": "multi-block streaming hybrid negative tests",
+  "total": 48,
+  "passed": 48,
+  "failed": 0,
+  "overall_pass": true,
+  "overall_status": "PASS",
+  "tests": [
+    {
+      "name": "range_duplicate_rejected",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "range_non_contiguous_rejected",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "range_out_of_bounds_rejected",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "range_negative_rejected",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "range_last_layer_rejected",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "range_empty_rejected",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "range_crossing_last_layer_rejected",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "range_valid_anchor_accepted",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "range_1_accepted",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "metadata_block_index_and_fp16_correct",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "artifact_manifest_exists",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "block16_reuses_phase14_artifact",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "qk_rmsnorm_real_affine_not_all_ones",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "q_norm_not_reused_across_blocks",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "event_load_b_before_unload_a_rejected",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "event_reversed_order_rejected",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "event_execute_before_load_rejected",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "event_chain_ends_loaded_rejected",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "event_unload_wrong_block_rejected",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "event_strict_order_accepted",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "cache_not_cleared_detected",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "resident_bytes_not_zero_detected",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "adapter_streaming_block16_rc0",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "adapter_streaming_order_ok",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "adapter_streaming_validated",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "adapter_streaming_one_resident_block",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "adapter_streaming_cache_cleared",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "adapter_no_silent_fallback",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "adapter_rejects_unknown_variant",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "adapter_rejects_missing_input",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "adapter_rejects_out_of_range_block",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "silent_fallback_zero_calls_detected",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "original_block_executed_detected",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "adapter_call_count_too_few_detected",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "adapter_call_count_too_many_detected",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "adapter_evidence_ok_criterion",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "nan_output_detected",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "inf_output_detected",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "error_over_limit_detected",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "error_under_limit_accepted",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "resident_equals_streaming_final_vid",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "constant_frames_detected",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "frame_count_mismatch_detected",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "psnr_below_threshold_detected",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "ssim_below_threshold_detected",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "no_heavy_binary_tracked",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "no_phase15_heavy_dirs_tracked",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "no_phase15_bin_tracked",
+      "pass": true,
+      "detail": ""
+    }
+  ]
+}

@@ -1,0 +1,2690 @@
+{
+  "phase": 15,
+  "real_seedvr2_weights": true,
+  "multiblock_hybrid": true,
+  "checkpoint_sha256": "6bcc5ac59447e97b100477480aebb01be2ec724c8340bb83faae21f64848604b",
+  "continuous_blocks": true,
+  "max_resident_weighted_blocks": 1,
+  "streaming_mode_validated": true,
+  "chains": {
+    "chain_1": {
+      "chain": "chain_1",
+      "range": [
+        16
+      ],
+      "input_block": 16,
+      "ref_elapsed_s": 34.223,
+      "streaming": {
+        "rep0": {
+          "rc": 0,
+          "report": {
+            "android_vulkan": false,
+            "block_indices": [
+              16
+            ],
+            "events": [
+              {
+                "block_index": 16,
+                "cache_size_after": 12,
+                "cache_size_before": 0,
+                "duration_ms": 205.2906,
+                "resident_bytes_after": 317205528,
+                "stage": "LOAD",
+                "t_ms": 205.3069,
+                "variant": "real_seedvr2_block16_c2560_h20_hd128"
+              },
+              {
+                "block_index": 16,
+                "cache_size_after": 12,
+                "cache_size_before": 12,
+                "duration_ms": 194.9911,
+                "stage": "EXECUTE",
+                "t_ms": 403.6044,
+                "total_packed": 244,
+                "txt_hash": "f22b7252e2c4f51b",
+                "variant": "real_seedvr2_block16_c2560_h20_hd128",
+                "vid_hash": "693e4310e6165d8f"
+              },
+              {
+                "block_index": 16,
+                "cache_cleared": true,
+                "cache_size_after": 0,
+                "cache_size_before": 12,
+                "duration_ms": 18.5535,
+                "resident_bytes_after": 0,
+                "stage": "UNLOAD",
+                "t_ms": 425.2387,
+                "variant": "real_seedvr2_block16_c2560_h20_hd128"
+              },
+              {
+                "block_index": 16,
+                "files_probed": 48,
+                "handles_released": true,
+                "stage": "FILE_PROBE",
+                "t_ms": 456.3759
+              }
+            ],
+            "full_32_block_ncnn": false,
+            "full_pipeline_pytorch": true,
+            "max_resident_weighted_blocks": 1,
+            "mode": "streaming",
+            "ncnn_adapter_call_count": 1,
+            "order_ok": true,
+            "original_block_call_count": 0,
+            "per_block": [
+              {
+                "block_index": 16,
+                "execute_ms": 194.9911,
+                "load_ms": 0,
+                "txt_hash": "f22b7252e2c4f51b",
+                "unload_ms": 0,
+                "variant": "real_seedvr2_block16_c2560_h20_hd128",
+                "vid_hash": "693e4310e6165d8f"
+              }
+            ],
+            "silent_fallback": false,
+            "streaming_mode_validated": true,
+            "total_execute_ms": 194,
+            "total_load_ms": 205,
+            "total_unload_ms": 18,
+            "total_wall_ms": 464.286
+          }
+        },
+        "rep1": {
+          "rc": 0,
+          "report": {
+            "android_vulkan": false,
+            "block_indices": [
+              16
+            ],
+            "events": [
+              {
+                "block_index": 16,
+                "cache_size_after": 12,
+                "cache_size_before": 0,
+                "duration_ms": 117.2629,
+                "resident_bytes_after": 317205528,
+                "stage": "LOAD",
+                "t_ms": 117.2734,
+                "variant": "real_seedvr2_block16_c2560_h20_hd128"
+              },
+              {
+                "block_index": 16,
+                "cache_size_after": 12,
+                "cache_size_before": 12,
+                "duration_ms": 189.9665,
+                "stage": "EXECUTE",
+                "t_ms": 309.6983,
+                "total_packed": 244,
+                "txt_hash": "f22b7252e2c4f51b",
+                "variant": "real_seedvr2_block16_c2560_h20_hd128",
+                "vid_hash": "693e4310e6165d8f"
+              },
+              {
+                "block_index": 16,
+                "cache_cleared": true,
+                "cache_size_after": 0,
+                "cache_size_before": 12,
+                "duration_ms": 12.5771,
+                "resident_bytes_after": 0,
+                "stage": "UNLOAD",
+                "t_ms": 325.2795,
+                "variant": "real_seedvr2_block16_c2560_h20_hd128"
+              },
+              {
+                "block_index": 16,
+                "files_probed": 48,
+                "handles_released": true,
+                "stage": "FILE_PROBE",
+                "t_ms": 354.5261
+              }
+            ],
+            "full_32_block_ncnn": false,
+            "full_pipeline_pytorch": true,
+            "max_resident_weighted_blocks": 1,
+            "mode": "streaming",
+            "ncnn_adapter_call_count": 1,
+            "order_ok": true,
+            "original_block_call_count": 0,
+            "per_block": [
+              {
+                "block_index": 16,
+                "execute_ms": 189.9665,
+                "load_ms": 0,
+                "txt_hash": "f22b7252e2c4f51b",
+                "unload_ms": 0,
+                "variant": "real_seedvr2_block16_c2560_h20_hd128",
+                "vid_hash": "693e4310e6165d8f"
+              }
+            ],
+            "silent_fallback": false,
+            "streaming_mode_validated": true,
+            "total_execute_ms": 189,
+            "total_load_ms": 117,
+            "total_unload_ms": 12,
+            "total_wall_ms": 360.5355
+          }
+        },
+        "rep2": {
+          "rc": 0,
+          "report": {
+            "android_vulkan": false,
+            "block_indices": [
+              16
+            ],
+            "events": [
+              {
+                "block_index": 16,
+                "cache_size_after": 12,
+                "cache_size_before": 0,
+                "duration_ms": 120.3803,
+                "resident_bytes_after": 317205528,
+                "stage": "LOAD",
+                "t_ms": 120.4196,
+                "variant": "real_seedvr2_block16_c2560_h20_hd128"
+              },
+              {
+                "block_index": 16,
+                "cache_size_after": 12,
+                "cache_size_before": 12,
+                "duration_ms": 183.5574,
+                "stage": "EXECUTE",
+                "t_ms": 306.6017,
+                "total_packed": 244,
+                "txt_hash": "f22b7252e2c4f51b",
+                "variant": "real_seedvr2_block16_c2560_h20_hd128",
+                "vid_hash": "693e4310e6165d8f"
+              },
+              {
+                "block_index": 16,
+                "cache_cleared": true,
+                "cache_size_after": 0,
+                "cache_size_before": 12,
+                "duration_ms": 13.7435,
+                "resident_bytes_after": 0,
+                "stage": "UNLOAD",
+                "t_ms": 323.4284,
+                "variant": "real_seedvr2_block16_c2560_h20_hd128"
+              },
+              {
+                "block_index": 16,
+                "files_probed": 48,
+                "handles_released": true,
+                "stage": "FILE_PROBE",
+                "t_ms": 354.2734
+              }
+            ],
+            "full_32_block_ncnn": false,
+            "full_pipeline_pytorch": true,
+            "max_resident_weighted_blocks": 1,
+            "mode": "streaming",
+            "ncnn_adapter_call_count": 1,
+            "order_ok": true,
+            "original_block_call_count": 0,
+            "per_block": [
+              {
+                "block_index": 16,
+                "execute_ms": 183.5574,
+                "load_ms": 0,
+                "txt_hash": "f22b7252e2c4f51b",
+                "unload_ms": 0,
+                "variant": "real_seedvr2_block16_c2560_h20_hd128",
+                "vid_hash": "693e4310e6165d8f"
+              }
+            ],
+            "silent_fallback": false,
+            "streaming_mode_validated": true,
+            "total_execute_ms": 183,
+            "total_load_ms": 120,
+            "total_unload_ms": 13,
+            "total_wall_ms": 360.8049
+          }
+        }
+      },
+      "resident": {
+        "rep0": {
+          "rc": 0,
+          "report": {
+            "android_vulkan": false,
+            "block_indices": [
+              16
+            ],
+            "events": [
+              {
+                "block_index": 16,
+                "cache_size_after": 12,
+                "cache_size_before": 0,
+                "duration_ms": 118.7127,
+                "resident_bytes_after": 317205528,
+                "stage": "LOAD",
+                "t_ms": 118.7227,
+                "variant": "real_seedvr2_block16_c2560_h20_hd128"
+              },
+              {
+                "block_index": 16,
+                "cache_size_after": 12,
+                "cache_size_before": 12,
+                "duration_ms": 187.0434,
+                "stage": "EXECUTE",
+                "t_ms": 308.8344,
+                "total_packed": 244,
+                "txt_hash": "f22b7252e2c4f51b",
+                "variant": "real_seedvr2_block16_c2560_h20_hd128",
+                "vid_hash": "693e4310e6165d8f"
+              },
+              {
+                "block_index": 16,
+                "cache_size_after": 0,
+                "cache_size_before": 12,
+                "duration_ms": 12.3166,
+                "stage": "UNLOAD",
+                "t_ms": 329.3923
+              }
+            ],
+            "full_32_block_ncnn": false,
+            "full_pipeline_pytorch": true,
+            "max_resident_weighted_blocks": 1,
+            "mode": "resident",
+            "ncnn_adapter_call_count": 1,
+            "order_ok": true,
+            "original_block_call_count": 0,
+            "per_block": [
+              {
+                "block_index": 16,
+                "execute_ms": 187.0434,
+                "load_ms": 0,
+                "txt_hash": "f22b7252e2c4f51b",
+                "unload_ms": 0,
+                "variant": "real_seedvr2_block16_c2560_h20_hd128",
+                "vid_hash": "693e4310e6165d8f"
+              }
+            ],
+            "silent_fallback": false,
+            "streaming_mode_validated": false,
+            "total_execute_ms": 187,
+            "total_load_ms": 118,
+            "total_unload_ms": 12,
+            "total_wall_ms": 329.4419
+          }
+        },
+        "rep1": {
+          "rc": 0,
+          "report": {
+            "android_vulkan": false,
+            "block_indices": [
+              16
+            ],
+            "events": [
+              {
+                "block_index": 16,
+                "cache_size_after": 12,
+                "cache_size_before": 0,
+                "duration_ms": 113.0618,
+                "resident_bytes_after": 317205528,
+                "stage": "LOAD",
+                "t_ms": 113.0707,
+                "variant": "real_seedvr2_block16_c2560_h20_hd128"
+              },
+              {
+                "block_index": 16,
+                "cache_size_after": 12,
+                "cache_size_before": 12,
+                "duration_ms": 187.6945,
+                "stage": "EXECUTE",
+                "t_ms": 303.4759,
+                "total_packed": 244,
+                "txt_hash": "f22b7252e2c4f51b",
+                "variant": "real_seedvr2_block16_c2560_h20_hd128",
+                "vid_hash": "693e4310e6165d8f"
+              },
+              {
+                "block_index": 16,
+                "cache_size_after": 0,
+                "cache_size_before": 12,
+                "duration_ms": 13.665,
+                "stage": "UNLOAD",
+                "t_ms": 326.1119
+              }
+            ],
+            "full_32_block_ncnn": false,
+            "full_pipeline_pytorch": true,
+            "max_resident_weighted_blocks": 1,
+            "mode": "resident",
+            "ncnn_adapter_call_count": 1,
+            "order_ok": true,
+            "original_block_call_count": 0,
+            "per_block": [
+              {
+                "block_index": 16,
+                "execute_ms": 187.6945,
+                "load_ms": 0,
+                "txt_hash": "f22b7252e2c4f51b",
+                "unload_ms": 0,
+                "variant": "real_seedvr2_block16_c2560_h20_hd128",
+                "vid_hash": "693e4310e6165d8f"
+              }
+            ],
+            "silent_fallback": false,
+            "streaming_mode_validated": false,
+            "total_execute_ms": 187,
+            "total_load_ms": 113,
+            "total_unload_ms": 13,
+            "total_wall_ms": 326.1451
+          }
+        },
+        "rep2": {
+          "rc": 0,
+          "report": {
+            "android_vulkan": false,
+            "block_indices": [
+              16
+            ],
+            "events": [
+              {
+                "block_index": 16,
+                "cache_size_after": 12,
+                "cache_size_before": 0,
+                "duration_ms": 119.2352,
+                "resident_bytes_after": 317205528,
+                "stage": "LOAD",
+                "t_ms": 119.2471,
+                "variant": "real_seedvr2_block16_c2560_h20_hd128"
+              },
+              {
+                "block_index": 16,
+                "cache_size_after": 12,
+                "cache_size_before": 12,
+                "duration_ms": 185.9571,
+                "stage": "EXECUTE",
+                "t_ms": 307.5295,
+                "total_packed": 244,
+                "txt_hash": "f22b7252e2c4f51b",
+                "variant": "real_seedvr2_block16_c2560_h20_hd128",
+                "vid_hash": "693e4310e6165d8f"
+              },
+              {
+                "block_index": 16,
+                "cache_size_after": 0,
+                "cache_size_before": 12,
+                "duration_ms": 13.7438,
+                "stage": "UNLOAD",
+                "t_ms": 331.1141
+              }
+            ],
+            "full_32_block_ncnn": false,
+            "full_pipeline_pytorch": true,
+            "max_resident_weighted_blocks": 1,
+            "mode": "resident",
+            "ncnn_adapter_call_count": 1,
+            "order_ok": true,
+            "original_block_call_count": 0,
+            "per_block": [
+              {
+                "block_index": 16,
+                "execute_ms": 185.9571,
+                "load_ms": 0,
+                "txt_hash": "f22b7252e2c4f51b",
+                "unload_ms": 0,
+                "variant": "real_seedvr2_block16_c2560_h20_hd128",
+                "vid_hash": "693e4310e6165d8f"
+              }
+            ],
+            "silent_fallback": false,
+            "streaming_mode_validated": false,
+            "total_execute_ms": 185,
+            "total_load_ms": 119,
+            "total_unload_ms": 13,
+            "total_wall_ms": 331.1436
+          }
+        }
+      },
+      "final_error": [
+        {
+          "max_abs_error": 0.000244140625,
+          "mean_abs_error": 3.578814471438818e-07,
+          "rmse": 8.504237598572217e-07,
+          "relative_max_error": 8.872485910137475e-09,
+          "nan_count": 0,
+          "inf_count": 0
+        },
+        {
+          "max_abs_error": 0.000244140625,
+          "mean_abs_error": 3.578814471438818e-07,
+          "rmse": 8.504237598572217e-07,
+          "relative_max_error": 8.872485910137475e-09,
+          "nan_count": 0,
+          "inf_count": 0
+        },
+        {
+          "max_abs_error": 0.000244140625,
+          "mean_abs_error": 3.578814471438818e-07,
+          "rmse": 8.504237598572217e-07,
+          "relative_max_error": 8.872485910137475e-09,
+          "nan_count": 0,
+          "inf_count": 0
+        }
+      ],
+      "per_block_error": {
+        "0": [
+          {
+            "block_index": 16,
+            "max_abs_error": 0.000244140625,
+            "mean_abs_error": 3.578814471438818e-07,
+            "rmse": 8.504237598572217e-07,
+            "relative_max_error": 8.872485910137475e-09,
+            "nan_count": 0,
+            "inf_count": 0
+          }
+        ],
+        "1": [
+          {
+            "block_index": 16,
+            "max_abs_error": 0.000244140625,
+            "mean_abs_error": 3.578814471438818e-07,
+            "rmse": 8.504237598572217e-07,
+            "relative_max_error": 8.872485910137475e-09,
+            "nan_count": 0,
+            "inf_count": 0
+          }
+        ],
+        "2": [
+          {
+            "block_index": 16,
+            "max_abs_error": 0.000244140625,
+            "mean_abs_error": 3.578814471438818e-07,
+            "rmse": 8.504237598572217e-07,
+            "relative_max_error": 8.872485910137475e-09,
+            "nan_count": 0,
+            "inf_count": 0
+          }
+        ]
+      },
+      "rel_limit": 0.001,
+      "pass": true
+    },
+    "chain_2": {
+      "chain": "chain_2",
+      "range": [
+        16,
+        17
+      ],
+      "input_block": 16,
+      "ref_elapsed_s": 29.75,
+      "streaming": {
+        "rep0": {
+          "rc": 0,
+          "report": {
+            "android_vulkan": false,
+            "block_indices": [
+              16,
+              17
+            ],
+            "events": [
+              {
+                "block_index": 16,
+                "cache_size_after": 12,
+                "cache_size_before": 0,
+                "duration_ms": 228.0705,
+                "resident_bytes_after": 317205528,
+                "stage": "LOAD",
+                "t_ms": 228.0926,
+                "variant": "real_seedvr2_block16_c2560_h20_hd128"
+              },
+              {
+                "block_index": 16,
+                "cache_size_after": 12,
+                "cache_size_before": 12,
+                "duration_ms": 199.3697,
+                "stage": "EXECUTE",
+                "t_ms": 430.8055,
+                "total_packed": 244,
+                "txt_hash": "f22b7252e2c4f51b",
+                "variant": "real_seedvr2_block16_c2560_h20_hd128",
+                "vid_hash": "693e4310e6165d8f"
+              },
+              {
+                "block_index": 16,
+                "cache_cleared": true,
+                "cache_size_after": 0,
+                "cache_size_before": 12,
+                "duration_ms": 21.3241,
+                "resident_bytes_after": 0,
+                "stage": "UNLOAD",
+                "t_ms": 455.362,
+                "variant": "real_seedvr2_block16_c2560_h20_hd128"
+              },
+              {
+                "block_index": 16,
+                "files_probed": 48,
+                "handles_released": true,
+                "stage": "FILE_PROBE",
+                "t_ms": 487.3272
+              },
+              {
+                "block_index": 17,
+                "cache_size_after": 12,
+                "cache_size_before": 0,
+                "duration_ms": 291.1593,
+                "resident_bytes_after": 317205528,
+                "stage": "LOAD",
+                "t_ms": 784.5504,
+                "variant": "real_seedvr2_block17_c2560_h20_hd128"
+              },
+              {
+                "block_index": 17,
+                "cache_size_after": 12,
+                "cache_size_before": 12,
+                "duration_ms": 200.3551,
+                "stage": "EXECUTE",
+                "t_ms": 988.0896,
+                "total_packed": 244,
+                "txt_hash": "02c850c189ed6e2e",
+                "variant": "real_seedvr2_block17_c2560_h20_hd128",
+                "vid_hash": "b57a60521ffb5b03"
+              },
+              {
+                "block_index": 17,
+                "cache_cleared": true,
+                "cache_size_after": 0,
+                "cache_size_before": 12,
+                "duration_ms": 15.5919,
+                "resident_bytes_after": 0,
+                "stage": "UNLOAD",
+                "t_ms": 1006.7667,
+                "variant": "real_seedvr2_block17_c2560_h20_hd128"
+              },
+              {
+                "block_index": 17,
+                "files_probed": 48,
+                "handles_released": true,
+                "stage": "FILE_PROBE",
+                "t_ms": 1039.206
+              }
+            ],
+            "full_32_block_ncnn": false,
+            "full_pipeline_pytorch": true,
+            "max_resident_weighted_blocks": 1,
+            "mode": "streaming",
+            "ncnn_adapter_call_count": 2,
+            "order_ok": true,
+            "original_block_call_count": 0,
+            "per_block": [
+              {
+                "block_index": 16,
+                "execute_ms": 199.3697,
+                "load_ms": 0,
+                "txt_hash": "f22b7252e2c4f51b",
+                "unload_ms": 0,
+                "variant": "real_seedvr2_block16_c2560_h20_hd128",
+                "vid_hash": "693e4310e6165d8f"
+              },
+              {
+                "block_index": 17,
+                "execute_ms": 200.3551,
+                "load_ms": 0,
+                "txt_hash": "02c850c189ed6e2e",
+                "unload_ms": 0,
+                "variant": "real_seedvr2_block17_c2560_h20_hd128",
+                "vid_hash": "b57a60521ffb5b03"
+              }
+            ],
+            "silent_fallback": false,
+            "streaming_mode_validated": true,
+            "total_execute_ms": 399,
+            "total_load_ms": 519,
+            "total_unload_ms": 36,
+            "total_wall_ms": 1047.3492
+          }
+        },
+        "rep1": {
+          "rc": 0,
+          "report": {
+            "android_vulkan": false,
+            "block_indices": [
+              16,
+              17
+            ],
+            "events": [
+              {
+                "block_index": 16,
+                "cache_size_after": 12,
+                "cache_size_before": 0,
+                "duration_ms": 120.7098,
+                "resident_bytes_after": 317205528,
+                "stage": "LOAD",
+                "t_ms": 120.7359,
+                "variant": "real_seedvr2_block16_c2560_h20_hd128"
+              },
+              {
+                "block_index": 16,
+                "cache_size_after": 12,
+                "cache_size_before": 12,
+                "duration_ms": 185.3045,
+                "stage": "EXECUTE",
+                "t_ms": 309.0111,
+                "total_packed": 244,
+                "txt_hash": "f22b7252e2c4f51b",
+                "variant": "real_seedvr2_block16_c2560_h20_hd128",
+                "vid_hash": "693e4310e6165d8f"
+              },
+              {
+                "block_index": 16,
+                "cache_cleared": true,
+                "cache_size_after": 0,
+                "cache_size_before": 12,
+                "duration_ms": 13.5263,
+                "resident_bytes_after": 0,
+                "stage": "UNLOAD",
+                "t_ms": 325.4954,
+                "variant": "real_seedvr2_block16_c2560_h20_hd128"
+              },
+              {
+                "block_index": 16,
+                "files_probed": 48,
+                "handles_released": true,
+                "stage": "FILE_PROBE",
+                "t_ms": 358.4979
+              },
+              {
+                "block_index": 17,
+                "cache_size_after": 12,
+                "cache_size_before": 0,
+                "duration_ms": 133.3677,
+                "resident_bytes_after": 317205528,
+                "stage": "LOAD",
+                "t_ms": 496.34,
+                "variant": "real_seedvr2_block17_c2560_h20_hd128"
+              },
+              {
+                "block_index": 17,
+                "cache_size_after": 12,
+                "cache_size_before": 12,
+                "duration_ms": 186.9767,
+                "stage": "EXECUTE",
+                "t_ms": 686.117,
+                "total_packed": 244,
+                "txt_hash": "02c850c189ed6e2e",
+                "variant": "real_seedvr2_block17_c2560_h20_hd128",
+                "vid_hash": "b57a60521ffb5b03"
+              },
+              {
+                "block_index": 17,
+                "cache_cleared": true,
+                "cache_size_after": 0,
+                "cache_size_before": 12,
+                "duration_ms": 13.6642,
+                "resident_bytes_after": 0,
+                "stage": "UNLOAD",
+                "t_ms": 702.9103,
+                "variant": "real_seedvr2_block17_c2560_h20_hd128"
+              },
+              {
+                "block_index": 17,
+                "files_probed": 48,
+                "handles_released": true,
+                "stage": "FILE_PROBE",
+                "t_ms": 734.7373
+              }
+            ],
+            "full_32_block_ncnn": false,
+            "full_pipeline_pytorch": true,
+            "max_resident_weighted_blocks": 1,
+            "mode": "streaming",
+            "ncnn_adapter_call_count": 2,
+            "order_ok": true,
+            "original_block_call_count": 0,
+            "per_block": [
+              {
+                "block_index": 16,
+                "execute_ms": 185.3045,
+                "load_ms": 0,
+                "txt_hash": "f22b7252e2c4f51b",
+                "unload_ms": 0,
+                "variant": "real_seedvr2_block16_c2560_h20_hd128",
+                "vid_hash": "693e4310e6165d8f"
+              },
+              {
+                "block_index": 17,
+                "execute_ms": 186.9767,
+                "load_ms": 0,
+                "txt_hash": "02c850c189ed6e2e",
+                "unload_ms": 0,
+                "variant": "real_seedvr2_block17_c2560_h20_hd128",
+                "vid_hash": "b57a60521ffb5b03"
+              }
+            ],
+            "silent_fallback": false,
+            "streaming_mode_validated": true,
+            "total_execute_ms": 371,
+            "total_load_ms": 253,
+            "total_unload_ms": 26,
+            "total_wall_ms": 740.6918
+          }
+        },
+        "rep2": {
+          "rc": 0,
+          "report": {
+            "android_vulkan": false,
+            "block_indices": [
+              16,
+              17
+            ],
+            "events": [
+              {
+                "block_index": 16,
+                "cache_size_after": 12,
+                "cache_size_before": 0,
+                "duration_ms": 129.2407,
+                "resident_bytes_after": 317205528,
+                "stage": "LOAD",
+                "t_ms": 129.2572,
+                "variant": "real_seedvr2_block16_c2560_h20_hd128"
+              },
+              {
+                "block_index": 16,
+                "cache_size_after": 12,
+                "cache_size_before": 12,
+                "duration_ms": 201.4216,
+                "stage": "EXECUTE",
+                "t_ms": 333.5537,
+                "total_packed": 244,
+                "txt_hash": "f22b7252e2c4f51b",
+                "variant": "real_seedvr2_block16_c2560_h20_hd128",
+                "vid_hash": "693e4310e6165d8f"
+              },
+              {
+                "block_index": 16,
+                "cache_cleared": true,
+                "cache_size_after": 0,
+                "cache_size_before": 12,
+                "duration_ms": 13.4149,
+                "resident_bytes_after": 0,
+                "stage": "UNLOAD",
+                "t_ms": 350.2188,
+                "variant": "real_seedvr2_block16_c2560_h20_hd128"
+              },
+              {
+                "block_index": 16,
+                "files_probed": 48,
+                "handles_released": true,
+                "stage": "FILE_PROBE",
+                "t_ms": 382.0711
+              },
+              {
+                "block_index": 17,
+                "cache_size_after": 12,
+                "cache_size_before": 0,
+                "duration_ms": 122.0663,
+                "resident_bytes_after": 317205528,
+                "stage": "LOAD",
+                "t_ms": 508.9484,
+                "variant": "real_seedvr2_block17_c2560_h20_hd128"
+              },
+              {
+                "block_index": 17,
+                "cache_size_after": 12,
+                "cache_size_before": 12,
+                "duration_ms": 187.866,
+                "stage": "EXECUTE",
+                "t_ms": 699.6818,
+                "total_packed": 244,
+                "txt_hash": "02c850c189ed6e2e",
+                "variant": "real_seedvr2_block17_c2560_h20_hd128",
+                "vid_hash": "b57a60521ffb5b03"
+              },
+              {
+                "block_index": 17,
+                "cache_cleared": true,
+                "cache_size_after": 0,
+                "cache_size_before": 12,
+                "duration_ms": 13.9089,
+                "resident_bytes_after": 0,
+                "stage": "UNLOAD",
+                "t_ms": 716.7366,
+                "variant": "real_seedvr2_block17_c2560_h20_hd128"
+              },
+              {
+                "block_index": 17,
+                "files_probed": 48,
+                "handles_released": true,
+                "stage": "FILE_PROBE",
+                "t_ms": 754.227
+              }
+            ],
+            "full_32_block_ncnn": false,
+            "full_pipeline_pytorch": true,
+            "max_resident_weighted_blocks": 1,
+            "mode": "streaming",
+            "ncnn_adapter_call_count": 2,
+            "order_ok": true,
+            "original_block_call_count": 0,
+            "per_block": [
+              {
+                "block_index": 16,
+                "execute_ms": 201.4216,
+                "load_ms": 0,
+                "txt_hash": "f22b7252e2c4f51b",
+                "unload_ms": 0,
+                "variant": "real_seedvr2_block16_c2560_h20_hd128",
+                "vid_hash": "693e4310e6165d8f"
+              },
+              {
+                "block_index": 17,
+                "execute_ms": 187.866,
+                "load_ms": 0,
+                "txt_hash": "02c850c189ed6e2e",
+                "unload_ms": 0,
+                "variant": "real_seedvr2_block17_c2560_h20_hd128",
+                "vid_hash": "b57a60521ffb5b03"
+              }
+            ],
+            "silent_fallback": false,
+            "streaming_mode_validated": true,
+            "total_execute_ms": 388,
+            "total_load_ms": 251,
+            "total_unload_ms": 26,
+            "total_wall_ms": 761.3792
+          }
+        }
+      },
+      "resident": {
+        "rep0": {
+          "rc": 0,
+          "report": {
+            "android_vulkan": false,
+            "block_indices": [
+              16,
+              17
+            ],
+            "events": [
+              {
+                "block_index": 16,
+                "cache_size_after": 12,
+                "cache_size_before": 0,
+                "duration_ms": 127.6824,
+                "resident_bytes_after": 317205528,
+                "stage": "LOAD",
+                "t_ms": 127.6922,
+                "variant": "real_seedvr2_block16_c2560_h20_hd128"
+              },
+              {
+                "block_index": 17,
+                "cache_size_after": 12,
+                "cache_size_before": 0,
+                "duration_ms": 135.2184,
+                "resident_bytes_after": 317205528,
+                "stage": "LOAD",
+                "t_ms": 262.9222,
+                "variant": "real_seedvr2_block17_c2560_h20_hd128"
+              },
+              {
+                "block_index": 16,
+                "cache_size_after": 12,
+                "cache_size_before": 12,
+                "duration_ms": 186.5892,
+                "stage": "EXECUTE",
+                "t_ms": 452.4368,
+                "total_packed": 244,
+                "txt_hash": "f22b7252e2c4f51b",
+                "variant": "real_seedvr2_block16_c2560_h20_hd128",
+                "vid_hash": "693e4310e6165d8f"
+              },
+              {
+                "block_index": 17,
+                "cache_size_after": 12,
+                "cache_size_before": 12,
+                "duration_ms": 188.8421,
+                "stage": "EXECUTE",
+                "t_ms": 653.1173,
+                "total_packed": 244,
+                "txt_hash": "02c850c189ed6e2e",
+                "variant": "real_seedvr2_block17_c2560_h20_hd128",
+                "vid_hash": "b57a60521ffb5b03"
+              },
+              {
+                "block_index": 16,
+                "cache_size_after": 0,
+                "cache_size_before": 12,
+                "duration_ms": 14.0195,
+                "stage": "UNLOAD",
+                "t_ms": 677.7684
+              },
+              {
+                "block_index": 17,
+                "cache_size_after": 0,
+                "cache_size_before": 12,
+                "duration_ms": 19.5657,
+                "stage": "UNLOAD",
+                "t_ms": 697.3664
+              }
+            ],
+            "full_32_block_ncnn": false,
+            "full_pipeline_pytorch": true,
+            "max_resident_weighted_blocks": 2,
+            "mode": "resident",
+            "ncnn_adapter_call_count": 2,
+            "order_ok": true,
+            "original_block_call_count": 0,
+            "per_block": [
+              {
+                "block_index": 16,
+                "execute_ms": 186.5892,
+                "load_ms": 0,
+                "txt_hash": "f22b7252e2c4f51b",
+                "unload_ms": 0,
+                "variant": "real_seedvr2_block16_c2560_h20_hd128",
+                "vid_hash": "693e4310e6165d8f"
+              },
+              {
+                "block_index": 17,
+                "execute_ms": 188.8421,
+                "load_ms": 0,
+                "txt_hash": "02c850c189ed6e2e",
+                "unload_ms": 0,
+                "variant": "real_seedvr2_block17_c2560_h20_hd128",
+                "vid_hash": "b57a60521ffb5b03"
+              }
+            ],
+            "silent_fallback": false,
+            "streaming_mode_validated": false,
+            "total_execute_ms": 374,
+            "total_load_ms": 262,
+            "total_unload_ms": 33,
+            "total_wall_ms": 697.4087
+          }
+        },
+        "rep1": {
+          "rc": 0,
+          "report": {
+            "android_vulkan": false,
+            "block_indices": [
+              16,
+              17
+            ],
+            "events": [
+              {
+                "block_index": 16,
+                "cache_size_after": 12,
+                "cache_size_before": 0,
+                "duration_ms": 123.3312,
+                "resident_bytes_after": 317205528,
+                "stage": "LOAD",
+                "t_ms": 123.3421,
+                "variant": "real_seedvr2_block16_c2560_h20_hd128"
+              },
+              {
+                "block_index": 17,
+                "cache_size_after": 12,
+                "cache_size_before": 0,
+                "duration_ms": 119.8048,
+                "resident_bytes_after": 317205528,
+                "stage": "LOAD",
+                "t_ms": 243.1579,
+                "variant": "real_seedvr2_block17_c2560_h20_hd128"
+              },
+              {
+                "block_index": 16,
+                "cache_size_after": 12,
+                "cache_size_before": 12,
+                "duration_ms": 180.2154,
+                "stage": "EXECUTE",
+                "t_ms": 426.0078,
+                "total_packed": 244,
+                "txt_hash": "f22b7252e2c4f51b",
+                "variant": "real_seedvr2_block16_c2560_h20_hd128",
+                "vid_hash": "693e4310e6165d8f"
+              },
+              {
+                "block_index": 17,
+                "cache_size_after": 12,
+                "cache_size_before": 12,
+                "duration_ms": 177.6885,
+                "stage": "EXECUTE",
+                "t_ms": 614.1074,
+                "total_packed": 244,
+                "txt_hash": "02c850c189ed6e2e",
+                "variant": "real_seedvr2_block17_c2560_h20_hd128",
+                "vid_hash": "b57a60521ffb5b03"
+              },
+              {
+                "block_index": 16,
+                "cache_size_after": 0,
+                "cache_size_before": 12,
+                "duration_ms": 12.9288,
+                "stage": "UNLOAD",
+                "t_ms": 636.6219
+              },
+              {
+                "block_index": 17,
+                "cache_size_after": 0,
+                "cache_size_before": 12,
+                "duration_ms": 13.034,
+                "stage": "UNLOAD",
+                "t_ms": 649.6913
+              }
+            ],
+            "full_32_block_ncnn": false,
+            "full_pipeline_pytorch": true,
+            "max_resident_weighted_blocks": 2,
+            "mode": "resident",
+            "ncnn_adapter_call_count": 2,
+            "order_ok": true,
+            "original_block_call_count": 0,
+            "per_block": [
+              {
+                "block_index": 16,
+                "execute_ms": 180.2154,
+                "load_ms": 0,
+                "txt_hash": "f22b7252e2c4f51b",
+                "unload_ms": 0,
+                "variant": "real_seedvr2_block16_c2560_h20_hd128",
+                "vid_hash": "693e4310e6165d8f"
+              },
+              {
+                "block_index": 17,
+                "execute_ms": 177.6885,
+                "load_ms": 0,
+                "txt_hash": "02c850c189ed6e2e",
+                "unload_ms": 0,
+                "variant": "real_seedvr2_block17_c2560_h20_hd128",
+                "vid_hash": "b57a60521ffb5b03"
+              }
+            ],
+            "silent_fallback": false,
+            "streaming_mode_validated": false,
+            "total_execute_ms": 357,
+            "total_load_ms": 242,
+            "total_unload_ms": 25,
+            "total_wall_ms": 649.7452
+          }
+        },
+        "rep2": {
+          "rc": 0,
+          "report": {
+            "android_vulkan": false,
+            "block_indices": [
+              16,
+              17
+            ],
+            "events": [
+              {
+                "block_index": 16,
+                "cache_size_after": 12,
+                "cache_size_before": 0,
+                "duration_ms": 127.0583,
+                "resident_bytes_after": 317205528,
+                "stage": "LOAD",
+                "t_ms": 127.0691,
+                "variant": "real_seedvr2_block16_c2560_h20_hd128"
+              },
+              {
+                "block_index": 17,
+                "cache_size_after": 12,
+                "cache_size_before": 0,
+                "duration_ms": 132.4077,
+                "resident_bytes_after": 317205528,
+                "stage": "LOAD",
+                "t_ms": 259.4861,
+                "variant": "real_seedvr2_block17_c2560_h20_hd128"
+              },
+              {
+                "block_index": 16,
+                "cache_size_after": 12,
+                "cache_size_before": 12,
+                "duration_ms": 226.2045,
+                "stage": "EXECUTE",
+                "t_ms": 490.1873,
+                "total_packed": 244,
+                "txt_hash": "f22b7252e2c4f51b",
+                "variant": "real_seedvr2_block16_c2560_h20_hd128",
+                "vid_hash": "693e4310e6165d8f"
+              },
+              {
+                "block_index": 17,
+                "cache_size_after": 12,
+                "cache_size_before": 12,
+                "duration_ms": 201.5843,
+                "stage": "EXECUTE",
+                "t_ms": 705.3173,
+                "total_packed": 244,
+                "txt_hash": "02c850c189ed6e2e",
+                "variant": "real_seedvr2_block17_c2560_h20_hd128",
+                "vid_hash": "b57a60521ffb5b03"
+              },
+              {
+                "block_index": 16,
+                "cache_size_after": 0,
+                "cache_size_before": 12,
+                "duration_ms": 10.5414,
+                "stage": "UNLOAD",
+                "t_ms": 725.1514
+              },
+              {
+                "block_index": 17,
+                "cache_size_after": 0,
+                "cache_size_before": 12,
+                "duration_ms": 12.9454,
+                "stage": "UNLOAD",
+                "t_ms": 738.1418
+              }
+            ],
+            "full_32_block_ncnn": false,
+            "full_pipeline_pytorch": true,
+            "max_resident_weighted_blocks": 2,
+            "mode": "resident",
+            "ncnn_adapter_call_count": 2,
+            "order_ok": true,
+            "original_block_call_count": 0,
+            "per_block": [
+              {
+                "block_index": 16,
+                "execute_ms": 226.2045,
+                "load_ms": 0,
+                "txt_hash": "f22b7252e2c4f51b",
+                "unload_ms": 0,
+                "variant": "real_seedvr2_block16_c2560_h20_hd128",
+                "vid_hash": "693e4310e6165d8f"
+              },
+              {
+                "block_index": 17,
+                "execute_ms": 201.5843,
+                "load_ms": 0,
+                "txt_hash": "02c850c189ed6e2e",
+                "unload_ms": 0,
+                "variant": "real_seedvr2_block17_c2560_h20_hd128",
+                "vid_hash": "b57a60521ffb5b03"
+              }
+            ],
+            "silent_fallback": false,
+            "streaming_mode_validated": false,
+            "total_execute_ms": 427,
+            "total_load_ms": 259,
+            "total_unload_ms": 22,
+            "total_wall_ms": 738.1854
+          }
+        }
+      },
+      "final_error": [
+        {
+          "max_abs_error": 0.0780029296875,
+          "mean_abs_error": 0.000617068144492805,
+          "rmse": 0.0009593515424057841,
+          "relative_max_error": 2.8348107592132504e-06,
+          "nan_count": 0,
+          "inf_count": 0
+        },
+        {
+          "max_abs_error": 0.0780029296875,
+          "mean_abs_error": 0.000617068144492805,
+          "rmse": 0.0009593515424057841,
+          "relative_max_error": 2.8348107592132504e-06,
+          "nan_count": 0,
+          "inf_count": 0
+        },
+        {
+          "max_abs_error": 0.0780029296875,
+          "mean_abs_error": 0.000617068144492805,
+          "rmse": 0.0009593515424057841,
+          "relative_max_error": 2.8348107592132504e-06,
+          "nan_count": 0,
+          "inf_count": 0
+        }
+      ],
+      "per_block_error": {
+        "0": [
+          {
+            "block_index": 16,
+            "max_abs_error": 0.000244140625,
+            "mean_abs_error": 3.578814471438818e-07,
+            "rmse": 8.504237598572217e-07,
+            "relative_max_error": 8.872485910137475e-09,
+            "nan_count": 0,
+            "inf_count": 0
+          },
+          {
+            "block_index": 17,
+            "max_abs_error": 0.0780029296875,
+            "mean_abs_error": 0.000617068144492805,
+            "rmse": 0.0009593515424057841,
+            "relative_max_error": 2.8348107592132504e-06,
+            "nan_count": 0,
+            "inf_count": 0
+          }
+        ],
+        "1": [
+          {
+            "block_index": 16,
+            "max_abs_error": 0.000244140625,
+            "mean_abs_error": 3.578814471438818e-07,
+            "rmse": 8.504237598572217e-07,
+            "relative_max_error": 8.872485910137475e-09,
+            "nan_count": 0,
+            "inf_count": 0
+          },
+          {
+            "block_index": 17,
+            "max_abs_error": 0.0780029296875,
+            "mean_abs_error": 0.000617068144492805,
+            "rmse": 0.0009593515424057841,
+            "relative_max_error": 2.8348107592132504e-06,
+            "nan_count": 0,
+            "inf_count": 0
+          }
+        ],
+        "2": [
+          {
+            "block_index": 16,
+            "max_abs_error": 0.000244140625,
+            "mean_abs_error": 3.578814471438818e-07,
+            "rmse": 8.504237598572217e-07,
+            "relative_max_error": 8.872485910137475e-09,
+            "nan_count": 0,
+            "inf_count": 0
+          },
+          {
+            "block_index": 17,
+            "max_abs_error": 0.0780029296875,
+            "mean_abs_error": 0.000617068144492805,
+            "rmse": 0.0009593515424057841,
+            "relative_max_error": 2.8348107592132504e-06,
+            "nan_count": 0,
+            "inf_count": 0
+          }
+        ]
+      },
+      "rel_limit": 0.002,
+      "pass": true
+    },
+    "chain_4": {
+      "chain": "chain_4",
+      "range": [
+        15,
+        16,
+        17,
+        18
+      ],
+      "input_block": 15,
+      "ref_elapsed_s": 33.115,
+      "streaming": {
+        "rep0": {
+          "rc": 0,
+          "report": {
+            "android_vulkan": false,
+            "block_indices": [
+              15,
+              16,
+              17,
+              18
+            ],
+            "events": [
+              {
+                "block_index": 15,
+                "cache_size_after": 12,
+                "cache_size_before": 0,
+                "duration_ms": 299.9529,
+                "resident_bytes_after": 317205528,
+                "stage": "LOAD",
+                "t_ms": 299.986,
+                "variant": "real_seedvr2_block15_c2560_h20_hd128"
+              },
+              {
+                "block_index": 15,
+                "cache_size_after": 12,
+                "cache_size_before": 12,
+                "duration_ms": 207.5099,
+                "stage": "EXECUTE",
+                "t_ms": 510.6723,
+                "total_packed": 244,
+                "txt_hash": "5ed82a9ce22d6797",
+                "variant": "real_seedvr2_block15_c2560_h20_hd128",
+                "vid_hash": "f254376c8c1453b2"
+              },
+              {
+                "block_index": 15,
+                "cache_cleared": true,
+                "cache_size_after": 0,
+                "cache_size_before": 12,
+                "duration_ms": 20.3549,
+                "resident_bytes_after": 0,
+                "stage": "UNLOAD",
+                "t_ms": 534.3077,
+                "variant": "real_seedvr2_block15_c2560_h20_hd128"
+              },
+              {
+                "block_index": 15,
+                "files_probed": 48,
+                "handles_released": true,
+                "stage": "FILE_PROBE",
+                "t_ms": 564.6074
+              },
+              {
+                "block_index": 16,
+                "cache_size_after": 12,
+                "cache_size_before": 0,
+                "duration_ms": 257.8177,
+                "resident_bytes_after": 317205528,
+                "stage": "LOAD",
+                "t_ms": 828.169,
+                "variant": "real_seedvr2_block16_c2560_h20_hd128"
+              },
+              {
+                "block_index": 16,
+                "cache_size_after": 12,
+                "cache_size_before": 12,
+                "duration_ms": 192.0427,
+                "stage": "EXECUTE",
+                "t_ms": 1022.7821,
+                "total_packed": 244,
+                "txt_hash": "bc297f9966ef4d76",
+                "variant": "real_seedvr2_block16_c2560_h20_hd128",
+                "vid_hash": "b6ab0aa9869be03a"
+              },
+              {
+                "block_index": 16,
+                "cache_cleared": true,
+                "cache_size_after": 0,
+                "cache_size_before": 12,
+                "duration_ms": 14.5605,
+                "resident_bytes_after": 0,
+                "stage": "UNLOAD",
+                "t_ms": 1040.4047,
+                "variant": "real_seedvr2_block16_c2560_h20_hd128"
+              },
+              {
+                "block_index": 16,
+                "files_probed": 48,
+                "handles_released": true,
+                "stage": "FILE_PROBE",
+                "t_ms": 1073.2936
+              },
+              {
+                "block_index": 17,
+                "cache_size_after": 12,
+                "cache_size_before": 0,
+                "duration_ms": 274.5109,
+                "resident_bytes_after": 317205528,
+                "stage": "LOAD",
+                "t_ms": 1354.3964,
+                "variant": "real_seedvr2_block17_c2560_h20_hd128"
+              },
+              {
+                "block_index": 17,
+                "cache_size_after": 12,
+                "cache_size_before": 12,
+                "duration_ms": 187.2298,
+                "stage": "EXECUTE",
+                "t_ms": 1544.0861,
+                "total_packed": 244,
+                "txt_hash": "00384bc7280064db",
+                "variant": "real_seedvr2_block17_c2560_h20_hd128",
+                "vid_hash": "0481d0c2d6ed30af"
+              },
+              {
+                "block_index": 17,
+                "cache_cleared": true,
+                "cache_size_after": 0,
+                "cache_size_before": 12,
+                "duration_ms": 14.4133,
+                "resident_bytes_after": 0,
+                "stage": "UNLOAD",
+                "t_ms": 1561.64,
+                "variant": "real_seedvr2_block17_c2560_h20_hd128"
+              },
+              {
+                "block_index": 17,
+                "files_probed": 48,
+                "handles_released": true,
+                "stage": "FILE_PROBE",
+                "t_ms": 1590.3971
+              },
+              {
+                "block_index": 18,
+                "cache_size_after": 12,
+                "cache_size_before": 0,
+                "duration_ms": 352.7374,
+                "resident_bytes_after": 317205528,
+                "stage": "LOAD",
+                "t_ms": 1950.7979,
+                "variant": "real_seedvr2_block18_c2560_h20_hd128"
+              },
+              {
+                "block_index": 18,
+                "cache_size_after": 12,
+                "cache_size_before": 12,
+                "duration_ms": 228.4065,
+                "stage": "EXECUTE",
+                "t_ms": 2181.9578,
+                "total_packed": 244,
+                "txt_hash": "2223705b2a74a4e7",
+                "variant": "real_seedvr2_block18_c2560_h20_hd128",
+                "vid_hash": "e2f393b32e97b902"
+              },
+              {
+                "block_index": 18,
+                "cache_cleared": true,
+                "cache_size_after": 0,
+                "cache_size_before": 12,
+                "duration_ms": 20.0185,
+                "resident_bytes_after": 0,
+                "stage": "UNLOAD",
+                "t_ms": 2205.8471,
+                "variant": "real_seedvr2_block18_c2560_h20_hd128"
+              },
+              {
+                "block_index": 18,
+                "files_probed": 48,
+                "handles_released": true,
+                "stage": "FILE_PROBE",
+                "t_ms": 2252.1062
+              }
+            ],
+            "full_32_block_ncnn": false,
+            "full_pipeline_pytorch": true,
+            "max_resident_weighted_blocks": 1,
+            "mode": "streaming",
+            "ncnn_adapter_call_count": 4,
+            "order_ok": true,
+            "original_block_call_count": 0,
+            "per_block": [
+              {
+                "block_index": 15,
+                "execute_ms": 207.5099,
+                "load_ms": 0,
+                "txt_hash": "5ed82a9ce22d6797",
+                "unload_ms": 0,
+                "variant": "real_seedvr2_block15_c2560_h20_hd128",
+                "vid_hash": "f254376c8c1453b2"
+              },
+              {
+                "block_index": 16,
+                "execute_ms": 192.0427,
+                "load_ms": 0,
+                "txt_hash": "bc297f9966ef4d76",
+                "unload_ms": 0,
+                "variant": "real_seedvr2_block16_c2560_h20_hd128",
+                "vid_hash": "b6ab0aa9869be03a"
+              },
+              {
+                "block_index": 17,
+                "execute_ms": 187.2298,
+                "load_ms": 0,
+                "txt_hash": "00384bc7280064db",
+                "unload_ms": 0,
+                "variant": "real_seedvr2_block17_c2560_h20_hd128",
+                "vid_hash": "0481d0c2d6ed30af"
+              },
+              {
+                "block_index": 18,
+                "execute_ms": 228.4065,
+                "load_ms": 0,
+                "txt_hash": "2223705b2a74a4e7",
+                "unload_ms": 0,
+                "variant": "real_seedvr2_block18_c2560_h20_hd128",
+                "vid_hash": "e2f393b32e97b902"
+              }
+            ],
+            "silent_fallback": false,
+            "streaming_mode_validated": true,
+            "total_execute_ms": 814,
+            "total_load_ms": 1182,
+            "total_unload_ms": 68,
+            "total_wall_ms": 2260.2855
+          }
+        },
+        "rep1": {
+          "rc": 0,
+          "report": {
+            "android_vulkan": false,
+            "block_indices": [
+              15,
+              16,
+              17,
+              18
+            ],
+            "events": [
+              {
+                "block_index": 15,
+                "cache_size_after": 12,
+                "cache_size_before": 0,
+                "duration_ms": 125.4373,
+                "resident_bytes_after": 317205528,
+                "stage": "LOAD",
+                "t_ms": 125.4601,
+                "variant": "real_seedvr2_block15_c2560_h20_hd128"
+              },
+              {
+                "block_index": 15,
+                "cache_size_after": 12,
+                "cache_size_before": 12,
+                "duration_ms": 195.6154,
+                "stage": "EXECUTE",
+                "t_ms": 323.7426,
+                "total_packed": 244,
+                "txt_hash": "5ed82a9ce22d6797",
+                "variant": "real_seedvr2_block15_c2560_h20_hd128",
+                "vid_hash": "f254376c8c1453b2"
+              },
+              {
+                "block_index": 15,
+                "cache_cleared": true,
+                "cache_size_after": 0,
+                "cache_size_before": 12,
+                "duration_ms": 13.3582,
+                "resident_bytes_after": 0,
+                "stage": "UNLOAD",
+                "t_ms": 340.0824,
+                "variant": "real_seedvr2_block15_c2560_h20_hd128"
+              },
+              {
+                "block_index": 15,
+                "files_probed": 48,
+                "handles_released": true,
+                "stage": "FILE_PROBE",
+                "t_ms": 371.9187
+              },
+              {
+                "block_index": 16,
+                "cache_size_after": 12,
+                "cache_size_before": 0,
+                "duration_ms": 126.0213,
+                "resident_bytes_after": 317205528,
+                "stage": "LOAD",
+                "t_ms": 502.3134,
+                "variant": "real_seedvr2_block16_c2560_h20_hd128"
+              },
+              {
+                "block_index": 16,
+                "cache_size_after": 12,
+                "cache_size_before": 12,
+                "duration_ms": 190.7157,
+                "stage": "EXECUTE",
+                "t_ms": 696.1816,
+                "total_packed": 244,
+                "txt_hash": "bc297f9966ef4d76",
+                "variant": "real_seedvr2_block16_c2560_h20_hd128",
+                "vid_hash": "b6ab0aa9869be03a"
+              },
+              {
+                "block_index": 16,
+                "cache_cleared": true,
+                "cache_size_after": 0,
+                "cache_size_before": 12,
+                "duration_ms": 14.3601,
+                "resident_bytes_after": 0,
+                "stage": "UNLOAD",
+                "t_ms": 713.5263,
+                "variant": "real_seedvr2_block16_c2560_h20_hd128"
+              },
+              {
+                "block_index": 16,
+                "files_probed": 48,
+                "handles_released": true,
+                "stage": "FILE_PROBE",
+                "t_ms": 748.6248
+              },
+              {
+                "block_index": 17,
+                "cache_size_after": 12,
+                "cache_size_before": 0,
+                "duration_ms": 132.7508,
+                "resident_bytes_after": 317205528,
+                "stage": "LOAD",
+                "t_ms": 886.1146,
+                "variant": "real_seedvr2_block17_c2560_h20_hd128"
+              },
+              {
+                "block_index": 17,
+                "cache_size_after": 12,
+                "cache_size_before": 12,
+                "duration_ms": 182.2074,
+                "stage": "EXECUTE",
+                "t_ms": 1071.1355,
+                "total_packed": 244,
+                "txt_hash": "00384bc7280064db",
+                "variant": "real_seedvr2_block17_c2560_h20_hd128",
+                "vid_hash": "0481d0c2d6ed30af"
+              },
+              {
+                "block_index": 17,
+                "cache_cleared": true,
+                "cache_size_after": 0,
+                "cache_size_before": 12,
+                "duration_ms": 12.9198,
+                "resident_bytes_after": 0,
+                "stage": "UNLOAD",
+                "t_ms": 1087.1337,
+                "variant": "real_seedvr2_block17_c2560_h20_hd128"
+              },
+              {
+                "block_index": 17,
+                "files_probed": 48,
+                "handles_released": true,
+                "stage": "FILE_PROBE",
+                "t_ms": 1116.5289
+              },
+              {
+                "block_index": 18,
+                "cache_size_after": 12,
+                "cache_size_before": 0,
+                "duration_ms": 116.2944,
+                "resident_bytes_after": 317205528,
+                "stage": "LOAD",
+                "t_ms": 1237.3813,
+                "variant": "real_seedvr2_block18_c2560_h20_hd128"
+              },
+              {
+                "block_index": 18,
+                "cache_size_after": 12,
+                "cache_size_before": 12,
+                "duration_ms": 188.1543,
+                "stage": "EXECUTE",
+                "t_ms": 1428.1481,
+                "total_packed": 244,
+                "txt_hash": "2223705b2a74a4e7",
+                "variant": "real_seedvr2_block18_c2560_h20_hd128",
+                "vid_hash": "e2f393b32e97b902"
+              },
+              {
+                "block_index": 18,
+                "cache_cleared": true,
+                "cache_size_after": 0,
+                "cache_size_before": 12,
+                "duration_ms": 13.361,
+                "resident_bytes_after": 0,
+                "stage": "UNLOAD",
+                "t_ms": 1444.5343,
+                "variant": "real_seedvr2_block18_c2560_h20_hd128"
+              },
+              {
+                "block_index": 18,
+                "files_probed": 48,
+                "handles_released": true,
+                "stage": "FILE_PROBE",
+                "t_ms": 1476.0147
+              }
+            ],
+            "full_32_block_ncnn": false,
+            "full_pipeline_pytorch": true,
+            "max_resident_weighted_blocks": 1,
+            "mode": "streaming",
+            "ncnn_adapter_call_count": 4,
+            "order_ok": true,
+            "original_block_call_count": 0,
+            "per_block": [
+              {
+                "block_index": 15,
+                "execute_ms": 195.6154,
+                "load_ms": 0,
+                "txt_hash": "5ed82a9ce22d6797",
+                "unload_ms": 0,
+                "variant": "real_seedvr2_block15_c2560_h20_hd128",
+                "vid_hash": "f254376c8c1453b2"
+              },
+              {
+                "block_index": 16,
+                "execute_ms": 190.7157,
+                "load_ms": 0,
+                "txt_hash": "bc297f9966ef4d76",
+                "unload_ms": 0,
+                "variant": "real_seedvr2_block16_c2560_h20_hd128",
+                "vid_hash": "b6ab0aa9869be03a"
+              },
+              {
+                "block_index": 17,
+                "execute_ms": 182.2074,
+                "load_ms": 0,
+                "txt_hash": "00384bc7280064db",
+                "unload_ms": 0,
+                "variant": "real_seedvr2_block17_c2560_h20_hd128",
+                "vid_hash": "0481d0c2d6ed30af"
+              },
+              {
+                "block_index": 18,
+                "execute_ms": 188.1543,
+                "load_ms": 0,
+                "txt_hash": "2223705b2a74a4e7",
+                "unload_ms": 0,
+                "variant": "real_seedvr2_block18_c2560_h20_hd128",
+                "vid_hash": "e2f393b32e97b902"
+              }
+            ],
+            "silent_fallback": false,
+            "streaming_mode_validated": true,
+            "total_execute_ms": 755,
+            "total_load_ms": 499,
+            "total_unload_ms": 52,
+            "total_wall_ms": 1482.1152
+          }
+        },
+        "rep2": {
+          "rc": 0,
+          "report": {
+            "android_vulkan": false,
+            "block_indices": [
+              15,
+              16,
+              17,
+              18
+            ],
+            "events": [
+              {
+                "block_index": 15,
+                "cache_size_after": 12,
+                "cache_size_before": 0,
+                "duration_ms": 130.2034,
+                "resident_bytes_after": 317205528,
+                "stage": "LOAD",
+                "t_ms": 130.2461,
+                "variant": "real_seedvr2_block15_c2560_h20_hd128"
+              },
+              {
+                "block_index": 15,
+                "cache_size_after": 12,
+                "cache_size_before": 12,
+                "duration_ms": 202.2316,
+                "stage": "EXECUTE",
+                "t_ms": 334.8702,
+                "total_packed": 244,
+                "txt_hash": "5ed82a9ce22d6797",
+                "variant": "real_seedvr2_block15_c2560_h20_hd128",
+                "vid_hash": "f254376c8c1453b2"
+              },
+              {
+                "block_index": 15,
+                "cache_cleared": true,
+                "cache_size_after": 0,
+                "cache_size_before": 12,
+                "duration_ms": 14.1675,
+                "resident_bytes_after": 0,
+                "stage": "UNLOAD",
+                "t_ms": 352.0163,
+                "variant": "real_seedvr2_block15_c2560_h20_hd128"
+              },
+              {
+                "block_index": 15,
+                "files_probed": 48,
+                "handles_released": true,
+                "stage": "FILE_PROBE",
+                "t_ms": 382.4721
+              },
+              {
+                "block_index": 16,
+                "cache_size_after": 12,
+                "cache_size_before": 0,
+                "duration_ms": 128.2314,
+                "resident_bytes_after": 317205528,
+                "stage": "LOAD",
+                "t_ms": 515.6618,
+                "variant": "real_seedvr2_block16_c2560_h20_hd128"
+              },
+              {
+                "block_index": 16,
+                "cache_size_after": 12,
+                "cache_size_before": 12,
+                "duration_ms": 186.5737,
+                "stage": "EXECUTE",
+                "t_ms": 704.8152,
+                "total_packed": 244,
+                "txt_hash": "bc297f9966ef4d76",
+                "variant": "real_seedvr2_block16_c2560_h20_hd128",
+                "vid_hash": "b6ab0aa9869be03a"
+              },
+              {
+                "block_index": 16,
+                "cache_cleared": true,
+                "cache_size_after": 0,
+                "cache_size_before": 12,
+                "duration_ms": 13.2915,
+                "resident_bytes_after": 0,
+                "stage": "UNLOAD",
+                "t_ms": 721.0154,
+                "variant": "real_seedvr2_block16_c2560_h20_hd128"
+              },
+              {
+                "block_index": 16,
+                "files_probed": 48,
+                "handles_released": true,
+                "stage": "FILE_PROBE",
+                "t_ms": 754.3726
+              },
+              {
+                "block_index": 17,
+                "cache_size_after": 12,
+                "cache_size_before": 0,
+                "duration_ms": 128.482,
+                "resident_bytes_after": 317205528,
+                "stage": "LOAD",
+                "t_ms": 887.4628,
+                "variant": "real_seedvr2_block17_c2560_h20_hd128"
+              },
+              {
+                "block_index": 17,
+                "cache_size_after": 12,
+                "cache_size_before": 12,
+                "duration_ms": 199.1378,
+                "stage": "EXECUTE",
+                "t_ms": 1089.0519,
+                "total_packed": 244,
+                "txt_hash": "00384bc7280064db",
+                "variant": "real_seedvr2_block17_c2560_h20_hd128",
+                "vid_hash": "0481d0c2d6ed30af"
+              },
+              {
+                "block_index": 17,
+                "cache_cleared": true,
+                "cache_size_after": 0,
+                "cache_size_before": 12,
+                "duration_ms": 13.224,
+                "resident_bytes_after": 0,
+                "stage": "UNLOAD",
+                "t_ms": 1105.6522,
+                "variant": "real_seedvr2_block17_c2560_h20_hd128"
+              },
+              {
+                "block_index": 17,
+                "files_probed": 48,
+                "handles_released": true,
+                "stage": "FILE_PROBE",
+                "t_ms": 1139.2822
+              },
+              {
+                "block_index": 18,
+                "cache_size_after": 12,
+                "cache_size_before": 0,
+                "duration_ms": 126.6379,
+                "resident_bytes_after": 317205528,
+                "stage": "LOAD",
+                "t_ms": 1270.7057,
+                "variant": "real_seedvr2_block18_c2560_h20_hd128"
+              },
+              {
+                "block_index": 18,
+                "cache_size_after": 12,
+                "cache_size_before": 12,
+                "duration_ms": 194.6057,
+                "stage": "EXECUTE",
+                "t_ms": 1468.0582,
+                "total_packed": 244,
+                "txt_hash": "2223705b2a74a4e7",
+                "variant": "real_seedvr2_block18_c2560_h20_hd128",
+                "vid_hash": "e2f393b32e97b902"
+              },
+              {
+                "block_index": 18,
+                "cache_cleared": true,
+                "cache_size_after": 0,
+                "cache_size_before": 12,
+                "duration_ms": 13.4365,
+                "resident_bytes_after": 0,
+                "stage": "UNLOAD",
+                "t_ms": 1484.6581,
+                "variant": "real_seedvr2_block18_c2560_h20_hd128"
+              },
+              {
+                "block_index": 18,
+                "files_probed": 48,
+                "handles_released": true,
+                "stage": "FILE_PROBE",
+                "t_ms": 1516.158
+              }
+            ],
+            "full_32_block_ncnn": false,
+            "full_pipeline_pytorch": true,
+            "max_resident_weighted_blocks": 1,
+            "mode": "streaming",
+            "ncnn_adapter_call_count": 4,
+            "order_ok": true,
+            "original_block_call_count": 0,
+            "per_block": [
+              {
+                "block_index": 15,
+                "execute_ms": 202.2316,
+                "load_ms": 0,
+                "txt_hash": "5ed82a9ce22d6797",
+                "unload_ms": 0,
+                "variant": "real_seedvr2_block15_c2560_h20_hd128",
+                "vid_hash": "f254376c8c1453b2"
+              },
+              {
+                "block_index": 16,
+                "execute_ms": 186.5737,
+                "load_ms": 0,
+                "txt_hash": "bc297f9966ef4d76",
+                "unload_ms": 0,
+                "variant": "real_seedvr2_block16_c2560_h20_hd128",
+                "vid_hash": "b6ab0aa9869be03a"
+              },
+              {
+                "block_index": 17,
+                "execute_ms": 199.1378,
+                "load_ms": 0,
+                "txt_hash": "00384bc7280064db",
+                "unload_ms": 0,
+                "variant": "real_seedvr2_block17_c2560_h20_hd128",
+                "vid_hash": "0481d0c2d6ed30af"
+              },
+              {
+                "block_index": 18,
+                "execute_ms": 194.6057,
+                "load_ms": 0,
+                "txt_hash": "2223705b2a74a4e7",
+                "unload_ms": 0,
+                "variant": "real_seedvr2_block18_c2560_h20_hd128",
+                "vid_hash": "e2f393b32e97b902"
+              }
+            ],
+            "silent_fallback": false,
+            "streaming_mode_validated": true,
+            "total_execute_ms": 781,
+            "total_load_ms": 512,
+            "total_unload_ms": 53,
+            "total_wall_ms": 1522.6639
+          }
+        }
+      },
+      "resident": {
+        "rep0": {
+          "rc": 0,
+          "report": {
+            "android_vulkan": false,
+            "block_indices": [
+              15,
+              16,
+              17,
+              18
+            ],
+            "events": [
+              {
+                "block_index": 15,
+                "cache_size_after": 12,
+                "cache_size_before": 0,
+                "duration_ms": 134.1803,
+                "resident_bytes_after": 317205528,
+                "stage": "LOAD",
+                "t_ms": 134.1989,
+                "variant": "real_seedvr2_block15_c2560_h20_hd128"
+              },
+              {
+                "block_index": 16,
+                "cache_size_after": 12,
+                "cache_size_before": 0,
+                "duration_ms": 148.8055,
+                "resident_bytes_after": 317205528,
+                "stage": "LOAD",
+                "t_ms": 283.015,
+                "variant": "real_seedvr2_block16_c2560_h20_hd128"
+              },
+              {
+                "block_index": 17,
+                "cache_size_after": 12,
+                "cache_size_before": 0,
+                "duration_ms": 169.0409,
+                "resident_bytes_after": 317205528,
+                "stage": "LOAD",
+                "t_ms": 452.0799,
+                "variant": "real_seedvr2_block17_c2560_h20_hd128"
+              },
+              {
+                "block_index": 18,
+                "cache_size_after": 12,
+                "cache_size_before": 0,
+                "duration_ms": 168.845,
+                "resident_bytes_after": 317205528,
+                "stage": "LOAD",
+                "t_ms": 620.9452,
+                "variant": "real_seedvr2_block18_c2560_h20_hd128"
+              },
+              {
+                "block_index": 15,
+                "cache_size_after": 12,
+                "cache_size_before": 12,
+                "duration_ms": 201.6054,
+                "stage": "EXECUTE",
+                "t_ms": 825.5901,
+                "total_packed": 244,
+                "txt_hash": "5ed82a9ce22d6797",
+                "variant": "real_seedvr2_block15_c2560_h20_hd128",
+                "vid_hash": "f254376c8c1453b2"
+              },
+              {
+                "block_index": 16,
+                "cache_size_after": 12,
+                "cache_size_before": 12,
+                "duration_ms": 196.1005,
+                "stage": "EXECUTE",
+                "t_ms": 1033.6223,
+                "total_packed": 244,
+                "txt_hash": "bc297f9966ef4d76",
+                "variant": "real_seedvr2_block16_c2560_h20_hd128",
+                "vid_hash": "b6ab0aa9869be03a"
+              },
+              {
+                "block_index": 17,
+                "cache_size_after": 12,
+                "cache_size_before": 12,
+                "duration_ms": 215.317,
+                "stage": "EXECUTE",
+                "t_ms": 1263.4825,
+                "total_packed": 244,
+                "txt_hash": "00384bc7280064db",
+                "variant": "real_seedvr2_block17_c2560_h20_hd128",
+                "vid_hash": "0481d0c2d6ed30af"
+              },
+              {
+                "block_index": 18,
+                "cache_size_after": 12,
+                "cache_size_before": 12,
+                "duration_ms": 246.4041,
+                "stage": "EXECUTE",
+                "t_ms": 1523.1025,
+                "total_packed": 244,
+                "txt_hash": "2223705b2a74a4e7",
+                "variant": "real_seedvr2_block18_c2560_h20_hd128",
+                "vid_hash": "e2f393b32e97b902"
+              },
+              {
+                "block_index": 15,
+                "cache_size_after": 0,
+                "cache_size_before": 12,
+                "duration_ms": 15.4547,
+                "stage": "UNLOAD",
+                "t_ms": 1550.024
+              },
+              {
+                "block_index": 16,
+                "cache_size_after": 0,
+                "cache_size_before": 12,
+                "duration_ms": 18.4981,
+                "stage": "UNLOAD",
+                "t_ms": 1568.5337
+              },
+              {
+                "block_index": 17,
+                "cache_size_after": 0,
+                "cache_size_before": 12,
+                "duration_ms": 22.5773,
+                "stage": "UNLOAD",
+                "t_ms": 1591.1582
+              },
+              {
+                "block_index": 18,
+                "cache_size_after": 0,
+                "cache_size_before": 12,
+                "duration_ms": 24.3017,
+                "stage": "UNLOAD",
+                "t_ms": 1615.4717
+              }
+            ],
+            "full_32_block_ncnn": false,
+            "full_pipeline_pytorch": true,
+            "max_resident_weighted_blocks": 4,
+            "mode": "resident",
+            "ncnn_adapter_call_count": 4,
+            "order_ok": true,
+            "original_block_call_count": 0,
+            "per_block": [
+              {
+                "block_index": 15,
+                "execute_ms": 201.6054,
+                "load_ms": 0,
+                "txt_hash": "5ed82a9ce22d6797",
+                "unload_ms": 0,
+                "variant": "real_seedvr2_block15_c2560_h20_hd128",
+                "vid_hash": "f254376c8c1453b2"
+              },
+              {
+                "block_index": 16,
+                "execute_ms": 196.1005,
+                "load_ms": 0,
+                "txt_hash": "bc297f9966ef4d76",
+                "unload_ms": 0,
+                "variant": "real_seedvr2_block16_c2560_h20_hd128",
+                "vid_hash": "b6ab0aa9869be03a"
+              },
+              {
+                "block_index": 17,
+                "execute_ms": 215.317,
+                "load_ms": 0,
+                "txt_hash": "00384bc7280064db",
+                "unload_ms": 0,
+                "variant": "real_seedvr2_block17_c2560_h20_hd128",
+                "vid_hash": "0481d0c2d6ed30af"
+              },
+              {
+                "block_index": 18,
+                "execute_ms": 246.4041,
+                "load_ms": 0,
+                "txt_hash": "2223705b2a74a4e7",
+                "unload_ms": 0,
+                "variant": "real_seedvr2_block18_c2560_h20_hd128",
+                "vid_hash": "e2f393b32e97b902"
+              }
+            ],
+            "silent_fallback": false,
+            "streaming_mode_validated": false,
+            "total_execute_ms": 858,
+            "total_load_ms": 619,
+            "total_unload_ms": 79,
+            "total_wall_ms": 1615.5635
+          }
+        },
+        "rep1": {
+          "rc": 0,
+          "report": {
+            "android_vulkan": false,
+            "block_indices": [
+              15,
+              16,
+              17,
+              18
+            ],
+            "events": [
+              {
+                "block_index": 15,
+                "cache_size_after": 12,
+                "cache_size_before": 0,
+                "duration_ms": 133.6347,
+                "resident_bytes_after": 317205528,
+                "stage": "LOAD",
+                "t_ms": 133.6465,
+                "variant": "real_seedvr2_block15_c2560_h20_hd128"
+              },
+              {
+                "block_index": 16,
+                "cache_size_after": 12,
+                "cache_size_before": 0,
+                "duration_ms": 143.9485,
+                "resident_bytes_after": 317205528,
+                "stage": "LOAD",
+                "t_ms": 277.6076,
+                "variant": "real_seedvr2_block16_c2560_h20_hd128"
+              },
+              {
+                "block_index": 17,
+                "cache_size_after": 12,
+                "cache_size_before": 0,
+                "duration_ms": 135.1285,
+                "resident_bytes_after": 317205528,
+                "stage": "LOAD",
+                "t_ms": 412.7629,
+                "variant": "real_seedvr2_block17_c2560_h20_hd128"
+              },
+              {
+                "block_index": 18,
+                "cache_size_after": 12,
+                "cache_size_before": 0,
+                "duration_ms": 125.4819,
+                "resident_bytes_after": 317205528,
+                "stage": "LOAD",
+                "t_ms": 538.2633,
+                "variant": "real_seedvr2_block18_c2560_h20_hd128"
+              },
+              {
+                "block_index": 15,
+                "cache_size_after": 12,
+                "cache_size_before": 12,
+                "duration_ms": 193.5919,
+                "stage": "EXECUTE",
+                "t_ms": 734.3813,
+                "total_packed": 244,
+                "txt_hash": "5ed82a9ce22d6797",
+                "variant": "real_seedvr2_block15_c2560_h20_hd128",
+                "vid_hash": "f254376c8c1453b2"
+              },
+              {
+                "block_index": 16,
+                "cache_size_after": 12,
+                "cache_size_before": 12,
+                "duration_ms": 181.8211,
+                "stage": "EXECUTE",
+                "t_ms": 926.1825,
+                "total_packed": 244,
+                "txt_hash": "bc297f9966ef4d76",
+                "variant": "real_seedvr2_block16_c2560_h20_hd128",
+                "vid_hash": "b6ab0aa9869be03a"
+              },
+              {
+                "block_index": 17,
+                "cache_size_after": 12,
+                "cache_size_before": 12,
+                "duration_ms": 190.144,
+                "stage": "EXECUTE",
+                "t_ms": 1126.6691,
+                "total_packed": 244,
+                "txt_hash": "00384bc7280064db",
+                "variant": "real_seedvr2_block17_c2560_h20_hd128",
+                "vid_hash": "0481d0c2d6ed30af"
+              },
+              {
+                "block_index": 18,
+                "cache_size_after": 12,
+                "cache_size_before": 12,
+                "duration_ms": 192.6989,
+                "stage": "EXECUTE",
+                "t_ms": 1330.2153,
+                "total_packed": 244,
+                "txt_hash": "2223705b2a74a4e7",
+                "variant": "real_seedvr2_block18_c2560_h20_hd128",
+                "vid_hash": "e2f393b32e97b902"
+              },
+              {
+                "block_index": 15,
+                "cache_size_after": 0,
+                "cache_size_before": 12,
+                "duration_ms": 13.3712,
+                "stage": "UNLOAD",
+                "t_ms": 1353.6136
+              },
+              {
+                "block_index": 16,
+                "cache_size_after": 0,
+                "cache_size_before": 12,
+                "duration_ms": 12.6964,
+                "stage": "UNLOAD",
+                "t_ms": 1366.3239
+              },
+              {
+                "block_index": 17,
+                "cache_size_after": 0,
+                "cache_size_before": 12,
+                "duration_ms": 13.3941,
+                "stage": "UNLOAD",
+                "t_ms": 1379.7788
+              },
+              {
+                "block_index": 18,
+                "cache_size_after": 0,
+                "cache_size_before": 12,
+                "duration_ms": 14.8774,
+                "stage": "UNLOAD",
+                "t_ms": 1394.6673
+              }
+            ],
+            "full_32_block_ncnn": false,
+            "full_pipeline_pytorch": true,
+            "max_resident_weighted_blocks": 4,
+            "mode": "resident",
+            "ncnn_adapter_call_count": 4,
+            "order_ok": true,
+            "original_block_call_count": 0,
+            "per_block": [
+              {
+                "block_index": 15,
+                "execute_ms": 193.5919,
+                "load_ms": 0,
+                "txt_hash": "5ed82a9ce22d6797",
+                "unload_ms": 0,
+                "variant": "real_seedvr2_block15_c2560_h20_hd128",
+                "vid_hash": "f254376c8c1453b2"
+              },
+              {
+                "block_index": 16,
+                "execute_ms": 181.8211,
+                "load_ms": 0,
+                "txt_hash": "bc297f9966ef4d76",
+                "unload_ms": 0,
+                "variant": "real_seedvr2_block16_c2560_h20_hd128",
+                "vid_hash": "b6ab0aa9869be03a"
+              },
+              {
+                "block_index": 17,
+                "execute_ms": 190.144,
+                "load_ms": 0,
+                "txt_hash": "00384bc7280064db",
+                "unload_ms": 0,
+                "variant": "real_seedvr2_block17_c2560_h20_hd128",
+                "vid_hash": "0481d0c2d6ed30af"
+              },
+              {
+                "block_index": 18,
+                "execute_ms": 192.6989,
+                "load_ms": 0,
+                "txt_hash": "2223705b2a74a4e7",
+                "unload_ms": 0,
+                "variant": "real_seedvr2_block18_c2560_h20_hd128",
+                "vid_hash": "e2f393b32e97b902"
+              }
+            ],
+            "silent_fallback": false,
+            "streaming_mode_validated": false,
+            "total_execute_ms": 756,
+            "total_load_ms": 536,
+            "total_unload_ms": 52,
+            "total_wall_ms": 1394.7448
+          }
+        },
+        "rep2": {
+          "rc": 0,
+          "report": {
+            "android_vulkan": false,
+            "block_indices": [
+              15,
+              16,
+              17,
+              18
+            ],
+            "events": [
+              {
+                "block_index": 15,
+                "cache_size_after": 12,
+                "cache_size_before": 0,
+                "duration_ms": 127.141,
+                "resident_bytes_after": 317205528,
+                "stage": "LOAD",
+                "t_ms": 127.1535,
+                "variant": "real_seedvr2_block15_c2560_h20_hd128"
+              },
+              {
+                "block_index": 16,
+                "cache_size_after": 12,
+                "cache_size_before": 0,
+                "duration_ms": 127.3307,
+                "resident_bytes_after": 317205528,
+                "stage": "LOAD",
+                "t_ms": 254.5007,
+                "variant": "real_seedvr2_block16_c2560_h20_hd128"
+              },
+              {
+                "block_index": 17,
+                "cache_size_after": 12,
+                "cache_size_before": 0,
+                "duration_ms": 128.7581,
+                "resident_bytes_after": 317205528,
+                "stage": "LOAD",
+                "t_ms": 383.2758,
+                "variant": "real_seedvr2_block17_c2560_h20_hd128"
+              },
+              {
+                "block_index": 18,
+                "cache_size_after": 12,
+                "cache_size_before": 0,
+                "duration_ms": 133.9118,
+                "resident_bytes_after": 317205528,
+                "stage": "LOAD",
+                "t_ms": 517.2063,
+                "variant": "real_seedvr2_block18_c2560_h20_hd128"
+              },
+              {
+                "block_index": 15,
+                "cache_size_after": 12,
+                "cache_size_before": 12,
+                "duration_ms": 202.7638,
+                "stage": "EXECUTE",
+                "t_ms": 723.0516,
+                "total_packed": 244,
+                "txt_hash": "5ed82a9ce22d6797",
+                "variant": "real_seedvr2_block15_c2560_h20_hd128",
+                "vid_hash": "f254376c8c1453b2"
+              },
+              {
+                "block_index": 16,
+                "cache_size_after": 12,
+                "cache_size_before": 12,
+                "duration_ms": 187.5427,
+                "stage": "EXECUTE",
+                "t_ms": 921.3472,
+                "total_packed": 244,
+                "txt_hash": "bc297f9966ef4d76",
+                "variant": "real_seedvr2_block16_c2560_h20_hd128",
+                "vid_hash": "b6ab0aa9869be03a"
+              },
+              {
+                "block_index": 17,
+                "cache_size_after": 12,
+                "cache_size_before": 12,
+                "duration_ms": 187.2602,
+                "stage": "EXECUTE",
+                "t_ms": 1118.4922,
+                "total_packed": 244,
+                "txt_hash": "00384bc7280064db",
+                "variant": "real_seedvr2_block17_c2560_h20_hd128",
+                "vid_hash": "0481d0c2d6ed30af"
+              },
+              {
+                "block_index": 18,
+                "cache_size_after": 12,
+                "cache_size_before": 12,
+                "duration_ms": 187.555,
+                "stage": "EXECUTE",
+                "t_ms": 1316.9291,
+                "total_packed": 244,
+                "txt_hash": "2223705b2a74a4e7",
+                "variant": "real_seedvr2_block18_c2560_h20_hd128",
+                "vid_hash": "e2f393b32e97b902"
+              },
+              {
+                "block_index": 15,
+                "cache_size_after": 0,
+                "cache_size_before": 12,
+                "duration_ms": 10.3178,
+                "stage": "UNLOAD",
+                "t_ms": 1337.4972
+              },
+              {
+                "block_index": 16,
+                "cache_size_after": 0,
+                "cache_size_before": 12,
+                "duration_ms": 10.169,
+                "stage": "UNLOAD",
+                "t_ms": 1347.6771
+              },
+              {
+                "block_index": 17,
+                "cache_size_after": 0,
+                "cache_size_before": 12,
+                "duration_ms": 14.5988,
+                "stage": "UNLOAD",
+                "t_ms": 1362.3146
+              },
+              {
+                "block_index": 18,
+                "cache_size_after": 0,
+                "cache_size_before": 12,
+                "duration_ms": 17.3062,
+                "stage": "UNLOAD",
+                "t_ms": 1379.6429
+              }
+            ],
+            "full_32_block_ncnn": false,
+            "full_pipeline_pytorch": true,
+            "max_resident_weighted_blocks": 4,
+            "mode": "resident",
+            "ncnn_adapter_call_count": 4,
+            "order_ok": true,
+            "original_block_call_count": 0,
+            "per_block": [
+              {
+                "block_index": 15,
+                "execute_ms": 202.7638,
+                "load_ms": 0,
+                "txt_hash": "5ed82a9ce22d6797",
+                "unload_ms": 0,
+                "variant": "real_seedvr2_block15_c2560_h20_hd128",
+                "vid_hash": "f254376c8c1453b2"
+              },
+              {
+                "block_index": 16,
+                "execute_ms": 187.5427,
+                "load_ms": 0,
+                "txt_hash": "bc297f9966ef4d76",
+                "unload_ms": 0,
+                "variant": "real_seedvr2_block16_c2560_h20_hd128",
+                "vid_hash": "b6ab0aa9869be03a"
+              },
+              {
+                "block_index": 17,
+                "execute_ms": 187.2602,
+                "load_ms": 0,
+                "txt_hash": "00384bc7280064db",
+                "unload_ms": 0,
+                "variant": "real_seedvr2_block17_c2560_h20_hd128",
+                "vid_hash": "0481d0c2d6ed30af"
+              },
+              {
+                "block_index": 18,
+                "execute_ms": 187.555,
+                "load_ms": 0,
+                "txt_hash": "2223705b2a74a4e7",
+                "unload_ms": 0,
+                "variant": "real_seedvr2_block18_c2560_h20_hd128",
+                "vid_hash": "e2f393b32e97b902"
+              }
+            ],
+            "silent_fallback": false,
+            "streaming_mode_validated": false,
+            "total_execute_ms": 763,
+            "total_load_ms": 515,
+            "total_unload_ms": 51,
+            "total_wall_ms": 1380.0965
+          }
+        }
+      },
+      "final_error": [
+        {
+          "max_abs_error": 0.1038055419921875,
+          "mean_abs_error": 0.0011406134581193328,
+          "rmse": 0.0017285719513893127,
+          "relative_max_error": 3.7770950577443492e-06,
+          "nan_count": 0,
+          "inf_count": 0
+        },
+        {
+          "max_abs_error": 0.1038055419921875,
+          "mean_abs_error": 0.0011406134581193328,
+          "rmse": 0.0017285719513893127,
+          "relative_max_error": 3.7770950577443492e-06,
+          "nan_count": 0,
+          "inf_count": 0
+        },
+        {
+          "max_abs_error": 0.1038055419921875,
+          "mean_abs_error": 0.0011406134581193328,
+          "rmse": 0.0017285719513893127,
+          "relative_max_error": 3.7770950577443492e-06,
+          "nan_count": 0,
+          "inf_count": 0
+        }
+      ],
+      "per_block_error": {
+        "0": [
+          {
+            "block_index": 15,
+            "max_abs_error": 0.0595703125,
+            "mean_abs_error": 0.0007080743671394885,
+            "rmse": 0.001080059097148478,
+            "relative_max_error": 2.1664659903551774e-06,
+            "nan_count": 0,
+            "inf_count": 0
+          },
+          {
+            "block_index": 16,
+            "max_abs_error": 0.0520782470703125,
+            "mean_abs_error": 0.0007451035198755562,
+            "rmse": 0.001090276869945228,
+            "relative_max_error": 1.8942278613525639e-06,
+            "nan_count": 0,
+            "inf_count": 0
+          },
+          {
+            "block_index": 17,
+            "max_abs_error": 0.1051483154296875,
+            "mean_abs_error": 0.0009702385286800563,
+            "rmse": 0.0014894678024575114,
+            "relative_max_error": 3.824599979809931e-06,
+            "nan_count": 0,
+            "inf_count": 0
+          },
+          {
+            "block_index": 18,
+            "max_abs_error": 0.1038055419921875,
+            "mean_abs_error": 0.0011406134581193328,
+            "rmse": 0.0017285719513893127,
+            "relative_max_error": 3.7770950577443492e-06,
+            "nan_count": 0,
+            "inf_count": 0
+          }
+        ],
+        "1": [
+          {
+            "block_index": 15,
+            "max_abs_error": 0.0595703125,
+            "mean_abs_error": 0.0007080743671394885,
+            "rmse": 0.001080059097148478,
+            "relative_max_error": 2.1664659903551774e-06,
+            "nan_count": 0,
+            "inf_count": 0
+          },
+          {
+            "block_index": 16,
+            "max_abs_error": 0.0520782470703125,
+            "mean_abs_error": 0.0007451035198755562,
+            "rmse": 0.001090276869945228,
+            "relative_max_error": 1.8942278613525639e-06,
+            "nan_count": 0,
+            "inf_count": 0
+          },
+          {
+            "block_index": 17,
+            "max_abs_error": 0.1051483154296875,
+            "mean_abs_error": 0.0009702385286800563,
+            "rmse": 0.0014894678024575114,
+            "relative_max_error": 3.824599979809931e-06,
+            "nan_count": 0,
+            "inf_count": 0
+          },
+          {
+            "block_index": 18,
+            "max_abs_error": 0.1038055419921875,
+            "mean_abs_error": 0.0011406134581193328,
+            "rmse": 0.0017285719513893127,
+            "relative_max_error": 3.7770950577443492e-06,
+            "nan_count": 0,
+            "inf_count": 0
+          }
+        ],
+        "2": [
+          {
+            "block_index": 15,
+            "max_abs_error": 0.0595703125,
+            "mean_abs_error": 0.0007080743671394885,
+            "rmse": 0.001080059097148478,
+            "relative_max_error": 2.1664659903551774e-06,
+            "nan_count": 0,
+            "inf_count": 0
+          },
+          {
+            "block_index": 16,
+            "max_abs_error": 0.0520782470703125,
+            "mean_abs_error": 0.0007451035198755562,
+            "rmse": 0.001090276869945228,
+            "relative_max_error": 1.8942278613525639e-06,
+            "nan_count": 0,
+            "inf_count": 0
+          },
+          {
+            "block_index": 17,
+            "max_abs_error": 0.1051483154296875,
+            "mean_abs_error": 0.0009702385286800563,
+            "rmse": 0.0014894678024575114,
+            "relative_max_error": 3.824599979809931e-06,
+            "nan_count": 0,
+            "inf_count": 0
+          },
+          {
+            "block_index": 18,
+            "max_abs_error": 0.1038055419921875,
+            "mean_abs_error": 0.0011406134581193328,
+            "rmse": 0.0017285719513893127,
+            "relative_max_error": 3.7770950577443492e-06,
+            "nan_count": 0,
+            "inf_count": 0
+          }
+        ]
+      },
+      "rel_limit": 0.005,
+      "pass": true
+    }
+  },
+  "overall_pass": true,
+  "overall_status": "PASS"
+}

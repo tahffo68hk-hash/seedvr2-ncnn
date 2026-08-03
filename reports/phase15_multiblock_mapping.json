@@ -1,0 +1,1309 @@
+{
+  "phase": 15,
+  "checkpoint_sha256": "6bcc5ac59447e97b100477480aebb01be2ec724c8340bb83faae21f64848604b",
+  "real_seedvr2_weights": true,
+  "shared_weights": true,
+  "block_indices": [
+    15,
+    16,
+    17,
+    18
+  ],
+  "per_block": {
+    "15": {
+      "block_index": 15,
+      "prefix": "blocks.15.",
+      "key_count": 15,
+      "source_numel": 79316757,
+      "mapped_key_count": 15,
+      "mapped_numel": 79316757,
+      "expected_keys_equals_consumed_keys": true,
+      "unmapped_keys": [],
+      "duplicate_keys": [],
+      "shape_mismatches": [],
+      "qkv_split_concat_bit_exact": true,
+      "qkv_slice_rows": {
+        "q": [
+          0,
+          2560
+        ],
+        "k": [
+          2560,
+          5120
+        ],
+        "v": [
+          5120,
+          7680
+        ]
+      },
+      "swiglu_mapping_ok": true,
+      "ada_single_runtime_only": true,
+      "qk_rmsnorm_affine": {
+        "norm_q.all.weight": {
+          "min": 0.01654120907187462,
+          "max": 1.750303864479065,
+          "mean": 1.3898907899856567,
+          "std": 0.21367403864860535,
+          "all_ones": false,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "71edb638cafe4bff762ec35084f3c3430a85434bae04ea4a87560e8e9b23631e"
+        },
+        "norm_k.all.weight": {
+          "min": 0.012740752659738064,
+          "max": 1.8614871501922607,
+          "mean": 1.392351746559143,
+          "std": 0.2192743867635727,
+          "all_ones": false,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "097f5686cfbcf1bff8a5aae134a72b267cea1654bee455e9cee35bcea032aeeb"
+        }
+      },
+      "qk_affine_all_ones": {
+        "norm_q.all.weight": false,
+        "norm_k.all.weight": false
+      },
+      "real_affine_required": true,
+      "entries": [
+        {
+          "state_dict_key": "blocks.15.attn.norm_q.all.weight",
+          "source_module": "attn.norm_q",
+          "shared_branch": "all",
+          "semantic_role": "qk_norm_affine_weight",
+          "branch": "shared_vid_txt",
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "dtype": "torch.float32",
+          "conversion": "pnnx_managed",
+          "target_artifacts": [
+            "models/q_norm/model.ncnn.bin",
+            "models/q_norm/model.ncnn.param"
+          ]
+        },
+        {
+          "state_dict_key": "blocks.15.attn.norm_k.all.weight",
+          "source_module": "attn.norm_k",
+          "shared_branch": "all",
+          "semantic_role": "qk_norm_affine_weight",
+          "branch": "shared_vid_txt",
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "dtype": "torch.float32",
+          "conversion": "pnnx_managed",
+          "target_artifacts": [
+            "models/k_norm/model.ncnn.bin",
+            "models/k_norm/model.ncnn.param"
+          ]
+        },
+        {
+          "state_dict_key": "blocks.15.attn.proj_qkv.all.weight",
+          "source_module": "attn.proj_qkv",
+          "shared_branch": "all",
+          "semantic_role": "linear_weight_or_bias",
+          "branch": "shared_vid_txt",
+          "shape": [
+            7680,
+            2560
+          ],
+          "numel": 19660800,
+          "dtype": "torch.float32",
+          "conversion": "pnnx_managed",
+          "target_artifacts": [
+            "models/qkv/model.ncnn.bin",
+            "models/qkv/model.ncnn.param"
+          ]
+        },
+        {
+          "state_dict_key": "blocks.15.attn.proj_out.all.weight",
+          "source_module": "attn.proj_out",
+          "shared_branch": "all",
+          "semantic_role": "linear_weight_or_bias",
+          "branch": "shared_vid_txt",
+          "shape": [
+            2560,
+            2560
+          ],
+          "numel": 6553600,
+          "dtype": "torch.float32",
+          "conversion": "pnnx_managed",
+          "target_artifacts": [
+            "models/attn_proj/model.ncnn.bin",
+            "models/attn_proj/model.ncnn.param"
+          ]
+        },
+        {
+          "state_dict_key": "blocks.15.attn.proj_out.all.bias",
+          "source_module": "attn.proj_out",
+          "shared_branch": "all",
+          "semantic_role": "linear_weight_or_bias",
+          "branch": "shared_vid_txt",
+          "shape": [
+            2560
+          ],
+          "numel": 2560,
+          "dtype": "torch.float32",
+          "conversion": "pnnx_managed",
+          "target_artifacts": [
+            "models/attn_proj/model.ncnn.bin",
+            "models/attn_proj/model.ncnn.param"
+          ]
+        },
+        {
+          "state_dict_key": "blocks.15.mlp.all.proj_in.weight",
+          "source_module": "mlp.all",
+          "shared_branch": "all",
+          "semantic_role": "linear_weight_or_bias",
+          "branch": "shared_vid_txt",
+          "shape": [
+            6912,
+            2560
+          ],
+          "numel": 17694720,
+          "dtype": "torch.float32",
+          "conversion": "pnnx_managed",
+          "target_artifacts": [
+            "models/swiglu_up/model.ncnn.bin",
+            "models/swiglu_up/model.ncnn.param"
+          ]
+        },
+        {
+          "state_dict_key": "blocks.15.mlp.all.proj_in_gate.weight",
+          "source_module": "mlp.all",
+          "shared_branch": "all",
+          "semantic_role": "linear_weight_or_bias",
+          "branch": "shared_vid_txt",
+          "shape": [
+            6912,
+            2560
+          ],
+          "numel": 17694720,
+          "dtype": "torch.float32",
+          "conversion": "pnnx_managed",
+          "target_artifacts": [
+            "models/swiglu_gate/model.ncnn.bin",
+            "models/swiglu_gate/model.ncnn.param"
+          ]
+        },
+        {
+          "state_dict_key": "blocks.15.mlp.all.proj_out.weight",
+          "source_module": "mlp.all",
+          "shared_branch": "all",
+          "semantic_role": "linear_weight_or_bias",
+          "branch": "shared_vid_txt",
+          "shape": [
+            2560,
+            6912
+          ],
+          "numel": 17694720,
+          "dtype": "torch.float32",
+          "conversion": "pnnx_managed",
+          "target_artifacts": [
+            "models/swiglu_out/model.ncnn.bin",
+            "models/swiglu_out/model.ncnn.param"
+          ]
+        },
+        {
+          "state_dict_key": "blocks.15.ada.all.attn_shift",
+          "source_module": "ada",
+          "shared_branch": "all",
+          "semantic_role": "ada_single_parameter",
+          "branch": "shared_vid_txt",
+          "shape": [
+            2560
+          ],
+          "numel": 2560,
+          "dtype": "torch.float32",
+          "conversion": "runtime_only",
+          "target_artifacts": [
+            "params/ada_vid_attn_shift.bin",
+            "params/ada_txt_attn_shift.bin"
+          ]
+        },
+        {
+          "state_dict_key": "blocks.15.ada.all.attn_scale",
+          "source_module": "ada",
+          "shared_branch": "all",
+          "semantic_role": "ada_single_parameter",
+          "branch": "shared_vid_txt",
+          "shape": [
+            2560
+          ],
+          "numel": 2560,
+          "dtype": "torch.float32",
+          "conversion": "runtime_only",
+          "target_artifacts": [
+            "params/ada_vid_attn_scale.bin",
+            "params/ada_txt_attn_scale.bin"
+          ]
+        },
+        {
+          "state_dict_key": "blocks.15.ada.all.attn_gate",
+          "source_module": "ada",
+          "shared_branch": "all",
+          "semantic_role": "ada_single_parameter",
+          "branch": "shared_vid_txt",
+          "shape": [
+            2560
+          ],
+          "numel": 2560,
+          "dtype": "torch.float32",
+          "conversion": "runtime_only",
+          "target_artifacts": [
+            "params/ada_vid_attn_gate.bin",
+            "params/ada_txt_attn_gate.bin"
+          ]
+        },
+        {
+          "state_dict_key": "blocks.15.ada.all.mlp_shift",
+          "source_module": "ada",
+          "shared_branch": "all",
+          "semantic_role": "ada_single_parameter",
+          "branch": "shared_vid_txt",
+          "shape": [
+            2560
+          ],
+          "numel": 2560,
+          "dtype": "torch.float32",
+          "conversion": "runtime_only",
+          "target_artifacts": [
+            "params/ada_vid_mlp_shift.bin",
+            "params/ada_txt_mlp_shift.bin"
+          ]
+        },
+        {
+          "state_dict_key": "blocks.15.ada.all.mlp_scale",
+          "source_module": "ada",
+          "shared_branch": "all",
+          "semantic_role": "ada_single_parameter",
+          "branch": "shared_vid_txt",
+          "shape": [
+            2560
+          ],
+          "numel": 2560,
+          "dtype": "torch.float32",
+          "conversion": "runtime_only",
+          "target_artifacts": [
+            "params/ada_vid_mlp_scale.bin",
+            "params/ada_txt_mlp_scale.bin"
+          ]
+        },
+        {
+          "state_dict_key": "blocks.15.ada.all.mlp_gate",
+          "source_module": "ada",
+          "shared_branch": "all",
+          "semantic_role": "ada_single_parameter",
+          "branch": "shared_vid_txt",
+          "shape": [
+            2560
+          ],
+          "numel": 2560,
+          "dtype": "torch.float32",
+          "conversion": "runtime_only",
+          "target_artifacts": [
+            "params/ada_vid_mlp_gate.bin",
+            "params/ada_txt_mlp_gate.bin"
+          ]
+        },
+        {
+          "state_dict_key": "blocks.15.attn.rope.rope.freqs",
+          "source_module": "attn.rope",
+          "shared_branch": "all",
+          "semantic_role": "rope_freqs_base_buffer",
+          "branch": "shared_vid_txt",
+          "shape": [
+            21
+          ],
+          "numel": 21,
+          "dtype": "torch.float32",
+          "conversion": "runtime_only",
+          "target_artifacts": [
+            "host-generated MM-RoPE3D tables"
+          ]
+        }
+      ]
+    },
+    "16": {
+      "block_index": 16,
+      "prefix": "blocks.16.",
+      "key_count": 15,
+      "source_numel": 79316757,
+      "mapped_key_count": 15,
+      "mapped_numel": 79316757,
+      "expected_keys_equals_consumed_keys": true,
+      "unmapped_keys": [],
+      "duplicate_keys": [],
+      "shape_mismatches": [],
+      "qkv_split_concat_bit_exact": true,
+      "qkv_slice_rows": {
+        "q": [
+          0,
+          2560
+        ],
+        "k": [
+          2560,
+          5120
+        ],
+        "v": [
+          5120,
+          7680
+        ]
+      },
+      "swiglu_mapping_ok": true,
+      "ada_single_runtime_only": true,
+      "qk_rmsnorm_affine": {
+        "norm_q.all.weight": {
+          "min": 0.7623492479324341,
+          "max": 1.6977627277374268,
+          "mean": 1.4038362503051758,
+          "std": 0.19021059572696686,
+          "all_ones": false,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "99c5742e5e2659a5a3ce0ad1b0ff4b38b6088de90ca88951f7987d2aae37fe66"
+        },
+        "norm_k.all.weight": {
+          "min": 0.7658812999725342,
+          "max": 1.7889069318771362,
+          "mean": 1.4272979497909546,
+          "std": 0.18802060186862946,
+          "all_ones": false,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "02cae8eb344193c497a8ac461e2b5803767de0b9f18cd77bcfc761822f624567"
+        }
+      },
+      "qk_affine_all_ones": {
+        "norm_q.all.weight": false,
+        "norm_k.all.weight": false
+      },
+      "real_affine_required": true,
+      "entries": [
+        {
+          "state_dict_key": "blocks.16.attn.norm_q.all.weight",
+          "source_module": "attn.norm_q",
+          "shared_branch": "all",
+          "semantic_role": "qk_norm_affine_weight",
+          "branch": "shared_vid_txt",
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "dtype": "torch.float32",
+          "conversion": "pnnx_managed",
+          "target_artifacts": [
+            "models/q_norm/model.ncnn.bin",
+            "models/q_norm/model.ncnn.param"
+          ]
+        },
+        {
+          "state_dict_key": "blocks.16.attn.norm_k.all.weight",
+          "source_module": "attn.norm_k",
+          "shared_branch": "all",
+          "semantic_role": "qk_norm_affine_weight",
+          "branch": "shared_vid_txt",
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "dtype": "torch.float32",
+          "conversion": "pnnx_managed",
+          "target_artifacts": [
+            "models/k_norm/model.ncnn.bin",
+            "models/k_norm/model.ncnn.param"
+          ]
+        },
+        {
+          "state_dict_key": "blocks.16.attn.proj_qkv.all.weight",
+          "source_module": "attn.proj_qkv",
+          "shared_branch": "all",
+          "semantic_role": "linear_weight_or_bias",
+          "branch": "shared_vid_txt",
+          "shape": [
+            7680,
+            2560
+          ],
+          "numel": 19660800,
+          "dtype": "torch.float32",
+          "conversion": "pnnx_managed",
+          "target_artifacts": [
+            "models/qkv/model.ncnn.bin",
+            "models/qkv/model.ncnn.param"
+          ]
+        },
+        {
+          "state_dict_key": "blocks.16.attn.proj_out.all.weight",
+          "source_module": "attn.proj_out",
+          "shared_branch": "all",
+          "semantic_role": "linear_weight_or_bias",
+          "branch": "shared_vid_txt",
+          "shape": [
+            2560,
+            2560
+          ],
+          "numel": 6553600,
+          "dtype": "torch.float32",
+          "conversion": "pnnx_managed",
+          "target_artifacts": [
+            "models/attn_proj/model.ncnn.bin",
+            "models/attn_proj/model.ncnn.param"
+          ]
+        },
+        {
+          "state_dict_key": "blocks.16.attn.proj_out.all.bias",
+          "source_module": "attn.proj_out",
+          "shared_branch": "all",
+          "semantic_role": "linear_weight_or_bias",
+          "branch": "shared_vid_txt",
+          "shape": [
+            2560
+          ],
+          "numel": 2560,
+          "dtype": "torch.float32",
+          "conversion": "pnnx_managed",
+          "target_artifacts": [
+            "models/attn_proj/model.ncnn.bin",
+            "models/attn_proj/model.ncnn.param"
+          ]
+        },
+        {
+          "state_dict_key": "blocks.16.mlp.all.proj_in.weight",
+          "source_module": "mlp.all",
+          "shared_branch": "all",
+          "semantic_role": "linear_weight_or_bias",
+          "branch": "shared_vid_txt",
+          "shape": [
+            6912,
+            2560
+          ],
+          "numel": 17694720,
+          "dtype": "torch.float32",
+          "conversion": "pnnx_managed",
+          "target_artifacts": [
+            "models/swiglu_up/model.ncnn.bin",
+            "models/swiglu_up/model.ncnn.param"
+          ]
+        },
+        {
+          "state_dict_key": "blocks.16.mlp.all.proj_in_gate.weight",
+          "source_module": "mlp.all",
+          "shared_branch": "all",
+          "semantic_role": "linear_weight_or_bias",
+          "branch": "shared_vid_txt",
+          "shape": [
+            6912,
+            2560
+          ],
+          "numel": 17694720,
+          "dtype": "torch.float32",
+          "conversion": "pnnx_managed",
+          "target_artifacts": [
+            "models/swiglu_gate/model.ncnn.bin",
+            "models/swiglu_gate/model.ncnn.param"
+          ]
+        },
+        {
+          "state_dict_key": "blocks.16.mlp.all.proj_out.weight",
+          "source_module": "mlp.all",
+          "shared_branch": "all",
+          "semantic_role": "linear_weight_or_bias",
+          "branch": "shared_vid_txt",
+          "shape": [
+            2560,
+            6912
+          ],
+          "numel": 17694720,
+          "dtype": "torch.float32",
+          "conversion": "pnnx_managed",
+          "target_artifacts": [
+            "models/swiglu_out/model.ncnn.bin",
+            "models/swiglu_out/model.ncnn.param"
+          ]
+        },
+        {
+          "state_dict_key": "blocks.16.ada.all.attn_shift",
+          "source_module": "ada",
+          "shared_branch": "all",
+          "semantic_role": "ada_single_parameter",
+          "branch": "shared_vid_txt",
+          "shape": [
+            2560
+          ],
+          "numel": 2560,
+          "dtype": "torch.float32",
+          "conversion": "runtime_only",
+          "target_artifacts": [
+            "params/ada_vid_attn_shift.bin",
+            "params/ada_txt_attn_shift.bin"
+          ]
+        },
+        {
+          "state_dict_key": "blocks.16.ada.all.attn_scale",
+          "source_module": "ada",
+          "shared_branch": "all",
+          "semantic_role": "ada_single_parameter",
+          "branch": "shared_vid_txt",
+          "shape": [
+            2560
+          ],
+          "numel": 2560,
+          "dtype": "torch.float32",
+          "conversion": "runtime_only",
+          "target_artifacts": [
+            "params/ada_vid_attn_scale.bin",
+            "params/ada_txt_attn_scale.bin"
+          ]
+        },
+        {
+          "state_dict_key": "blocks.16.ada.all.attn_gate",
+          "source_module": "ada",
+          "shared_branch": "all",
+          "semantic_role": "ada_single_parameter",
+          "branch": "shared_vid_txt",
+          "shape": [
+            2560
+          ],
+          "numel": 2560,
+          "dtype": "torch.float32",
+          "conversion": "runtime_only",
+          "target_artifacts": [
+            "params/ada_vid_attn_gate.bin",
+            "params/ada_txt_attn_gate.bin"
+          ]
+        },
+        {
+          "state_dict_key": "blocks.16.ada.all.mlp_shift",
+          "source_module": "ada",
+          "shared_branch": "all",
+          "semantic_role": "ada_single_parameter",
+          "branch": "shared_vid_txt",
+          "shape": [
+            2560
+          ],
+          "numel": 2560,
+          "dtype": "torch.float32",
+          "conversion": "runtime_only",
+          "target_artifacts": [
+            "params/ada_vid_mlp_shift.bin",
+            "params/ada_txt_mlp_shift.bin"
+          ]
+        },
+        {
+          "state_dict_key": "blocks.16.ada.all.mlp_scale",
+          "source_module": "ada",
+          "shared_branch": "all",
+          "semantic_role": "ada_single_parameter",
+          "branch": "shared_vid_txt",
+          "shape": [
+            2560
+          ],
+          "numel": 2560,
+          "dtype": "torch.float32",
+          "conversion": "runtime_only",
+          "target_artifacts": [
+            "params/ada_vid_mlp_scale.bin",
+            "params/ada_txt_mlp_scale.bin"
+          ]
+        },
+        {
+          "state_dict_key": "blocks.16.ada.all.mlp_gate",
+          "source_module": "ada",
+          "shared_branch": "all",
+          "semantic_role": "ada_single_parameter",
+          "branch": "shared_vid_txt",
+          "shape": [
+            2560
+          ],
+          "numel": 2560,
+          "dtype": "torch.float32",
+          "conversion": "runtime_only",
+          "target_artifacts": [
+            "params/ada_vid_mlp_gate.bin",
+            "params/ada_txt_mlp_gate.bin"
+          ]
+        },
+        {
+          "state_dict_key": "blocks.16.attn.rope.rope.freqs",
+          "source_module": "attn.rope",
+          "shared_branch": "all",
+          "semantic_role": "rope_freqs_base_buffer",
+          "branch": "shared_vid_txt",
+          "shape": [
+            21
+          ],
+          "numel": 21,
+          "dtype": "torch.float32",
+          "conversion": "runtime_only",
+          "target_artifacts": [
+            "host-generated MM-RoPE3D tables"
+          ]
+        }
+      ]
+    },
+    "17": {
+      "block_index": 17,
+      "prefix": "blocks.17.",
+      "key_count": 15,
+      "source_numel": 79316757,
+      "mapped_key_count": 15,
+      "mapped_numel": 79316757,
+      "expected_keys_equals_consumed_keys": true,
+      "unmapped_keys": [],
+      "duplicate_keys": [],
+      "shape_mismatches": [],
+      "qkv_split_concat_bit_exact": true,
+      "qkv_slice_rows": {
+        "q": [
+          0,
+          2560
+        ],
+        "k": [
+          2560,
+          5120
+        ],
+        "v": [
+          5120,
+          7680
+        ]
+      },
+      "swiglu_mapping_ok": true,
+      "ada_single_runtime_only": true,
+      "qk_rmsnorm_affine": {
+        "norm_q.all.weight": {
+          "min": 0.5231637954711914,
+          "max": 1.7077769041061401,
+          "mean": 1.3915119171142578,
+          "std": 0.17563150823116302,
+          "all_ones": false,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "6e71aef4904a8cd75eb66af886ea6d947fb85108d68efdc230f8b79870d457de"
+        },
+        "norm_k.all.weight": {
+          "min": 0.5361014604568481,
+          "max": 1.848151445388794,
+          "mean": 1.4076814651489258,
+          "std": 0.19165034592151642,
+          "all_ones": false,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "530a2d34d282cfc3c2b1ac1c649c77f05c43765b43786912ead2cc61fea2145f"
+        }
+      },
+      "qk_affine_all_ones": {
+        "norm_q.all.weight": false,
+        "norm_k.all.weight": false
+      },
+      "real_affine_required": true,
+      "entries": [
+        {
+          "state_dict_key": "blocks.17.attn.norm_q.all.weight",
+          "source_module": "attn.norm_q",
+          "shared_branch": "all",
+          "semantic_role": "qk_norm_affine_weight",
+          "branch": "shared_vid_txt",
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "dtype": "torch.float32",
+          "conversion": "pnnx_managed",
+          "target_artifacts": [
+            "models/q_norm/model.ncnn.bin",
+            "models/q_norm/model.ncnn.param"
+          ]
+        },
+        {
+          "state_dict_key": "blocks.17.attn.norm_k.all.weight",
+          "source_module": "attn.norm_k",
+          "shared_branch": "all",
+          "semantic_role": "qk_norm_affine_weight",
+          "branch": "shared_vid_txt",
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "dtype": "torch.float32",
+          "conversion": "pnnx_managed",
+          "target_artifacts": [
+            "models/k_norm/model.ncnn.bin",
+            "models/k_norm/model.ncnn.param"
+          ]
+        },
+        {
+          "state_dict_key": "blocks.17.attn.proj_qkv.all.weight",
+          "source_module": "attn.proj_qkv",
+          "shared_branch": "all",
+          "semantic_role": "linear_weight_or_bias",
+          "branch": "shared_vid_txt",
+          "shape": [
+            7680,
+            2560
+          ],
+          "numel": 19660800,
+          "dtype": "torch.float32",
+          "conversion": "pnnx_managed",
+          "target_artifacts": [
+            "models/qkv/model.ncnn.bin",
+            "models/qkv/model.ncnn.param"
+          ]
+        },
+        {
+          "state_dict_key": "blocks.17.attn.proj_out.all.weight",
+          "source_module": "attn.proj_out",
+          "shared_branch": "all",
+          "semantic_role": "linear_weight_or_bias",
+          "branch": "shared_vid_txt",
+          "shape": [
+            2560,
+            2560
+          ],
+          "numel": 6553600,
+          "dtype": "torch.float32",
+          "conversion": "pnnx_managed",
+          "target_artifacts": [
+            "models/attn_proj/model.ncnn.bin",
+            "models/attn_proj/model.ncnn.param"
+          ]
+        },
+        {
+          "state_dict_key": "blocks.17.attn.proj_out.all.bias",
+          "source_module": "attn.proj_out",
+          "shared_branch": "all",
+          "semantic_role": "linear_weight_or_bias",
+          "branch": "shared_vid_txt",
+          "shape": [
+            2560
+          ],
+          "numel": 2560,
+          "dtype": "torch.float32",
+          "conversion": "pnnx_managed",
+          "target_artifacts": [
+            "models/attn_proj/model.ncnn.bin",
+            "models/attn_proj/model.ncnn.param"
+          ]
+        },
+        {
+          "state_dict_key": "blocks.17.mlp.all.proj_in.weight",
+          "source_module": "mlp.all",
+          "shared_branch": "all",
+          "semantic_role": "linear_weight_or_bias",
+          "branch": "shared_vid_txt",
+          "shape": [
+            6912,
+            2560
+          ],
+          "numel": 17694720,
+          "dtype": "torch.float32",
+          "conversion": "pnnx_managed",
+          "target_artifacts": [
+            "models/swiglu_up/model.ncnn.bin",
+            "models/swiglu_up/model.ncnn.param"
+          ]
+        },
+        {
+          "state_dict_key": "blocks.17.mlp.all.proj_in_gate.weight",
+          "source_module": "mlp.all",
+          "shared_branch": "all",
+          "semantic_role": "linear_weight_or_bias",
+          "branch": "shared_vid_txt",
+          "shape": [
+            6912,
+            2560
+          ],
+          "numel": 17694720,
+          "dtype": "torch.float32",
+          "conversion": "pnnx_managed",
+          "target_artifacts": [
+            "models/swiglu_gate/model.ncnn.bin",
+            "models/swiglu_gate/model.ncnn.param"
+          ]
+        },
+        {
+          "state_dict_key": "blocks.17.mlp.all.proj_out.weight",
+          "source_module": "mlp.all",
+          "shared_branch": "all",
+          "semantic_role": "linear_weight_or_bias",
+          "branch": "shared_vid_txt",
+          "shape": [
+            2560,
+            6912
+          ],
+          "numel": 17694720,
+          "dtype": "torch.float32",
+          "conversion": "pnnx_managed",
+          "target_artifacts": [
+            "models/swiglu_out/model.ncnn.bin",
+            "models/swiglu_out/model.ncnn.param"
+          ]
+        },
+        {
+          "state_dict_key": "blocks.17.ada.all.attn_shift",
+          "source_module": "ada",
+          "shared_branch": "all",
+          "semantic_role": "ada_single_parameter",
+          "branch": "shared_vid_txt",
+          "shape": [
+            2560
+          ],
+          "numel": 2560,
+          "dtype": "torch.float32",
+          "conversion": "runtime_only",
+          "target_artifacts": [
+            "params/ada_vid_attn_shift.bin",
+            "params/ada_txt_attn_shift.bin"
+          ]
+        },
+        {
+          "state_dict_key": "blocks.17.ada.all.attn_scale",
+          "source_module": "ada",
+          "shared_branch": "all",
+          "semantic_role": "ada_single_parameter",
+          "branch": "shared_vid_txt",
+          "shape": [
+            2560
+          ],
+          "numel": 2560,
+          "dtype": "torch.float32",
+          "conversion": "runtime_only",
+          "target_artifacts": [
+            "params/ada_vid_attn_scale.bin",
+            "params/ada_txt_attn_scale.bin"
+          ]
+        },
+        {
+          "state_dict_key": "blocks.17.ada.all.attn_gate",
+          "source_module": "ada",
+          "shared_branch": "all",
+          "semantic_role": "ada_single_parameter",
+          "branch": "shared_vid_txt",
+          "shape": [
+            2560
+          ],
+          "numel": 2560,
+          "dtype": "torch.float32",
+          "conversion": "runtime_only",
+          "target_artifacts": [
+            "params/ada_vid_attn_gate.bin",
+            "params/ada_txt_attn_gate.bin"
+          ]
+        },
+        {
+          "state_dict_key": "blocks.17.ada.all.mlp_shift",
+          "source_module": "ada",
+          "shared_branch": "all",
+          "semantic_role": "ada_single_parameter",
+          "branch": "shared_vid_txt",
+          "shape": [
+            2560
+          ],
+          "numel": 2560,
+          "dtype": "torch.float32",
+          "conversion": "runtime_only",
+          "target_artifacts": [
+            "params/ada_vid_mlp_shift.bin",
+            "params/ada_txt_mlp_shift.bin"
+          ]
+        },
+        {
+          "state_dict_key": "blocks.17.ada.all.mlp_scale",
+          "source_module": "ada",
+          "shared_branch": "all",
+          "semantic_role": "ada_single_parameter",
+          "branch": "shared_vid_txt",
+          "shape": [
+            2560
+          ],
+          "numel": 2560,
+          "dtype": "torch.float32",
+          "conversion": "runtime_only",
+          "target_artifacts": [
+            "params/ada_vid_mlp_scale.bin",
+            "params/ada_txt_mlp_scale.bin"
+          ]
+        },
+        {
+          "state_dict_key": "blocks.17.ada.all.mlp_gate",
+          "source_module": "ada",
+          "shared_branch": "all",
+          "semantic_role": "ada_single_parameter",
+          "branch": "shared_vid_txt",
+          "shape": [
+            2560
+          ],
+          "numel": 2560,
+          "dtype": "torch.float32",
+          "conversion": "runtime_only",
+          "target_artifacts": [
+            "params/ada_vid_mlp_gate.bin",
+            "params/ada_txt_mlp_gate.bin"
+          ]
+        },
+        {
+          "state_dict_key": "blocks.17.attn.rope.rope.freqs",
+          "source_module": "attn.rope",
+          "shared_branch": "all",
+          "semantic_role": "rope_freqs_base_buffer",
+          "branch": "shared_vid_txt",
+          "shape": [
+            21
+          ],
+          "numel": 21,
+          "dtype": "torch.float32",
+          "conversion": "runtime_only",
+          "target_artifacts": [
+            "host-generated MM-RoPE3D tables"
+          ]
+        }
+      ]
+    },
+    "18": {
+      "block_index": 18,
+      "prefix": "blocks.18.",
+      "key_count": 15,
+      "source_numel": 79316757,
+      "mapped_key_count": 15,
+      "mapped_numel": 79316757,
+      "expected_keys_equals_consumed_keys": true,
+      "unmapped_keys": [],
+      "duplicate_keys": [],
+      "shape_mismatches": [],
+      "qkv_split_concat_bit_exact": true,
+      "qkv_slice_rows": {
+        "q": [
+          0,
+          2560
+        ],
+        "k": [
+          2560,
+          5120
+        ],
+        "v": [
+          5120,
+          7680
+        ]
+      },
+      "swiglu_mapping_ok": true,
+      "ada_single_runtime_only": true,
+      "qk_rmsnorm_affine": {
+        "norm_q.all.weight": {
+          "min": 0.09258856624364853,
+          "max": 1.6991467475891113,
+          "mean": 1.345270037651062,
+          "std": 0.21704065799713135,
+          "all_ones": false,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "f2e449a6ab2b8ae3d54c56842cbf025a24d60a60fe981752c5277a1cfcafbf52"
+        },
+        "norm_k.all.weight": {
+          "min": 0.09369481354951859,
+          "max": 1.7026211023330688,
+          "mean": 1.3491500616073608,
+          "std": 0.21237996220588684,
+          "all_ones": false,
+          "unique_count": 128,
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "sha256": "e8afc4bd499152192465f486350cd9e8b42172256b30acd23e9c8c86f3c088ac"
+        }
+      },
+      "qk_affine_all_ones": {
+        "norm_q.all.weight": false,
+        "norm_k.all.weight": false
+      },
+      "real_affine_required": true,
+      "entries": [
+        {
+          "state_dict_key": "blocks.18.attn.norm_q.all.weight",
+          "source_module": "attn.norm_q",
+          "shared_branch": "all",
+          "semantic_role": "qk_norm_affine_weight",
+          "branch": "shared_vid_txt",
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "dtype": "torch.float32",
+          "conversion": "pnnx_managed",
+          "target_artifacts": [
+            "models/q_norm/model.ncnn.bin",
+            "models/q_norm/model.ncnn.param"
+          ]
+        },
+        {
+          "state_dict_key": "blocks.18.attn.norm_k.all.weight",
+          "source_module": "attn.norm_k",
+          "shared_branch": "all",
+          "semantic_role": "qk_norm_affine_weight",
+          "branch": "shared_vid_txt",
+          "shape": [
+            128
+          ],
+          "numel": 128,
+          "dtype": "torch.float32",
+          "conversion": "pnnx_managed",
+          "target_artifacts": [
+            "models/k_norm/model.ncnn.bin",
+            "models/k_norm/model.ncnn.param"
+          ]
+        },
+        {
+          "state_dict_key": "blocks.18.attn.proj_qkv.all.weight",
+          "source_module": "attn.proj_qkv",
+          "shared_branch": "all",
+          "semantic_role": "linear_weight_or_bias",
+          "branch": "shared_vid_txt",
+          "shape": [
+            7680,
+            2560
+          ],
+          "numel": 19660800,
+          "dtype": "torch.float32",
+          "conversion": "pnnx_managed",
+          "target_artifacts": [
+            "models/qkv/model.ncnn.bin",
+            "models/qkv/model.ncnn.param"
+          ]
+        },
+        {
+          "state_dict_key": "blocks.18.attn.proj_out.all.weight",
+          "source_module": "attn.proj_out",
+          "shared_branch": "all",
+          "semantic_role": "linear_weight_or_bias",
+          "branch": "shared_vid_txt",
+          "shape": [
+            2560,
+            2560
+          ],
+          "numel": 6553600,
+          "dtype": "torch.float32",
+          "conversion": "pnnx_managed",
+          "target_artifacts": [
+            "models/attn_proj/model.ncnn.bin",
+            "models/attn_proj/model.ncnn.param"
+          ]
+        },
+        {
+          "state_dict_key": "blocks.18.attn.proj_out.all.bias",
+          "source_module": "attn.proj_out",
+          "shared_branch": "all",
+          "semantic_role": "linear_weight_or_bias",
+          "branch": "shared_vid_txt",
+          "shape": [
+            2560
+          ],
+          "numel": 2560,
+          "dtype": "torch.float32",
+          "conversion": "pnnx_managed",
+          "target_artifacts": [
+            "models/attn_proj/model.ncnn.bin",
+            "models/attn_proj/model.ncnn.param"
+          ]
+        },
+        {
+          "state_dict_key": "blocks.18.mlp.all.proj_in.weight",
+          "source_module": "mlp.all",
+          "shared_branch": "all",
+          "semantic_role": "linear_weight_or_bias",
+          "branch": "shared_vid_txt",
+          "shape": [
+            6912,
+            2560
+          ],
+          "numel": 17694720,
+          "dtype": "torch.float32",
+          "conversion": "pnnx_managed",
+          "target_artifacts": [
+            "models/swiglu_up/model.ncnn.bin",
+            "models/swiglu_up/model.ncnn.param"
+          ]
+        },
+        {
+          "state_dict_key": "blocks.18.mlp.all.proj_in_gate.weight",
+          "source_module": "mlp.all",
+          "shared_branch": "all",
+          "semantic_role": "linear_weight_or_bias",
+          "branch": "shared_vid_txt",
+          "shape": [
+            6912,
+            2560
+          ],
+          "numel": 17694720,
+          "dtype": "torch.float32",
+          "conversion": "pnnx_managed",
+          "target_artifacts": [
+            "models/swiglu_gate/model.ncnn.bin",
+            "models/swiglu_gate/model.ncnn.param"
+          ]
+        },
+        {
+          "state_dict_key": "blocks.18.mlp.all.proj_out.weight",
+          "source_module": "mlp.all",
+          "shared_branch": "all",
+          "semantic_role": "linear_weight_or_bias",
+          "branch": "shared_vid_txt",
+          "shape": [
+            2560,
+            6912
+          ],
+          "numel": 17694720,
+          "dtype": "torch.float32",
+          "conversion": "pnnx_managed",
+          "target_artifacts": [
+            "models/swiglu_out/model.ncnn.bin",
+            "models/swiglu_out/model.ncnn.param"
+          ]
+        },
+        {
+          "state_dict_key": "blocks.18.ada.all.attn_shift",
+          "source_module": "ada",
+          "shared_branch": "all",
+          "semantic_role": "ada_single_parameter",
+          "branch": "shared_vid_txt",
+          "shape": [
+            2560
+          ],
+          "numel": 2560,
+          "dtype": "torch.float32",
+          "conversion": "runtime_only",
+          "target_artifacts": [
+            "params/ada_vid_attn_shift.bin",
+            "params/ada_txt_attn_shift.bin"
+          ]
+        },
+        {
+          "state_dict_key": "blocks.18.ada.all.attn_scale",
+          "source_module": "ada",
+          "shared_branch": "all",
+          "semantic_role": "ada_single_parameter",
+          "branch": "shared_vid_txt",
+          "shape": [
+            2560
+          ],
+          "numel": 2560,
+          "dtype": "torch.float32",
+          "conversion": "runtime_only",
+          "target_artifacts": [
+            "params/ada_vid_attn_scale.bin",
+            "params/ada_txt_attn_scale.bin"
+          ]
+        },
+        {
+          "state_dict_key": "blocks.18.ada.all.attn_gate",
+          "source_module": "ada",
+          "shared_branch": "all",
+          "semantic_role": "ada_single_parameter",
+          "branch": "shared_vid_txt",
+          "shape": [
+            2560
+          ],
+          "numel": 2560,
+          "dtype": "torch.float32",
+          "conversion": "runtime_only",
+          "target_artifacts": [
+            "params/ada_vid_attn_gate.bin",
+            "params/ada_txt_attn_gate.bin"
+          ]
+        },
+        {
+          "state_dict_key": "blocks.18.ada.all.mlp_shift",
+          "source_module": "ada",
+          "shared_branch": "all",
+          "semantic_role": "ada_single_parameter",
+          "branch": "shared_vid_txt",
+          "shape": [
+            2560
+          ],
+          "numel": 2560,
+          "dtype": "torch.float32",
+          "conversion": "runtime_only",
+          "target_artifacts": [
+            "params/ada_vid_mlp_shift.bin",
+            "params/ada_txt_mlp_shift.bin"
+          ]
+        },
+        {
+          "state_dict_key": "blocks.18.ada.all.mlp_scale",
+          "source_module": "ada",
+          "shared_branch": "all",
+          "semantic_role": "ada_single_parameter",
+          "branch": "shared_vid_txt",
+          "shape": [
+            2560
+          ],
+          "numel": 2560,
+          "dtype": "torch.float32",
+          "conversion": "runtime_only",
+          "target_artifacts": [
+            "params/ada_vid_mlp_scale.bin",
+            "params/ada_txt_mlp_scale.bin"
+          ]
+        },
+        {
+          "state_dict_key": "blocks.18.ada.all.mlp_gate",
+          "source_module": "ada",
+          "shared_branch": "all",
+          "semantic_role": "ada_single_parameter",
+          "branch": "shared_vid_txt",
+          "shape": [
+            2560
+          ],
+          "numel": 2560,
+          "dtype": "torch.float32",
+          "conversion": "runtime_only",
+          "target_artifacts": [
+            "params/ada_vid_mlp_gate.bin",
+            "params/ada_txt_mlp_gate.bin"
+          ]
+        },
+        {
+          "state_dict_key": "blocks.18.attn.rope.rope.freqs",
+          "source_module": "attn.rope",
+          "shared_branch": "all",
+          "semantic_role": "rope_freqs_base_buffer",
+          "branch": "shared_vid_txt",
+          "shape": [
+            21
+          ],
+          "numel": 21,
+          "dtype": "torch.float32",
+          "conversion": "runtime_only",
+          "target_artifacts": [
+            "host-generated MM-RoPE3D tables"
+          ]
+        }
+      ]
+    }
+  },
+  "overall": true,
+  "conclusion": "REAL_AFFINE_REQUIRED",
+  "note": "Every selected block carries its own real q/k RMSNorm affine weights; 0-byte folded bins and adjacent-block norm bins must NOT be reused."
+}
