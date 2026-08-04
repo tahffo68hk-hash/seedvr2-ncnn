@@ -62,6 +62,15 @@ class ScaffoldContractTests(unittest.TestCase):
             self.assertIn("device_required", data, report.name)
             self.assertIn("device_executed", data, report.name)
 
+    def test_android16_log_view_uses_plain_bounded_main_thread_updates(self):
+        source = (ROOT / "app/src/main/java/com/seededge/runtime/MainActivity.kt").read_text(encoding="utf-8")
+        self.assertNotIn("ScrollingMovementMethod", source)
+        self.assertNotIn("log.append(", source)
+        self.assertIn("TextView.BufferType.NORMAL", source)
+        self.assertIn("log.post", source)
+        self.assertIn("isSaveEnabled = false", source)
+        self.assertIn("R.id.runtime_log", source)
+
 
 if __name__ == "__main__":
     unittest.main()

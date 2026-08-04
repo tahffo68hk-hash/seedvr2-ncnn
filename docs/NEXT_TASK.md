@@ -12,3 +12,6 @@ Next task (Phase 18, NOT started - requires explicit authorization): Android/Vul
 # Next: Phase 18B — Xiaomi Pad device validation
 
 Phase 18A is READY_FOR_DEVICE; Phase 17 remains READY and full Phase 18 is NOT READY. Connect the Pad by USB, run `adb devices -l`, install the Phase 18A Debug APK, then execute the JNI JSON contract, synthetic ncnn CPU test, Vulkan capability probe, and only afterward the real VAE/DiT/full-chain device gates with explicit thresholds. Do not infer Adreno/Vulkan support from the successful offline build.
+# Phase 18B follow-ups after Android 16 UI fix
+
+Investigate the independent PKB110 ARM64 synthetic CPU finite/determinism failure, then extend the Vulkan probe to report device/GPU/driver/fp16 and run a no-fallback synthetic Vulkan inference. After those gates, continue real VAE/DiT/streaming/full-chain validation and repeat final acceptance on Xiaomi Pad 7 Pro. The Find X8 UI smoke does not replace Xiaomi Pad validation.

@@ -1,0 +1,17 @@
+{
+  "phase": "18B",
+  "device": {"model": "PKB110", "android": "16", "api": 36, "is_final_xiaomi_pad_target": false},
+  "device_executed": true,
+  "interfaces": {
+    "nativeGetVersion": {"called": true, "json_valid": true, "result": {"runtime":"SeedEdge Android Runtime","version":"18A.0","phase":"18A","abi":"arm64-v8a","device_tested":false}},
+    "nativeGetBuildInfo": {"called": true, "json_valid": true, "result": {"runtime":"SeedEdge Android Runtime","phase":"18A","abi":"arm64-v8a","ncnn_enabled":true,"vulkan_compiled":true,"device_tested":false,"build_date":"Aug 5 2026"}},
+    "nativeGetNcnnInfo": {"called": true, "json_valid": true, "result": {"ncnn_enabled":true,"ncnn_version":"20260730","ncnn_commit":"a4d2ea1d4422c9e849f166fd7a4aefb52f942f6a","openmp":false,"exceptions":false,"rtti":false,"vulkan_compiled":true,"device_tested":false}},
+    "nativeRunSyntheticCpuTest": {"called": true, "json_valid": true, "passed": false},
+    "nativeProbeVulkanSupport": {"called": true, "json_valid": true, "instance_created": true, "gpu_count": 1}
+  },
+  "all_five_returned_json": true,
+  "stale_phase18a_metadata_observed": true,
+  "app_survived_all_calls": true,
+  "overall_pass": true,
+  "note": "JNI transport smoke passed; payload-level synthetic/Vulkan gaps are separate reports."
+}

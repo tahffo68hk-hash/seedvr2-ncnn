@@ -1,0 +1,18 @@
+{
+  "phase": "18B",
+  "device": {"model": "PKB110", "android": "16", "api": 36, "gpu": "Mali-G925-Immortalis MC12", "gpu_name_source": "Android SurfaceFlinger", "is_final_xiaomi_pad_target": false},
+  "device_executed": true,
+  "ncnn_vulkan_compiled": true,
+  "gpu_count": 1,
+  "vulkan_instance_created": true,
+  "vulkan_device_created": false,
+  "gpu_name_exposed_by_current_jni": false,
+  "driver_exposed_by_current_jni": false,
+  "fp16_capability_exposed_by_current_jni": false,
+  "vulkan_synthetic_inference_executed": false,
+  "cpu_fallback": false,
+  "error": null,
+  "app_crashed": false,
+  "overall_pass": false,
+  "blocker": "Current probe validates instance creation and GPU count only; device creation, fp16 capability, and Vulkan inference remain unvalidated."
+}

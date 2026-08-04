@@ -1,0 +1,23 @@
+{
+  "phase": "18B",
+  "target": "Android 16 text layout crash fix",
+  "device": {"model": "PKB110", "marketing_name": "OPPO Find X8", "android": "16", "api": 36, "abi": "arm64-v8a", "is_final_xiaomi_pad_target": false},
+  "device_executed": true,
+  "exception": "java.lang.IndexOutOfBoundsException",
+  "message": "Invalid Context Range: 0, 228 must be in 0, 22",
+  "crashing_view": "MainActivity.log TextView",
+  "source_file": "android/app/src/main/java/com/seededge/runtime/MainActivity.kt",
+  "layout_id": "com.seededge.runtime:id/runtime_log",
+  "trigger": "Tap Run synthetic CPU test; its JSON result was appended to the log TextView",
+  "root_cause": "The read-only log installed ScrollingMovementMethod, which created Editor/Spannable interaction state, then mutated the same buffer with TextView.append(). On Android 16 hardware text drawing, an old 228-character run remained while the current draw buffer length was 22, producing the observed invalid context range.",
+  "evidence": {"before_fix_log_clickable": true, "before_fix_log_focusable": true, "before_fix_log_long_clickable": true, "after_fix_log_clickable": false, "after_fix_log_focusable": false, "after_fix_log_long_clickable": false, "main_thread_exception": true, "native_signal_seen": false},
+  "fix": "Remove ScrollingMovementMethod and append(); keep bounded immutable String state, post updates to the View, call setText with TextView.BufferType.NORMAL, disable text selection and state saving, and cap text at 16000 characters.",
+  "android_16_reproduced_before_fix": true,
+  "android_16_reproduced_after_fix": false,
+  "repeat_test_count": 65,
+  "fatal_exception_count_after_fix": 0,
+  "process_alive_after_fix": true,
+  "overall_pass": true,
+  "phase18_ready": false,
+  "note": "Find X8 temporary device validation != Xiaomi Pad final validation"
+}
