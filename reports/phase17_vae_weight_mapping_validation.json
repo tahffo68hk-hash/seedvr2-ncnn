@@ -1,0 +1,15 @@
+{
+  "phase": 17,
+  "real_seedvr2_weights": true,
+  "checkpoint_sha256": "c7df8a67e68b7f9aca3d5d2153d2ce8ab4373687741a0f9ce87cb356ace51cac",
+  "source_keys": 250,
+  "mapped_keys": 250,
+  "mapped_numel": 250648227,
+  "source_numel": 250648227,
+  "unmapped_keys": [],
+  "duplicate_keys": [],
+  "shape_mismatches": [],
+  "mapped_numel_equals_source_numel": true,
+  "pass": true,
+  "errors": []
+}

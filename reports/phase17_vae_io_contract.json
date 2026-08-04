@@ -1,0 +1,838 @@
+{
+  "phase": 17,
+  "real_seedvr2_weights": true,
+  "checkpoint_sha256": "c7df8a67e68b7f9aca3d5d2153d2ce8ab4373687741a0f9ce87cb356ace51cac",
+  "checkpoint_bytes": 1002691902,
+  "dtype": "float32 (CPU harness)",
+  "load_info": {
+    "load_seconds": 0.015
+  },
+  "encoder_stages": [
+    "conv_in",
+    "down0",
+    "down1",
+    "down2",
+    "down3",
+    "mid",
+    "out"
+  ],
+  "decoder_stages": [
+    "conv_in",
+    "mid",
+    "up0",
+    "up1",
+    "up2",
+    "up3",
+    "out"
+  ],
+  "profiles": {
+    "A": {
+      "profile": "A",
+      "video_frames": 4,
+      "video_shape": [
+        4,
+        128,
+        128,
+        3
+      ],
+      "vae_input_shape": [
+        1,
+        3,
+        5,
+        128,
+        128
+      ],
+      "latent_shape": [
+        1,
+        16,
+        2,
+        16,
+        16
+      ],
+      "latent_scaled_shape": [
+        1,
+        2,
+        16,
+        16,
+        16
+      ],
+      "decoded_shape": [
+        1,
+        3,
+        5,
+        128,
+        128
+      ],
+      "scaling_factor": 0.9152,
+      "shifting_factor": 0.0,
+      "use_sample": false,
+      "slicing": "whole-tensor (memory_state=DISABLED)",
+      "enc_seconds": 3.166,
+      "dec_seconds": 7.548,
+      "stage_files": {
+        "enc_conv_in": {
+          "in": {
+            "path": "D:\\AIProjects\\seedvr2-ncnn\\.phase17_local_artifacts\\reference_A\\enc_conv_in\\input.bin",
+            "shape": [
+              1,
+              3,
+              5,
+              128,
+              128
+            ],
+            "sha256": "b44ec1e3ec77e35afbebc951e9501ae96aa8c17bc96ea1a90b0780bc63889a8f"
+          },
+          "out": {
+            "path": "D:\\AIProjects\\seedvr2-ncnn\\.phase17_local_artifacts\\reference_A\\enc_conv_in\\output.bin",
+            "shape": [
+              1,
+              128,
+              5,
+              128,
+              128
+            ],
+            "sha256": "462a73f2e4f4d9a9b9f3db75d74a0b3be7fe46992143cf61e153d0105449a153"
+          }
+        },
+        "enc_down0": {
+          "in": {
+            "path": "D:\\AIProjects\\seedvr2-ncnn\\.phase17_local_artifacts\\reference_A\\enc_down0\\input.bin",
+            "shape": [
+              1,
+              128,
+              5,
+              128,
+              128
+            ],
+            "sha256": "462a73f2e4f4d9a9b9f3db75d74a0b3be7fe46992143cf61e153d0105449a153"
+          },
+          "out": {
+            "path": "D:\\AIProjects\\seedvr2-ncnn\\.phase17_local_artifacts\\reference_A\\enc_down0\\output.bin",
+            "shape": [
+              1,
+              128,
+              5,
+              64,
+              64
+            ],
+            "sha256": "ec52d2339a0df7b3a8c09ac3e50139c209300d5e54c678ab42754a98ad9a78fe"
+          }
+        },
+        "enc_down1": {
+          "in": {
+            "path": "D:\\AIProjects\\seedvr2-ncnn\\.phase17_local_artifacts\\reference_A\\enc_down1\\input.bin",
+            "shape": [
+              1,
+              128,
+              5,
+              64,
+              64
+            ],
+            "sha256": "ec52d2339a0df7b3a8c09ac3e50139c209300d5e54c678ab42754a98ad9a78fe"
+          },
+          "out": {
+            "path": "D:\\AIProjects\\seedvr2-ncnn\\.phase17_local_artifacts\\reference_A\\enc_down1\\output.bin",
+            "shape": [
+              1,
+              256,
+              3,
+              32,
+              32
+            ],
+            "sha256": "4b4b350ebbd18b44b46b0a868df30e1f8fc71064b3dc67f595189f3b361e84f3"
+          }
+        },
+        "enc_down2": {
+          "in": {
+            "path": "D:\\AIProjects\\seedvr2-ncnn\\.phase17_local_artifacts\\reference_A\\enc_down2\\input.bin",
+            "shape": [
+              1,
+              256,
+              3,
+              32,
+              32
+            ],
+            "sha256": "4b4b350ebbd18b44b46b0a868df30e1f8fc71064b3dc67f595189f3b361e84f3"
+          },
+          "out": {
+            "path": "D:\\AIProjects\\seedvr2-ncnn\\.phase17_local_artifacts\\reference_A\\enc_down2\\output.bin",
+            "shape": [
+              1,
+              512,
+              2,
+              16,
+              16
+            ],
+            "sha256": "46de51d8b3c22b6014890224d267471b3a5a311e65f4e880d0c98b73995f0232"
+          }
+        },
+        "enc_down3": {
+          "in": {
+            "path": "D:\\AIProjects\\seedvr2-ncnn\\.phase17_local_artifacts\\reference_A\\enc_down3\\input.bin",
+            "shape": [
+              1,
+              512,
+              2,
+              16,
+              16
+            ],
+            "sha256": "46de51d8b3c22b6014890224d267471b3a5a311e65f4e880d0c98b73995f0232"
+          },
+          "out": {
+            "path": "D:\\AIProjects\\seedvr2-ncnn\\.phase17_local_artifacts\\reference_A\\enc_down3\\output.bin",
+            "shape": [
+              1,
+              512,
+              2,
+              16,
+              16
+            ],
+            "sha256": "47a71dc51f58ffe2de72c4d633668aac94f64ac0e9094ea82490440d89ebb8d3"
+          }
+        },
+        "enc_mid": {
+          "in": {
+            "path": "D:\\AIProjects\\seedvr2-ncnn\\.phase17_local_artifacts\\reference_A\\enc_mid\\input.bin",
+            "shape": [
+              1,
+              512,
+              2,
+              16,
+              16
+            ],
+            "sha256": "47a71dc51f58ffe2de72c4d633668aac94f64ac0e9094ea82490440d89ebb8d3"
+          },
+          "out": {
+            "path": "D:\\AIProjects\\seedvr2-ncnn\\.phase17_local_artifacts\\reference_A\\enc_mid\\output.bin",
+            "shape": [
+              1,
+              512,
+              2,
+              16,
+              16
+            ],
+            "sha256": "e4725ede41b62d542f2d21a9aba3f6488ad9d66719db8728cb5df5ba3f2f6c72"
+          }
+        },
+        "enc_out": {
+          "in": {
+            "path": "D:\\AIProjects\\seedvr2-ncnn\\.phase17_local_artifacts\\reference_A\\enc_out\\input.bin",
+            "shape": [
+              2,
+              512,
+              16,
+              16
+            ],
+            "sha256": "e52ad24c8ed05d6c757b082060dbac3c33d939777f7cea9cf384e55c15015132"
+          },
+          "out": {
+            "path": "D:\\AIProjects\\seedvr2-ncnn\\.phase17_local_artifacts\\reference_A\\enc_out\\output.bin",
+            "shape": [
+              1,
+              32,
+              2,
+              16,
+              16
+            ],
+            "sha256": "b2e69197130034ec0aa517e938f7d4e62407b339a6b5c9c4c8ede062d98fc5c0"
+          }
+        },
+        "dec_conv_in": {
+          "in": {
+            "path": "D:\\AIProjects\\seedvr2-ncnn\\.phase17_local_artifacts\\reference_A\\dec_conv_in\\input.bin",
+            "shape": [
+              1,
+              16,
+              2,
+              16,
+              16
+            ],
+            "sha256": "7735bbf3b9aedabf3bfa0dc031ff7b7bb622860d719fe804fd5ee50dcf2fc5ab"
+          },
+          "out": {
+            "path": "D:\\AIProjects\\seedvr2-ncnn\\.phase17_local_artifacts\\reference_A\\dec_conv_in\\output.bin",
+            "shape": [
+              1,
+              512,
+              2,
+              16,
+              16
+            ],
+            "sha256": "3f8349effb7d7353fecf5ee8a595299bf12a23cb7f0dcc897b74672b933d7102"
+          }
+        },
+        "dec_mid": {
+          "in": {
+            "path": "D:\\AIProjects\\seedvr2-ncnn\\.phase17_local_artifacts\\reference_A\\dec_mid\\input.bin",
+            "shape": [
+              1,
+              512,
+              2,
+              16,
+              16
+            ],
+            "sha256": "3f8349effb7d7353fecf5ee8a595299bf12a23cb7f0dcc897b74672b933d7102"
+          },
+          "out": {
+            "path": "D:\\AIProjects\\seedvr2-ncnn\\.phase17_local_artifacts\\reference_A\\dec_mid\\output.bin",
+            "shape": [
+              1,
+              512,
+              2,
+              16,
+              16
+            ],
+            "sha256": "2f6db93d5e1a1c616d38c2827c81d6d024743e84ad25d0519f165af58f5183e5"
+          }
+        },
+        "dec_up0": {
+          "in": {
+            "path": "D:\\AIProjects\\seedvr2-ncnn\\.phase17_local_artifacts\\reference_A\\dec_up0\\input.bin",
+            "shape": [
+              1,
+              512,
+              2,
+              16,
+              16
+            ],
+            "sha256": "2f6db93d5e1a1c616d38c2827c81d6d024743e84ad25d0519f165af58f5183e5"
+          },
+          "out": {
+            "path": "D:\\AIProjects\\seedvr2-ncnn\\.phase17_local_artifacts\\reference_A\\dec_up0\\output.bin",
+            "shape": [
+              1,
+              512,
+              3,
+              32,
+              32
+            ],
+            "sha256": "6ab7d47a0ce355dd803eb2b9edb82f6fe8904698a3a71640e7a28e7fecde8b02"
+          }
+        },
+        "dec_up1": {
+          "in": {
+            "path": "D:\\AIProjects\\seedvr2-ncnn\\.phase17_local_artifacts\\reference_A\\dec_up1\\input.bin",
+            "shape": [
+              1,
+              512,
+              3,
+              32,
+              32
+            ],
+            "sha256": "6ab7d47a0ce355dd803eb2b9edb82f6fe8904698a3a71640e7a28e7fecde8b02"
+          },
+          "out": {
+            "path": "D:\\AIProjects\\seedvr2-ncnn\\.phase17_local_artifacts\\reference_A\\dec_up1\\output.bin",
+            "shape": [
+              1,
+              512,
+              5,
+              64,
+              64
+            ],
+            "sha256": "2635d7f47841597d981f346a626aafe1971a9d2759ddbd83aec4c2a0c3daf657"
+          }
+        },
+        "dec_up2": {
+          "in": {
+            "path": "D:\\AIProjects\\seedvr2-ncnn\\.phase17_local_artifacts\\reference_A\\dec_up2\\input.bin",
+            "shape": [
+              1,
+              512,
+              5,
+              64,
+              64
+            ],
+            "sha256": "2635d7f47841597d981f346a626aafe1971a9d2759ddbd83aec4c2a0c3daf657"
+          },
+          "out": {
+            "path": "D:\\AIProjects\\seedvr2-ncnn\\.phase17_local_artifacts\\reference_A\\dec_up2\\output.bin",
+            "shape": [
+              1,
+              256,
+              5,
+              128,
+              128
+            ],
+            "sha256": "01e663026b95e6ae53a8e3823a9c71529a3aafb71631006526790c4092e00368"
+          }
+        },
+        "dec_up3": {
+          "in": {
+            "path": "D:\\AIProjects\\seedvr2-ncnn\\.phase17_local_artifacts\\reference_A\\dec_up3\\input.bin",
+            "shape": [
+              1,
+              256,
+              5,
+              128,
+              128
+            ],
+            "sha256": "01e663026b95e6ae53a8e3823a9c71529a3aafb71631006526790c4092e00368"
+          },
+          "out": {
+            "path": "D:\\AIProjects\\seedvr2-ncnn\\.phase17_local_artifacts\\reference_A\\dec_up3\\output.bin",
+            "shape": [
+              1,
+              128,
+              5,
+              128,
+              128
+            ],
+            "sha256": "5d85d7dfd6bd28b3e8ecdbc8af6c533b6deef62f6342a16cd84ebd0ef1e594f5"
+          }
+        },
+        "dec_out": {
+          "in": {
+            "path": "D:\\AIProjects\\seedvr2-ncnn\\.phase17_local_artifacts\\reference_A\\dec_out\\input.bin",
+            "shape": [
+              5,
+              128,
+              128,
+              128
+            ],
+            "sha256": "90b82ee8b9c6a6ea7ef57551ed49d26417f32ffc67451986278038688103c69e"
+          },
+          "out": {
+            "path": "D:\\AIProjects\\seedvr2-ncnn\\.phase17_local_artifacts\\reference_A\\dec_out\\output.bin",
+            "shape": [
+              1,
+              3,
+              5,
+              128,
+              128
+            ],
+            "sha256": "a5bb8e074fcad84fd4756a8b72157f3798274d2dd38b8ac543a9d29ccac865f3"
+          }
+        }
+      },
+      "input_video.bin": "00cb8a8223d1a0858626e0002394282b4f7894ad049dee5b14523b9986c47ac4",
+      "latent_scaled.bin": "269d8755d4eeef37dd72225511de5ad62a579a0400666185fc9aa7bacad3372c"
+    },
+    "B": {
+      "profile": "B",
+      "video_frames": 8,
+      "video_shape": [
+        8,
+        192,
+        256,
+        3
+      ],
+      "vae_input_shape": [
+        1,
+        3,
+        9,
+        192,
+        256
+      ],
+      "latent_shape": [
+        1,
+        16,
+        3,
+        24,
+        32
+      ],
+      "latent_scaled_shape": [
+        1,
+        3,
+        24,
+        32,
+        16
+      ],
+      "decoded_shape": [
+        1,
+        3,
+        9,
+        192,
+        256
+      ],
+      "scaling_factor": 0.9152,
+      "shifting_factor": 0.0,
+      "use_sample": false,
+      "slicing": "whole-tensor (memory_state=DISABLED)",
+      "enc_seconds": 15.15,
+      "dec_seconds": 38.467,
+      "stage_files": {
+        "enc_conv_in": {
+          "in": {
+            "path": "D:\\AIProjects\\seedvr2-ncnn\\.phase17_local_artifacts\\reference_B\\enc_conv_in\\input.bin",
+            "shape": [
+              1,
+              3,
+              9,
+              192,
+              256
+            ],
+            "sha256": "62448cf7988d178b954f83230524a3b032a262e30c32af01463d3dd31b351a41"
+          },
+          "out": {
+            "path": "D:\\AIProjects\\seedvr2-ncnn\\.phase17_local_artifacts\\reference_B\\enc_conv_in\\output.bin",
+            "shape": [
+              1,
+              128,
+              9,
+              192,
+              256
+            ],
+            "sha256": "891eb0b1998f6998043e6b4588f0b0d8cc1166fe5c403ab3d285c9ee81aa3051"
+          }
+        },
+        "enc_down0": {
+          "in": {
+            "path": "D:\\AIProjects\\seedvr2-ncnn\\.phase17_local_artifacts\\reference_B\\enc_down0\\input.bin",
+            "shape": [
+              1,
+              128,
+              9,
+              192,
+              256
+            ],
+            "sha256": "891eb0b1998f6998043e6b4588f0b0d8cc1166fe5c403ab3d285c9ee81aa3051"
+          },
+          "out": {
+            "path": "D:\\AIProjects\\seedvr2-ncnn\\.phase17_local_artifacts\\reference_B\\enc_down0\\output.bin",
+            "shape": [
+              1,
+              128,
+              9,
+              96,
+              128
+            ],
+            "sha256": "2faf77ab2b5821f4204d8cddc1659a509cf3cbd2e9b70b16ffe1862121e0803d"
+          }
+        },
+        "enc_down1": {
+          "in": {
+            "path": "D:\\AIProjects\\seedvr2-ncnn\\.phase17_local_artifacts\\reference_B\\enc_down1\\input.bin",
+            "shape": [
+              1,
+              128,
+              9,
+              96,
+              128
+            ],
+            "sha256": "2faf77ab2b5821f4204d8cddc1659a509cf3cbd2e9b70b16ffe1862121e0803d"
+          },
+          "out": {
+            "path": "D:\\AIProjects\\seedvr2-ncnn\\.phase17_local_artifacts\\reference_B\\enc_down1\\output.bin",
+            "shape": [
+              1,
+              256,
+              5,
+              48,
+              64
+            ],
+            "sha256": "3338b95c5d44931fef5a4d8e9777a33ec827d73b999008d19a258451ff6df6a5"
+          }
+        },
+        "enc_down2": {
+          "in": {
+            "path": "D:\\AIProjects\\seedvr2-ncnn\\.phase17_local_artifacts\\reference_B\\enc_down2\\input.bin",
+            "shape": [
+              1,
+              256,
+              5,
+              48,
+              64
+            ],
+            "sha256": "3338b95c5d44931fef5a4d8e9777a33ec827d73b999008d19a258451ff6df6a5"
+          },
+          "out": {
+            "path": "D:\\AIProjects\\seedvr2-ncnn\\.phase17_local_artifacts\\reference_B\\enc_down2\\output.bin",
+            "shape": [
+              1,
+              512,
+              3,
+              24,
+              32
+            ],
+            "sha256": "e7f2c932be134bfe894b29b9d967a1925ab607c366ddd0a42b644f0c4f74f49c"
+          }
+        },
+        "enc_down3": {
+          "in": {
+            "path": "D:\\AIProjects\\seedvr2-ncnn\\.phase17_local_artifacts\\reference_B\\enc_down3\\input.bin",
+            "shape": [
+              1,
+              512,
+              3,
+              24,
+              32
+            ],
+            "sha256": "e7f2c932be134bfe894b29b9d967a1925ab607c366ddd0a42b644f0c4f74f49c"
+          },
+          "out": {
+            "path": "D:\\AIProjects\\seedvr2-ncnn\\.phase17_local_artifacts\\reference_B\\enc_down3\\output.bin",
+            "shape": [
+              1,
+              512,
+              3,
+              24,
+              32
+            ],
+            "sha256": "b3452c1c5c59f8bb52837617da1e1d03dd3da834c53ac9dbcf9bb8972e9d06c7"
+          }
+        },
+        "enc_mid": {
+          "in": {
+            "path": "D:\\AIProjects\\seedvr2-ncnn\\.phase17_local_artifacts\\reference_B\\enc_mid\\input.bin",
+            "shape": [
+              1,
+              512,
+              3,
+              24,
+              32
+            ],
+            "sha256": "b3452c1c5c59f8bb52837617da1e1d03dd3da834c53ac9dbcf9bb8972e9d06c7"
+          },
+          "out": {
+            "path": "D:\\AIProjects\\seedvr2-ncnn\\.phase17_local_artifacts\\reference_B\\enc_mid\\output.bin",
+            "shape": [
+              1,
+              512,
+              3,
+              24,
+              32
+            ],
+            "sha256": "6a9fd6d87f9390660ac694a519fe22d3eee9c5b7be7794e94102e42875dec5a7"
+          }
+        },
+        "enc_out": {
+          "in": {
+            "path": "D:\\AIProjects\\seedvr2-ncnn\\.phase17_local_artifacts\\reference_B\\enc_out\\input.bin",
+            "shape": [
+              3,
+              512,
+              24,
+              32
+            ],
+            "sha256": "60ede9ee760179d2796b0ec7187196c58434de1a4143985cc6926a3e3556fd40"
+          },
+          "out": {
+            "path": "D:\\AIProjects\\seedvr2-ncnn\\.phase17_local_artifacts\\reference_B\\enc_out\\output.bin",
+            "shape": [
+              1,
+              32,
+              3,
+              24,
+              32
+            ],
+            "sha256": "0c910fb09ff9c4b73c464ef2d3aff5d4a0275063d86393e707fff7c5fff7049f"
+          }
+        },
+        "dec_conv_in": {
+          "in": {
+            "path": "D:\\AIProjects\\seedvr2-ncnn\\.phase17_local_artifacts\\reference_B\\dec_conv_in\\input.bin",
+            "shape": [
+              1,
+              16,
+              3,
+              24,
+              32
+            ],
+            "sha256": "47565c1e6b462cd470f146b7d2f523452a86fd93ebb7d3bb89a99c8267499aaa"
+          },
+          "out": {
+            "path": "D:\\AIProjects\\seedvr2-ncnn\\.phase17_local_artifacts\\reference_B\\dec_conv_in\\output.bin",
+            "shape": [
+              1,
+              512,
+              3,
+              24,
+              32
+            ],
+            "sha256": "ba6b6199e4980113cf4b0af8a25069d1cb4e3f18d5a80ffabac4a02ec656d91c"
+          }
+        },
+        "dec_mid": {
+          "in": {
+            "path": "D:\\AIProjects\\seedvr2-ncnn\\.phase17_local_artifacts\\reference_B\\dec_mid\\input.bin",
+            "shape": [
+              1,
+              512,
+              3,
+              24,
+              32
+            ],
+            "sha256": "ba6b6199e4980113cf4b0af8a25069d1cb4e3f18d5a80ffabac4a02ec656d91c"
+          },
+          "out": {
+            "path": "D:\\AIProjects\\seedvr2-ncnn\\.phase17_local_artifacts\\reference_B\\dec_mid\\output.bin",
+            "shape": [
+              1,
+              512,
+              3,
+              24,
+              32
+            ],
+            "sha256": "8f75f8587afa31be5cbef963981e7a7b106de075d993d913a7c84023b3fcbc35"
+          }
+        },
+        "dec_up0": {
+          "in": {
+            "path": "D:\\AIProjects\\seedvr2-ncnn\\.phase17_local_artifacts\\reference_B\\dec_up0\\input.bin",
+            "shape": [
+              1,
+              512,
+              3,
+              24,
+              32
+            ],
+            "sha256": "8f75f8587afa31be5cbef963981e7a7b106de075d993d913a7c84023b3fcbc35"
+          },
+          "out": {
+            "path": "D:\\AIProjects\\seedvr2-ncnn\\.phase17_local_artifacts\\reference_B\\dec_up0\\output.bin",
+            "shape": [
+              1,
+              512,
+              5,
+              48,
+              64
+            ],
+            "sha256": "2a2bee9e4f31ef4d0c0bb166129ca7d4916f9f974a2de8fc98d2af34177553b6"
+          }
+        },
+        "dec_up1": {
+          "in": {
+            "path": "D:\\AIProjects\\seedvr2-ncnn\\.phase17_local_artifacts\\reference_B\\dec_up1\\input.bin",
+            "shape": [
+              1,
+              512,
+              5,
+              48,
+              64
+            ],
+            "sha256": "2a2bee9e4f31ef4d0c0bb166129ca7d4916f9f974a2de8fc98d2af34177553b6"
+          },
+          "out": {
+            "path": "D:\\AIProjects\\seedvr2-ncnn\\.phase17_local_artifacts\\reference_B\\dec_up1\\output.bin",
+            "shape": [
+              1,
+              512,
+              9,
+              96,
+              128
+            ],
+            "sha256": "25574ccc2ba6241e444193d65e9e16a54a7632d7b545131834ff880e5278b618"
+          }
+        },
+        "dec_up2": {
+          "in": {
+            "path": "D:\\AIProjects\\seedvr2-ncnn\\.phase17_local_artifacts\\reference_B\\dec_up2\\input.bin",
+            "shape": [
+              1,
+              512,
+              9,
+              96,
+              128
+            ],
+            "sha256": "25574ccc2ba6241e444193d65e9e16a54a7632d7b545131834ff880e5278b618"
+          },
+          "out": {
+            "path": "D:\\AIProjects\\seedvr2-ncnn\\.phase17_local_artifacts\\reference_B\\dec_up2\\output.bin",
+            "shape": [
+              1,
+              256,
+              9,
+              192,
+              256
+            ],
+            "sha256": "f69bf5827a61f0b32a12f132fa4cbb8b34bd01211f8c43ea41bb8e5a047c0948"
+          }
+        },
+        "dec_up3": {
+          "in": {
+            "path": "D:\\AIProjects\\seedvr2-ncnn\\.phase17_local_artifacts\\reference_B\\dec_up3\\input.bin",
+            "shape": [
+              1,
+              256,
+              9,
+              192,
+              256
+            ],
+            "sha256": "f69bf5827a61f0b32a12f132fa4cbb8b34bd01211f8c43ea41bb8e5a047c0948"
+          },
+          "out": {
+            "path": "D:\\AIProjects\\seedvr2-ncnn\\.phase17_local_artifacts\\reference_B\\dec_up3\\output.bin",
+            "shape": [
+              1,
+              128,
+              9,
+              192,
+              256
+            ],
+            "sha256": "46e78dfa64084d67cae09eda25ee35bdc16d1e93d5639a48096891b9f9aeeb19"
+          }
+        },
+        "dec_out": {
+          "in": {
+            "path": "D:\\AIProjects\\seedvr2-ncnn\\.phase17_local_artifacts\\reference_B\\dec_out\\input.bin",
+            "shape": [
+              9,
+              128,
+              192,
+              256
+            ],
+            "sha256": "073643a9a97c70aa5b5cfb27771dec376fb68bd76068421f57cca176d496a36d"
+          },
+          "out": {
+            "path": "D:\\AIProjects\\seedvr2-ncnn\\.phase17_local_artifacts\\reference_B\\dec_out\\output.bin",
+            "shape": [
+              1,
+              3,
+              9,
+              192,
+              256
+            ],
+            "sha256": "14a943cd676a90258c0d21dec2bae881c3bd580a2f86f287bac028f272b7d2eb"
+          }
+        }
+      },
+      "input_video.bin": "4a887d8329ac51082d66a28d8d321d5d5885ee27414620423c879254f027ae74",
+      "latent_scaled.bin": "73234a5c2bbda677c3433bcab2bdce5a85776c2613e4869fd25e9e30b28c6422"
+    }
+  },
+  "slicing_equivalence": {
+    "T9": {
+      "whole_shape": [
+        1,
+        16,
+        3,
+        24,
+        32
+      ],
+      "sliced_shape": [
+        1,
+        16,
+        3,
+        24,
+        32
+      ],
+      "max_abs_diff": 8.344650268554688e-07,
+      "equal": false
+    },
+    "T17": {
+      "whole_shape": [
+        1,
+        16,
+        5,
+        16,
+        16
+      ],
+      "sliced_shape": [
+        1,
+        16,
+        5,
+        16,
+        16
+      ],
+      "max_abs_diff": 7.152557373046875e-07,
+      "equal": false
+    }
+  },
+  "t8_sliced_crash": {
+    "crashed": true,
+    "error_type": "RuntimeError",
+    "error": "Calculated padded input size per channel: (2 x 33 x 33). Kernel size: (3 x 3 x 3). Kernel size can't be greater than actual input size",
+    "note": "official split_size=4 slicing on raw T=8 input; Profile B uses the official T=9 padded convention."
+  }
+}

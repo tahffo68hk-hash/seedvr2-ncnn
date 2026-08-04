@@ -111,3 +111,31 @@ conda run -n seedvr2-block-probe python tests/seedvr2_weight_mapping/check_no_la
 ```
 
 Acceptance (Phase 16 READY): block schedule + all-block mapping 32/32 (`expected==consumed`, unmapped/duplicates/shape-mismatches empty, QKV split/concat bit-exact, SwiGLU correct, AdaSingle runtime-only; q/k RMSNorm NOT all-ones -> `REAL_AFFINE_REQUIRED`); artifact inventory 32/32 (logical 13.32 GB, blocks 15-18 hardlink-reused from Phase 15, weight-free stages deduplicated); strict streaming lifecycle per block (`LOAD -> EXECUTE -> UNLOAD`, `cache_cleared=true`, `cache_size_after=0`, `resident_bytes_after=0`, file rename-probe passes, `max_resident_weighted_blocks=1`, `order_ok=true`, `streaming_mode_validated=true`); chain parity chain_8 rel 5.6465e-4 (limit 1e-2) / chain_16 2.0992e-3 (2e-2) / chain_full 5.0234e-3 (5e-2), NaN/Inf=0, 3x bit-identical; last-layer standalone combined rel 4.05e-6 (limit 1e-3); visual 8/16/full pixel PSNR 51.336/52.551/51.050 dB (>=34), SSIM 0.9974/0.9976/0.9972 (>=0.95), adapter evidence `ncnn=8/16/32`/`original=0`/`silent_fallback=false`/`state_machine_final=IDLE`; error growth E1..Efull finite (`reports/full_dit_error_growth.json`); negatives 80/80; regressions 27/27 (Phase 12/13/14/15 8 + core 12 + Phase 11 Python 4 + Phase 15 streaming adapter 2, historical baselines restored with `git restore`); git protection PASS (no `.phase16_*`/heavy files tracked); flags `real_seedvr2_weights=true`, `full_32_block_dit=true`, `max_resident_weighted_blocks=1`, `android_vulkan=false`, `large_artifacts_committed=false`. Phase 17 (VAE-in-ncnn / Android / Vulkan / fused-kernel parity) NOT started.
+
+Phase 17 real-weight SeedVR2 VAE ncnn + full video restoration (probe env `seedvr2-block-probe` for CPU parity; GPU env `.conda-cuda` for the official-pipeline visual runs):
+
+```text
+conda run -n seedvr2-block-probe python tests/seedvr2_vae_ncnn/inspect_real_vae_schema.py
+conda run -n seedvr2-block-probe python tests/seedvr2_vae_ncnn/generate_vae_weight_mapping.py
+conda run -n seedvr2-block-probe python tests/seedvr2_vae_ncnn/validate_vae_weight_mapping.py
+conda run -n seedvr2-block-probe python tests/seedvr2_vae_ncnn/verify_vae_export_wrapper.py
+conda run -n seedvr2-block-probe python tests/seedvr2_vae_ncnn/export_real_vae_stages.py --profile A   # or B
+conda run -n seedvr2-block-probe python tests/seedvr2_vae_ncnn/run_vae_stage_parity.py
+conda run -n seedvr2-block-probe python tests/seedvr2_vae_ncnn/run_vae_encoder_parity.py
+conda run -n seedvr2-block-probe python tests/seedvr2_vae_ncnn/run_vae_decoder_parity.py
+conda run -n seedvr2-block-probe python tests/seedvr2_vae_ncnn/run_vae_roundtrip.py
+conda run -n seedvr2-block-probe python tests/seedvr2_vae_ncnn/run_vae_tiling_contract.py
+conda run -n seedvr2-block-probe python tests/seedvr2_vae_ncnn/run_vae_streaming_lifecycle.py
+conda run -n seedvr2-block-probe python tests/seedvr2_vae_ncnn/run_phase17_profiles.py
+conda run -n seedvr2-block-probe python tests/seedvr2_vae_ncnn/run_phase17_negative_tests.py
+conda run -n seedvr2-block-probe python tests/seedvr2_vae_ncnn/run_phase17_regressions.py
+conda run -n seedvr2-block-probe python tests/seedvr2_weight_mapping/check_no_large_tracked_artifacts.py
+conda run -n seedvr2-block-probe python tests/seedvr2_vae_ncnn/run_phase17_git_protection.py
+.conda-cuda\python.exe tests/seedvr2_vae_ncnn/run_full_ncnn_core_pipeline.py --mode pytorch_reference
+.conda-cuda\python.exe tests/seedvr2_vae_ncnn/run_full_ncnn_core_pipeline.py --mode dit_ncnn_vae_pytorch
+.conda-cuda\python.exe tests/seedvr2_vae_ncnn/run_full_ncnn_core_pipeline.py --mode dit_ncnn_decoder_ncnn
+.conda-cuda\python.exe tests/seedvr2_vae_ncnn/run_full_ncnn_core_pipeline.py --mode full_ncnn_core
+.conda-cuda\python.exe tests/seedvr2_vae_ncnn/run_full_ncnn_core_pipeline.py --metrics
+```
+
+Acceptance (Phase 17 READY): official `ema_vae.pth` (sha256 `c7df8a67...`) exported as 14 FP32 ncnn stage chains (`pnnx fp16=0`, profiles A/B, git-ignored `.phase17_local_artifacts/`); weight mapping 250/250 (`mapped_numel == source_numel`, no unmapped/duplicates/shape mismatches, 6 deconv layout + 4 reshape conversions); stage parity 14/14 rel <= ~2.1e-6 (limit 1e-3); encoder parity A 2.166e-6 / B 1.897e-6 (limit 2e-3); decoder parity A/B rel 2.08e-5 / 1.73e-5, PNG PSNR 117.9 / 119.3 dB (>=45), SSIM 1.0 (>=0.99); full-VAE roundtrip A/B pixel PSNR ~116.7 / 117.8 dB, SSIM 1.0, adapter ncnn encoder 7 / decoder 14 vs original 1/2 and 2/4, silent_fallback=false; tiling contract (4k+1 padded convention, T=9/T=17 slicing equivalence < 8.4e-7, raw T=8 slice crash reproduced); streaming lifecycle (encoder 405 MB / decoder 607 MB, A->B->A error 0, cache 0, file handles released); latency / memory / IO profiles PASS; negatives 70/70; regressions PASS (Phase 14/15 matrices + Phase 16 CPU-light + cited GPU baselines, historical baselines restored); git protection PASS. Official-pipeline full video restoration (4 frames 128x128, seed 20260803, steps 1, cfg 1.0): `full_ncnn_core` pixel PSNR 51.195 dB (>=40) / SSIM 0.9990 (>=0.98), latent RMSE 0.0206, NaN/Inf=0, non-constant; `dit_ncnn_vae_pytorch` 51.998 dB / 0.9989; `dit_ncnn_decoder_ncnn` 52.105 dB / 0.9990; adapter evidence `ncnn_vae_encoder=1` / `ncnn_vae_decoder=1` / `original=0` / `silent_fallback=false` / `chain_hybrid_ran=true` / `max_resident_weighted_dit_blocks=1` / `max_resident_vae_model_sets=1`; harness RNG anchor keeps z bit-identical across modes; flags `real_seedvr2_weights=true`, `real_vae_weights=true`, `full_pure_ncnn_application=false`, `max_resident_weighted_dit_blocks=1`, `android_vulkan=false`, `large_artifacts_committed=false`. Phase 18 (Android/Vulkan / fused-kernel parity / full-pure-ncnn) NOT started.

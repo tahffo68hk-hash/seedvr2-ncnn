@@ -1,0 +1,96 @@
+{
+  "phase": 17,
+  "real_seedvr2_weights": true,
+  "real_vae_weights": true,
+  "checkpoint_sha256": "c7df8a67e68b7f9aca3d5d2153d2ce8ab4373687741a0f9ce87cb356ace51cac",
+  "scaling_factor": 0.9152,
+  "shifting_factor": 0.0,
+  "use_sample": false,
+  "mode": "encoder end-to-end (official PyTorch vs ncnn FP32 stage chain)",
+  "profiles": {
+    "A": {
+      "max_abs_error": 7.152557373046875e-06,
+      "mean_abs_error": 8.561046200838973e-07,
+      "rmse": 1.130168731484743e-06,
+      "relative_max": 2.166160386847363e-06,
+      "mse": 1.2772813616258332e-12,
+      "psnr_db": 118.93713425099932,
+      "ref_max": 3.3019518852233887,
+      "nan": 0,
+      "inf": 0,
+      "latent_shape_official": [
+        1,
+        16,
+        2,
+        16,
+        16
+      ],
+      "latent_shape_ncnn": [
+        1,
+        16,
+        2,
+        16,
+        16
+      ],
+      "shape_match": true,
+      "latent_sha256_official": "7735bbf3b9aedabf3bfa0dc031ff7b7bb622860d719fe804fd5ee50dcf2fc5ab",
+      "latent_sha256_ncnn": "c8937779d8c5e22c4f7a1ab1aa449f768cf1d7bba0fedde009d0ecacb48481aa",
+      "threshold_rel_max": 0.002,
+      "pass": true,
+      "encoder_chain_seconds": 133.034,
+      "encoder_call_count": 7,
+      "input_shape": [
+        1,
+        3,
+        5,
+        128,
+        128
+      ],
+      "note": "ncnn chain runs pre-scale latent; post-scale = (latent - shift) * scaling_factor"
+    },
+    "B": {
+      "max_abs_error": 6.9141387939453125e-06,
+      "mean_abs_error": 9.573593501165255e-07,
+      "rmse": 1.262159332451475e-06,
+      "relative_max": 1.8974047102090515e-06,
+      "mse": 1.5930461804943531e-12,
+      "psnr_db": 117.97771634341261,
+      "ref_max": 3.64399790763855,
+      "nan": 0,
+      "inf": 0,
+      "latent_shape_official": [
+        1,
+        16,
+        3,
+        24,
+        32
+      ],
+      "latent_shape_ncnn": [
+        1,
+        16,
+        3,
+        24,
+        32
+      ],
+      "shape_match": true,
+      "latent_sha256_official": "47565c1e6b462cd470f146b7d2f523452a86fd93ebb7d3bb89a99c8267499aaa",
+      "latent_sha256_ncnn": "8a120cdddbd4083d9de26a802b8ae41795dd02b5ff56410e7b9f78178799282f",
+      "threshold_rel_max": 0.002,
+      "pass": true,
+      "encoder_chain_seconds": 833.905,
+      "encoder_call_count": 7,
+      "input_shape": [
+        1,
+        3,
+        9,
+        192,
+        256
+      ],
+      "note": "ncnn chain runs pre-scale latent; post-scale = (latent - shift) * scaling_factor"
+    }
+  },
+  "overall_pass": true,
+  "thresholds": {
+    "encoder_latent_relative_max": 0.002
+  }
+}

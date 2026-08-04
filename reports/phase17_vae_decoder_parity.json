@@ -1,0 +1,158 @@
+{
+  "phase": 17,
+  "real_seedvr2_weights": true,
+  "real_vae_weights": true,
+  "checkpoint_sha256": "c7df8a67e68b7f9aca3d5d2153d2ce8ab4373687741a0f9ce87cb356ace51cac",
+  "scaling_factor": 0.9152,
+  "shifting_factor": 0.0,
+  "use_sample": false,
+  "mode": "decoder end-to-end (official PyTorch vs ncnn FP32 stage chain)",
+  "profiles": {
+    "A": {
+      "max_abs_error": 3.078579902648926e-05,
+      "mean_abs_error": 1.910713580481153e-06,
+      "rmse": 2.54604888798888e-06,
+      "relative_max": 2.0777902127834184e-05,
+      "psnr_db": 117.90326514310946,
+      "ref_max": 1.4816606044769287,
+      "nan": 0,
+      "inf": 0,
+      "decoded_shape_official": [
+        1,
+        3,
+        5,
+        128,
+        128
+      ],
+      "decoded_shape_ncnn": [
+        1,
+        3,
+        5,
+        128,
+        128
+      ],
+      "shape_match": true,
+      "decoded_sha256_official": "a5bb8e074fcad84fd4756a8b72157f3798274d2dd38b8ac543a9d29ccac865f3",
+      "decoded_sha256_ncnn": "fb7df65566367837c507d15206a96a7cac8f0cb6039f22626a9693842911aba9",
+      "threshold_rel_max": 0.002,
+      "pixels": {
+        "max_abs_error": 1.537799835205078e-05,
+        "mean_abs_error": 9.48769108314688e-07,
+        "rmse": 1.2693010995107381e-06,
+        "relative_max": 1.537799835205078e-05,
+        "psnr_db": 117.92870687497172,
+        "ref_max": 1.0,
+        "nan": 0,
+        "inf": 0,
+        "ssim": 0.9999999999640489,
+        "pixel_psnr_min_db": 45.0,
+        "pixel_ssim_min": 0.99,
+        "pass": true
+      },
+      "pass": true,
+      "decoder_chain_seconds": 344.624,
+      "decoder_call_count": 7,
+      "latent_input_shape": [
+        1,
+        16,
+        2,
+        16,
+        16
+      ],
+      "png_official": [
+        ".phase17_visual_outputs\\vae_decoder_parity_A\\official\\frame_000.png",
+        ".phase17_visual_outputs\\vae_decoder_parity_A\\official\\frame_001.png",
+        ".phase17_visual_outputs\\vae_decoder_parity_A\\official\\frame_002.png",
+        ".phase17_visual_outputs\\vae_decoder_parity_A\\official\\frame_003.png",
+        ".phase17_visual_outputs\\vae_decoder_parity_A\\official\\frame_004.png"
+      ],
+      "png_ncnn": [
+        ".phase17_visual_outputs\\vae_decoder_parity_A\\ncnn\\frame_000.png",
+        ".phase17_visual_outputs\\vae_decoder_parity_A\\ncnn\\frame_001.png",
+        ".phase17_visual_outputs\\vae_decoder_parity_A\\ncnn\\frame_002.png",
+        ".phase17_visual_outputs\\vae_decoder_parity_A\\ncnn\\frame_003.png",
+        ".phase17_visual_outputs\\vae_decoder_parity_A\\ncnn\\frame_004.png"
+      ]
+    },
+    "B": {
+      "max_abs_error": 2.637505531311035e-05,
+      "mean_abs_error": 1.6217446708123293e-06,
+      "rmse": 2.1757224859335225e-06,
+      "relative_max": 1.734433838463181e-05,
+      "psnr_db": 119.26852990997881,
+      "ref_max": 1.52067232131958,
+      "nan": 0,
+      "inf": 0,
+      "decoded_shape_official": [
+        1,
+        3,
+        9,
+        192,
+        256
+      ],
+      "decoded_shape_ncnn": [
+        1,
+        3,
+        9,
+        192,
+        256
+      ],
+      "shape_match": true,
+      "decoded_sha256_official": "14a943cd676a90258c0d21dec2bae881c3bd580a2f86f287bac028f272b7d2eb",
+      "decoded_sha256_ncnn": "53c82ed3b06513e0a3c5aaf43b59a579ddda96614f2995bcdf300915712cd492",
+      "threshold_rel_max": 0.002,
+      "pixels": {
+        "max_abs_error": 1.3172626495361328e-05,
+        "mean_abs_error": 8.07083330230707e-07,
+        "rmse": 1.0856779266396499e-06,
+        "relative_max": 1.3172626495361328e-05,
+        "psnr_db": 119.28597983800938,
+        "ref_max": 1.0,
+        "nan": 0,
+        "inf": 0,
+        "ssim": 0.9999999999735978,
+        "pixel_psnr_min_db": 45.0,
+        "pixel_ssim_min": 0.99,
+        "pass": true
+      },
+      "pass": true,
+      "decoder_chain_seconds": 2175.299,
+      "decoder_call_count": 7,
+      "latent_input_shape": [
+        1,
+        16,
+        3,
+        24,
+        32
+      ],
+      "png_official": [
+        ".phase17_visual_outputs\\vae_decoder_parity_B\\official\\frame_000.png",
+        ".phase17_visual_outputs\\vae_decoder_parity_B\\official\\frame_001.png",
+        ".phase17_visual_outputs\\vae_decoder_parity_B\\official\\frame_002.png",
+        ".phase17_visual_outputs\\vae_decoder_parity_B\\official\\frame_003.png",
+        ".phase17_visual_outputs\\vae_decoder_parity_B\\official\\frame_004.png",
+        ".phase17_visual_outputs\\vae_decoder_parity_B\\official\\frame_005.png",
+        ".phase17_visual_outputs\\vae_decoder_parity_B\\official\\frame_006.png",
+        ".phase17_visual_outputs\\vae_decoder_parity_B\\official\\frame_007.png",
+        ".phase17_visual_outputs\\vae_decoder_parity_B\\official\\frame_008.png"
+      ],
+      "png_ncnn": [
+        ".phase17_visual_outputs\\vae_decoder_parity_B\\ncnn\\frame_000.png",
+        ".phase17_visual_outputs\\vae_decoder_parity_B\\ncnn\\frame_001.png",
+        ".phase17_visual_outputs\\vae_decoder_parity_B\\ncnn\\frame_002.png",
+        ".phase17_visual_outputs\\vae_decoder_parity_B\\ncnn\\frame_003.png",
+        ".phase17_visual_outputs\\vae_decoder_parity_B\\ncnn\\frame_004.png",
+        ".phase17_visual_outputs\\vae_decoder_parity_B\\ncnn\\frame_005.png",
+        ".phase17_visual_outputs\\vae_decoder_parity_B\\ncnn\\frame_006.png",
+        ".phase17_visual_outputs\\vae_decoder_parity_B\\ncnn\\frame_007.png",
+        ".phase17_visual_outputs\\vae_decoder_parity_B\\ncnn\\frame_008.png"
+      ]
+    }
+  },
+  "overall_pass": true,
+  "thresholds": {
+    "decoded_float_relative_max": 0.002,
+    "decoded_png_psnr_min_db": 45.0,
+    "decoded_png_ssim_min": 0.99
+  }
+}

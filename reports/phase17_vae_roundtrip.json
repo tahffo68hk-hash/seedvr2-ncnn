@@ -1,0 +1,442 @@
+{
+  "phase": 17,
+  "real_seedvr2_weights": true,
+  "real_vae_weights": true,
+  "checkpoint_sha256": "c7df8a67e68b7f9aca3d5d2153d2ce8ab4373687741a0f9ce87cb356ace51cac",
+  "scaling_factor": 0.9152,
+  "shifting_factor": 0.0,
+  "use_sample": false,
+  "profiles": {
+    "A": {
+      "profile": "A",
+      "latent": {
+        "max_abs_error": 7.152557373046875e-06,
+        "mean_abs_error": 8.561046200838973e-07,
+        "rmse": 1.130168731484743e-06,
+        "relative_max": 2.166160386847363e-06,
+        "psnr_db": 118.93713425099932,
+        "ref_max": 3.3019518852233887,
+        "nan": 0,
+        "inf": 0,
+        "latent_shape_pt": [
+          1,
+          16,
+          2,
+          16,
+          16
+        ],
+        "latent_shape_ncnn": [
+          1,
+          16,
+          2,
+          16,
+          16
+        ]
+      },
+      "modes": {
+        "pytorch_reference": {
+          "float": {
+            "max_abs_error": 0.0,
+            "mean_abs_error": 0.0,
+            "rmse": 0.0,
+            "relative_max": 0.0,
+            "psnr_db": null,
+            "ref_max": 1.4816606044769287,
+            "nan": 0,
+            "inf": 0
+          },
+          "pixels": {
+            "max_abs_error": 0.0,
+            "mean_abs_error": 0.0,
+            "rmse": 0.0,
+            "relative_max": 0.0,
+            "psnr_db": null,
+            "ref_max": 1.0,
+            "nan": 0,
+            "inf": 0,
+            "ssim": 1.0,
+            "temporal_flicker_official": 0.11688180227959795,
+            "temporal_flicker_mode": 0.11688180227959795,
+            "non_constant_mode": true
+          },
+          "decoded_shape": [
+            1,
+            3,
+            5,
+            128,
+            128
+          ]
+        },
+        "decoder_only_hybrid": {
+          "float": {
+            "max_abs_error": 3.078579902648926e-05,
+            "mean_abs_error": 1.910713580481153e-06,
+            "rmse": 2.54604888798888e-06,
+            "relative_max": 2.0777902127834184e-05,
+            "psnr_db": 117.90326514310946,
+            "ref_max": 1.4816606044769287,
+            "nan": 0,
+            "inf": 0
+          },
+          "pixels": {
+            "max_abs_error": 1.537799835205078e-05,
+            "mean_abs_error": 9.48769108314688e-07,
+            "rmse": 1.2693010995107381e-06,
+            "relative_max": 1.537799835205078e-05,
+            "psnr_db": 117.92870687497172,
+            "ref_max": 1.0,
+            "nan": 0,
+            "inf": 0,
+            "ssim": 0.9999999999640489,
+            "temporal_flicker_official": 0.11688180227959795,
+            "temporal_flicker_mode": 0.11688181428159321,
+            "non_constant_mode": true
+          },
+          "decoded_shape": [
+            1,
+            3,
+            5,
+            128,
+            128
+          ]
+        },
+        "encoder_only_hybrid": {
+          "float": {
+            "max_abs_error": 2.276897430419922e-05,
+            "mean_abs_error": 1.3087741323876874e-06,
+            "rmse": 1.7509654260596745e-06,
+            "relative_max": 1.536719963762373e-05,
+            "psnr_db": 121.15504849840389,
+            "ref_max": 1.4816606044769287,
+            "nan": 0,
+            "inf": 0
+          },
+          "pixels": {
+            "max_abs_error": 1.138448715209961e-05,
+            "mean_abs_error": 6.501572594667474e-07,
+            "rmse": 8.734224526202362e-07,
+            "relative_max": 1.138448715209961e-05,
+            "psnr_db": 121.17551296174128,
+            "ref_max": 1.0,
+            "nan": 0,
+            "inf": 0,
+            "ssim": 0.9999999999837053,
+            "temporal_flicker_official": 0.11688180227959795,
+            "temporal_flicker_mode": 0.11688176265412646,
+            "non_constant_mode": true
+          },
+          "decoded_shape": [
+            1,
+            3,
+            5,
+            128,
+            128
+          ]
+        },
+        "full_vae_ncnn": {
+          "float": {
+            "max_abs_error": 2.9340386390686035e-05,
+            "mean_abs_error": 2.195799638086508e-06,
+            "rmse": 2.924126887674603e-06,
+            "relative_max": 1.9802366548744195e-05,
+            "psnr_db": 116.70067562949713,
+            "ref_max": 1.4816606044769287,
+            "nan": 0,
+            "inf": 0
+          },
+          "pixels": {
+            "max_abs_error": 1.4662742614746094e-05,
+            "mean_abs_error": 1.0902692641442021e-06,
+            "rmse": 1.4578012792218184e-06,
+            "relative_max": 1.4662742614746094e-05,
+            "psnr_db": 116.72603346027,
+            "ref_max": 1.0,
+            "nan": 0,
+            "inf": 0,
+            "ssim": 0.9999999999533337,
+            "temporal_flicker_official": 0.11688180227959795,
+            "temporal_flicker_mode": 0.11688176605305974,
+            "non_constant_mode": true
+          },
+          "decoded_shape": [
+            1,
+            3,
+            5,
+            128,
+            128
+          ]
+        }
+      },
+      "png": {
+        "pytorch_reference": [
+          ".phase17_visual_outputs\\vae_roundtrip_A\\pytorch_reference\\frame_000.png",
+          ".phase17_visual_outputs\\vae_roundtrip_A\\pytorch_reference\\frame_001.png",
+          ".phase17_visual_outputs\\vae_roundtrip_A\\pytorch_reference\\frame_002.png",
+          ".phase17_visual_outputs\\vae_roundtrip_A\\pytorch_reference\\frame_003.png",
+          ".phase17_visual_outputs\\vae_roundtrip_A\\pytorch_reference\\frame_004.png"
+        ],
+        "decoder_only_hybrid": [
+          ".phase17_visual_outputs\\vae_roundtrip_A\\decoder_only_hybrid\\frame_000.png",
+          ".phase17_visual_outputs\\vae_roundtrip_A\\decoder_only_hybrid\\frame_001.png",
+          ".phase17_visual_outputs\\vae_roundtrip_A\\decoder_only_hybrid\\frame_002.png",
+          ".phase17_visual_outputs\\vae_roundtrip_A\\decoder_only_hybrid\\frame_003.png",
+          ".phase17_visual_outputs\\vae_roundtrip_A\\decoder_only_hybrid\\frame_004.png"
+        ],
+        "encoder_only_hybrid": [
+          ".phase17_visual_outputs\\vae_roundtrip_A\\encoder_only_hybrid\\frame_000.png",
+          ".phase17_visual_outputs\\vae_roundtrip_A\\encoder_only_hybrid\\frame_001.png",
+          ".phase17_visual_outputs\\vae_roundtrip_A\\encoder_only_hybrid\\frame_002.png",
+          ".phase17_visual_outputs\\vae_roundtrip_A\\encoder_only_hybrid\\frame_003.png",
+          ".phase17_visual_outputs\\vae_roundtrip_A\\encoder_only_hybrid\\frame_004.png"
+        ],
+        "full_vae_ncnn": [
+          ".phase17_visual_outputs\\vae_roundtrip_A\\full_vae_ncnn\\frame_000.png",
+          ".phase17_visual_outputs\\vae_roundtrip_A\\full_vae_ncnn\\frame_001.png",
+          ".phase17_visual_outputs\\vae_roundtrip_A\\full_vae_ncnn\\frame_002.png",
+          ".phase17_visual_outputs\\vae_roundtrip_A\\full_vae_ncnn\\frame_003.png",
+          ".phase17_visual_outputs\\vae_roundtrip_A\\full_vae_ncnn\\frame_004.png"
+        ]
+      },
+      "call_counts": {
+        "ncnn_vae_encoder_call_count": 7,
+        "ncnn_vae_decoder_call_count": 14,
+        "original_vae_encoder_call_count": 1,
+        "original_vae_decoder_call_count": 2,
+        "silent_fallback": false
+      },
+      "latency_seconds": {
+        "pt_encoder": 2.92,
+        "pt_decoder": 7.221,
+        "ncnn_encoder_chain": 124.374,
+        "ncnn_decoder_chain_full": 345.085,
+        "ncnn_decoder_chain_hybrid": 339.274,
+        "pt_decoder_on_ncnn_latent": 7.242
+      },
+      "pass": true
+    },
+    "B": {
+      "profile": "B",
+      "latent": {
+        "max_abs_error": 6.9141387939453125e-06,
+        "mean_abs_error": 9.573593501165255e-07,
+        "rmse": 1.262159332451475e-06,
+        "relative_max": 1.8974047102090515e-06,
+        "psnr_db": 117.97771634341261,
+        "ref_max": 3.64399790763855,
+        "nan": 0,
+        "inf": 0,
+        "latent_shape_pt": [
+          1,
+          16,
+          3,
+          24,
+          32
+        ],
+        "latent_shape_ncnn": [
+          1,
+          16,
+          3,
+          24,
+          32
+        ]
+      },
+      "modes": {
+        "pytorch_reference": {
+          "float": {
+            "max_abs_error": 0.0,
+            "mean_abs_error": 0.0,
+            "rmse": 0.0,
+            "relative_max": 0.0,
+            "psnr_db": null,
+            "ref_max": 1.52067232131958,
+            "nan": 0,
+            "inf": 0
+          },
+          "pixels": {
+            "max_abs_error": 0.0,
+            "mean_abs_error": 0.0,
+            "rmse": 0.0,
+            "relative_max": 0.0,
+            "psnr_db": null,
+            "ref_max": 1.0,
+            "nan": 0,
+            "inf": 0,
+            "ssim": 1.0,
+            "temporal_flicker_official": 0.0861585726430955,
+            "temporal_flicker_mode": 0.0861585726430955,
+            "non_constant_mode": true
+          },
+          "decoded_shape": [
+            1,
+            3,
+            9,
+            192,
+            256
+          ]
+        },
+        "decoder_only_hybrid": {
+          "float": {
+            "max_abs_error": 2.637505531311035e-05,
+            "mean_abs_error": 1.6217446708123293e-06,
+            "rmse": 2.1757224859335225e-06,
+            "relative_max": 1.734433838463181e-05,
+            "psnr_db": 119.26852990997881,
+            "ref_max": 1.52067232131958,
+            "nan": 0,
+            "inf": 0
+          },
+          "pixels": {
+            "max_abs_error": 1.3172626495361328e-05,
+            "mean_abs_error": 8.07083330230707e-07,
+            "rmse": 1.0856779266396499e-06,
+            "relative_max": 1.3172626495361328e-05,
+            "psnr_db": 119.28597983800938,
+            "ref_max": 1.0,
+            "nan": 0,
+            "inf": 0,
+            "ssim": 0.9999999999735978,
+            "temporal_flicker_official": 0.0861585726430955,
+            "temporal_flicker_mode": 0.08615860387857942,
+            "non_constant_mode": true
+          },
+          "decoded_shape": [
+            1,
+            3,
+            9,
+            192,
+            256
+          ]
+        },
+        "encoder_only_hybrid": {
+          "float": {
+            "max_abs_error": 1.7702579498291016e-05,
+            "mean_abs_error": 1.2388759753486126e-06,
+            "rmse": 1.651276344223659e-06,
+            "relative_max": 1.1641284746295249e-05,
+            "psnr_db": 121.66420472629716,
+            "ref_max": 1.52067232131958,
+            "nan": 0,
+            "inf": 0
+          },
+          "pixels": {
+            "max_abs_error": 8.821487426757812e-06,
+            "mean_abs_error": 6.163506587194049e-07,
+            "rmse": 8.239970639227392e-07,
+            "relative_max": 8.821487426757812e-06,
+            "psnr_db": 121.68148671567964,
+            "ref_max": 1.0,
+            "nan": 0,
+            "inf": 0,
+            "ssim": 0.9999999999854398,
+            "temporal_flicker_official": 0.0861585726430955,
+            "temporal_flicker_mode": 0.08615860030120832,
+            "non_constant_mode": true
+          },
+          "decoded_shape": [
+            1,
+            3,
+            9,
+            192,
+            256
+          ]
+        },
+        "full_vae_ncnn": {
+          "float": {
+            "max_abs_error": 3.415346145629883e-05,
+            "mean_abs_error": 1.942230731021028e-06,
+            "rmse": 2.5926138610209164e-06,
+            "relative_max": 2.2459448348913056e-05,
+            "psnr_db": 117.74584314145261,
+            "ref_max": 1.52067232131958,
+            "nan": 0,
+            "inf": 0
+          },
+          "pixels": {
+            "max_abs_error": 1.710653305053711e-05,
+            "mean_abs_error": 9.662673147869537e-07,
+            "rmse": 1.2934228211992993e-06,
+            "relative_max": 1.710653305053711e-05,
+            "psnr_db": 117.76518961227333,
+            "ref_max": 1.0,
+            "nan": 0,
+            "inf": 0,
+            "ssim": 0.9999999999631591,
+            "temporal_flicker_official": 0.0861585726430955,
+            "temporal_flicker_mode": 0.08615863392598537,
+            "non_constant_mode": true
+          },
+          "decoded_shape": [
+            1,
+            3,
+            9,
+            192,
+            256
+          ]
+        }
+      },
+      "png": {
+        "pytorch_reference": [
+          ".phase17_visual_outputs\\vae_roundtrip_B\\pytorch_reference\\frame_000.png",
+          ".phase17_visual_outputs\\vae_roundtrip_B\\pytorch_reference\\frame_001.png",
+          ".phase17_visual_outputs\\vae_roundtrip_B\\pytorch_reference\\frame_002.png",
+          ".phase17_visual_outputs\\vae_roundtrip_B\\pytorch_reference\\frame_003.png",
+          ".phase17_visual_outputs\\vae_roundtrip_B\\pytorch_reference\\frame_004.png",
+          ".phase17_visual_outputs\\vae_roundtrip_B\\pytorch_reference\\frame_005.png",
+          ".phase17_visual_outputs\\vae_roundtrip_B\\pytorch_reference\\frame_006.png",
+          ".phase17_visual_outputs\\vae_roundtrip_B\\pytorch_reference\\frame_007.png",
+          ".phase17_visual_outputs\\vae_roundtrip_B\\pytorch_reference\\frame_008.png"
+        ],
+        "decoder_only_hybrid": [
+          ".phase17_visual_outputs\\vae_roundtrip_B\\decoder_only_hybrid\\frame_000.png",
+          ".phase17_visual_outputs\\vae_roundtrip_B\\decoder_only_hybrid\\frame_001.png",
+          ".phase17_visual_outputs\\vae_roundtrip_B\\decoder_only_hybrid\\frame_002.png",
+          ".phase17_visual_outputs\\vae_roundtrip_B\\decoder_only_hybrid\\frame_003.png",
+          ".phase17_visual_outputs\\vae_roundtrip_B\\decoder_only_hybrid\\frame_004.png",
+          ".phase17_visual_outputs\\vae_roundtrip_B\\decoder_only_hybrid\\frame_005.png",
+          ".phase17_visual_outputs\\vae_roundtrip_B\\decoder_only_hybrid\\frame_006.png",
+          ".phase17_visual_outputs\\vae_roundtrip_B\\decoder_only_hybrid\\frame_007.png",
+          ".phase17_visual_outputs\\vae_roundtrip_B\\decoder_only_hybrid\\frame_008.png"
+        ],
+        "encoder_only_hybrid": [
+          ".phase17_visual_outputs\\vae_roundtrip_B\\encoder_only_hybrid\\frame_000.png",
+          ".phase17_visual_outputs\\vae_roundtrip_B\\encoder_only_hybrid\\frame_001.png",
+          ".phase17_visual_outputs\\vae_roundtrip_B\\encoder_only_hybrid\\frame_002.png",
+          ".phase17_visual_outputs\\vae_roundtrip_B\\encoder_only_hybrid\\frame_003.png",
+          ".phase17_visual_outputs\\vae_roundtrip_B\\encoder_only_hybrid\\frame_004.png",
+          ".phase17_visual_outputs\\vae_roundtrip_B\\encoder_only_hybrid\\frame_005.png",
+          ".phase17_visual_outputs\\vae_roundtrip_B\\encoder_only_hybrid\\frame_006.png",
+          ".phase17_visual_outputs\\vae_roundtrip_B\\encoder_only_hybrid\\frame_007.png",
+          ".phase17_visual_outputs\\vae_roundtrip_B\\encoder_only_hybrid\\frame_008.png"
+        ],
+        "full_vae_ncnn": [
+          ".phase17_visual_outputs\\vae_roundtrip_B\\full_vae_ncnn\\frame_000.png",
+          ".phase17_visual_outputs\\vae_roundtrip_B\\full_vae_ncnn\\frame_001.png",
+          ".phase17_visual_outputs\\vae_roundtrip_B\\full_vae_ncnn\\frame_002.png",
+          ".phase17_visual_outputs\\vae_roundtrip_B\\full_vae_ncnn\\frame_003.png",
+          ".phase17_visual_outputs\\vae_roundtrip_B\\full_vae_ncnn\\frame_004.png",
+          ".phase17_visual_outputs\\vae_roundtrip_B\\full_vae_ncnn\\frame_005.png",
+          ".phase17_visual_outputs\\vae_roundtrip_B\\full_vae_ncnn\\frame_006.png",
+          ".phase17_visual_outputs\\vae_roundtrip_B\\full_vae_ncnn\\frame_007.png",
+          ".phase17_visual_outputs\\vae_roundtrip_B\\full_vae_ncnn\\frame_008.png"
+        ]
+      },
+      "call_counts": {
+        "ncnn_vae_encoder_call_count": 7,
+        "ncnn_vae_decoder_call_count": 14,
+        "original_vae_encoder_call_count": 2,
+        "original_vae_decoder_call_count": 4,
+        "silent_fallback": false
+      },
+      "latency_seconds": {
+        "pt_encoder": 14.774,
+        "pt_decoder": 37.832,
+        "ncnn_encoder_chain": 787.977,
+        "ncnn_decoder_chain_full": 2114.8,
+        "ncnn_decoder_chain_hybrid": 2141.703,
+        "pt_decoder_on_ncnn_latent": 39.218
+      },
+      "pass": true
+    }
+  },
+  "overall_pass": true
+}

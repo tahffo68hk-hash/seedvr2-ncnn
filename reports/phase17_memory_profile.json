@@ -1,0 +1,345 @@
+{
+  "phase": 17,
+  "real_seedvr2_weights": true,
+  "real_vae_weights": true,
+  "checkpoint_sha256": "c7df8a67e68b7f9aca3d5d2153d2ce8ab4373687741a0f9ce87cb356ace51cac",
+  "profiles": {
+    "A": {
+      "stages": {
+        "enc_conv_in": {
+          "artifact_bytes": 42472,
+          "repeats": 3,
+          "latency_seconds": [
+            0.251308799999606,
+            0.2563530000006722,
+            0.25322830000004615
+          ],
+          "p50": 0.25322830000004615,
+          "p95": 0.25322830000004615,
+          "max": 0.2563530000006722,
+          "peak_working_set_bytes": 135380992
+        },
+        "enc_down0": {
+          "artifact_bytes": 7694766,
+          "repeats": 1,
+          "latency_seconds": [
+            55.87043650000123
+          ],
+          "p50": 55.87043650000123,
+          "p95": 55.87043650000123,
+          "max": 55.87043650000123,
+          "peak_working_set_bytes": 438812672
+        },
+        "enc_down1": {
+          "artifact_bytes": 32027987,
+          "repeats": 1,
+          "latency_seconds": [
+            43.51514289999977
+          ],
+          "p50": 43.51514289999977,
+          "p95": 43.51514289999977,
+          "max": 43.51514289999977,
+          "peak_working_set_bytes": 320352256
+        },
+        "enc_down2": {
+          "artifact_bytes": 127986001,
+          "repeats": 1,
+          "latency_seconds": [
+            18.38958090000051
+          ],
+          "p50": 18.38958090000051,
+          "p95": 18.38958090000051,
+          "max": 18.38958090000051,
+          "peak_working_set_bytes": 228696064
+        },
+        "enc_down3": {
+          "artifact_bytes": 113290945,
+          "repeats": 1,
+          "latency_seconds": [
+            2.919917399998667
+          ],
+          "p50": 2.919917399998667,
+          "p95": 2.919917399998667,
+          "max": 2.919917399998667,
+          "peak_working_set_bytes": 134246400
+        },
+        "enc_mid": {
+          "artifact_bytes": 121705589,
+          "repeats": 1,
+          "latency_seconds": [
+            2.9212786000007327
+          ],
+          "p50": 2.9212786000007327,
+          "p95": 2.9212786000007327,
+          "max": 2.9212786000007327,
+          "peak_working_set_bytes": 142254080
+        },
+        "enc_out": {
+          "artifact_bytes": 1778712,
+          "repeats": 3,
+          "latency_seconds": [
+            0.0773761000000377,
+            0.07680359999903885,
+            0.08142509999925096
+          ],
+          "p50": 0.0773761000000377,
+          "p95": 0.0773761000000377,
+          "max": 0.08142509999925096,
+          "peak_working_set_bytes": 16449536
+        },
+        "dec_conv_in": {
+          "artifact_bytes": 887273,
+          "repeats": 3,
+          "latency_seconds": [
+            0.0507249000002048,
+            0.050120600000809645,
+            0.05030140000053507
+          ],
+          "p50": 0.05030140000053507,
+          "p95": 0.05030140000053507,
+          "max": 0.0507249000002048,
+          "peak_working_set_bytes": 7487488
+        },
+        "dec_mid": {
+          "artifact_bytes": 121705589,
+          "repeats": 1,
+          "latency_seconds": [
+            2.921266999999716
+          ],
+          "p50": 2.921266999999716,
+          "p95": 2.921266999999716,
+          "max": 2.921266999999716,
+          "peak_working_set_bytes": 142196736
+        },
+        "dec_up0": {
+          "artifact_bytes": 206658080,
+          "repeats": 1,
+          "latency_seconds": [
+            9.850098700000672
+          ],
+          "p50": 9.850098700000672,
+          "p95": 9.850098700000672,
+          "max": 9.850098700000672,
+          "peak_working_set_bytes": 273088512
+        },
+        "dec_up1": {
+          "artifact_bytes": 206692896,
+          "repeats": 1,
+          "latency_seconds": [
+            83.69816349999928
+          ],
+          "p50": 83.69816349999928,
+          "p95": 83.69816349999928,
+          "max": 83.69816349999928,
+          "peak_working_set_bytes": 569872384
+        },
+        "dec_up2": {
+          "artifact_bytes": 58368364,
+          "repeats": 1,
+          "latency_seconds": [
+            149.8467400999998
+          ],
+          "p50": 149.8467400999998,
+          "p95": 149.8467400999998,
+          "max": 149.8467400999998,
+          "peak_working_set_bytes": 893636608
+        },
+        "dec_up3": {
+          "artifact_bytes": 12562589,
+          "repeats": 1,
+          "latency_seconds": [
+            100.29283899999973
+          ],
+          "p50": 100.29283899999973,
+          "p95": 100.29283899999973,
+          "max": 100.29283899999973,
+          "peak_working_set_bytes": 776916992
+        },
+        "dec_out": {
+          "artifact_bytes": 47525,
+          "repeats": 3,
+          "latency_seconds": [
+            0.40369799999825773,
+            0.3988069999995787,
+            0.4030932000005123
+          ],
+          "p50": 0.4030932000005123,
+          "p95": 0.4030932000005123,
+          "max": 0.40369799999825773,
+          "peak_working_set_bytes": 294686720
+        }
+      },
+      "encoder_peak_working_set_bytes": 893636608,
+      "decoder_peak_working_set_bytes": 893636608
+    },
+    "B": {
+      "stages": {
+        "enc_conv_in": {
+          "artifact_bytes": 42472,
+          "repeats": 3,
+          "latency_seconds": [
+            1.1900257999986934,
+            1.1964153000008082,
+            1.1921634999998787
+          ],
+          "p50": 1.1921634999998787,
+          "p95": 1.1921634999998787,
+          "max": 1.1964153000008082,
+          "peak_working_set_bytes": 704000000
+        },
+        "enc_down0": {
+          "artifact_bytes": 7711158,
+          "repeats": 1,
+          "latency_seconds": [
+            328.46962449999955
+          ],
+          "p50": 328.46962449999955,
+          "p95": 328.46962449999955,
+          "max": 328.46962449999955,
+          "peak_working_set_bytes": 2145067008
+        },
+        "enc_down1": {
+          "artifact_bytes": 32056669,
+          "repeats": 1,
+          "latency_seconds": [
+            299.0015860000003
+          ],
+          "p50": 299.0015860000003,
+          "p95": 299.0015860000003,
+          "max": 299.0015860000003,
+          "peak_working_set_bytes": 1450962944
+        },
+        "enc_down2": {
+          "artifact_bytes": 128014679,
+          "repeats": 1,
+          "latency_seconds": [
+            139.67133380000087
+          ],
+          "p50": 139.67133380000087,
+          "p95": 139.67133380000087,
+          "max": 139.67133380000087,
+          "peak_working_set_bytes": 558596096
+        },
+        "enc_down3": {
+          "artifact_bytes": 113307329,
+          "repeats": 1,
+          "latency_seconds": [
+            14.476423699999941
+          ],
+          "p50": 14.476423699999941,
+          "p95": 14.476423699999941,
+          "max": 14.476423699999941,
+          "peak_working_set_bytes": 179961856
+        },
+        "enc_mid": {
+          "artifact_bytes": 125929124,
+          "repeats": 1,
+          "latency_seconds": [
+            14.497007399999347
+          ],
+          "p50": 14.497007399999347,
+          "p95": 14.497007399999347,
+          "max": 14.497007399999347,
+          "peak_working_set_bytes": 193552384
+        },
+        "enc_out": {
+          "artifact_bytes": 1782808,
+          "repeats": 3,
+          "latency_seconds": [
+            0.24875010000141629,
+            0.2492515000012645,
+            0.24687289999928907
+          ],
+          "p50": 0.24875010000141629,
+          "p95": 0.24875010000141629,
+          "max": 0.2492515000012645,
+          "peak_working_set_bytes": 43728896
+        },
+        "dec_conv_in": {
+          "artifact_bytes": 887273,
+          "repeats": 3,
+          "latency_seconds": [
+            0.12304070000027423,
+            0.12414449999960198,
+            0.12221320000026026
+          ],
+          "p50": 0.12304070000027423,
+          "p95": 0.12304070000027423,
+          "max": 0.12414449999960198,
+          "peak_working_set_bytes": 21278720
+        },
+        "dec_mid": {
+          "artifact_bytes": 125929124,
+          "repeats": 1,
+          "latency_seconds": [
+            14.558741500000906
+          ],
+          "p50": 14.558741500000906,
+          "p95": 14.558741500000906,
+          "max": 14.558741500000906,
+          "peak_working_set_bytes": 193544192
+        },
+        "dec_up0": {
+          "artifact_bytes": 206689824,
+          "repeats": 1,
+          "latency_seconds": [
+            62.31842449999931
+          ],
+          "p50": 62.31842449999931,
+          "p95": 62.31842449999931,
+          "max": 62.31842449999931,
+          "peak_working_set_bytes": 481210368
+        },
+        "dec_up1": {
+          "artifact_bytes": 206791206,
+          "repeats": 1,
+          "latency_seconds": [
+            562.5940056999989
+          ],
+          "p50": 562.5940056999989,
+          "p95": 562.5940056999989,
+          "max": 562.5940056999989,
+          "peak_working_set_bytes": 1987706880
+        },
+        "dec_up2": {
+          "artifact_bytes": 58786169,
+          "repeats": 1,
+          "latency_seconds": [
+            897.9635251999989
+          ],
+          "p50": 897.9635251999989,
+          "p95": 897.9635251999989,
+          "max": 897.9635251999989,
+          "peak_working_set_bytes": 4262572032
+        },
+        "dec_up3": {
+          "artifact_bytes": 12591271,
+          "repeats": 1,
+          "latency_seconds": [
+            569.9536945999989
+          ],
+          "p50": 569.9536945999989,
+          "p95": 569.9536945999989,
+          "max": 569.9536945999989,
+          "peak_working_set_bytes": 3904110592
+        },
+        "dec_out": {
+          "artifact_bytes": 51623,
+          "repeats": 3,
+          "latency_seconds": [
+            2.1248090000008233,
+            2.149390599999606,
+            2.2011200999986613
+          ],
+          "p50": 2.149390599999606,
+          "p95": 2.149390599999606,
+          "max": 2.2011200999986613,
+          "peak_working_set_bytes": 1480949760
+        }
+      },
+      "encoder_peak_working_set_bytes": 4262572032,
+      "decoder_peak_working_set_bytes": 4262572032
+    }
+  },
+  "overall_pass": true
+}

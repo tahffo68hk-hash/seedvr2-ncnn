@@ -1,0 +1,158 @@
+{
+  "phase": 17,
+  "milestone": "real-weight SeedVR2 VAE ncnn + full 32-Block DiT core",
+  "real_seedvr2_weights": true,
+  "real_vae_weights": true,
+  "checkpoint_sha256": "c7df8a67e68b7f9aca3d5d2153d2ce8ab4373687741a0f9ce87cb356ace51cac",
+  "run": {
+    "seed": 20260803,
+    "steps": 1,
+    "cfg_scale": 1.0,
+    "frames": 4,
+    "height": 128,
+    "width": 128,
+    "use_sample": false
+  },
+  "modes": {
+    "dit_ncnn_vae_pytorch": {
+      "latent": {
+        "label": "latent",
+        "max_abs_error": 0.15625,
+        "mean_abs_error": 0.014247594401240349,
+        "rmse": 0.019230386462336786,
+        "psnr_db": 34.320239758003325,
+        "nan_count": 0,
+        "inf_count": 0
+      },
+      "pixels": {
+        "max_abs_error": 0.03125,
+        "mean_abs_error": 0.0011334875598549843,
+        "rmse": 0.002512601906764382,
+        "psnr_db": 51.99752629970433,
+        "ssim": 0.9989129602719872,
+        "nan_count": 0,
+        "inf_count": 0,
+        "ref_std": 0.20186223089694977,
+        "hybrid_std": 0.20176081359386444,
+        "mismatch_count": 11421,
+        "frames": 4,
+        "resolution": [
+          128,
+          128
+        ],
+        "flicker_reference": 0.2224493771791458,
+        "flicker_mode": 0.22234323620796204,
+        "non_constant_reference": true,
+        "non_constant_mode": true,
+        "all_black_mode": false,
+        "all_white_mode": false
+      }
+    },
+    "dit_ncnn_decoder_ncnn": {
+      "latent": {
+        "label": "latent",
+        "max_abs_error": 0.15625,
+        "mean_abs_error": 0.014247594401240349,
+        "rmse": 0.019230386462336786,
+        "psnr_db": 34.320239758003325,
+        "nan_count": 0,
+        "inf_count": 0
+      },
+      "pixels": {
+        "max_abs_error": 0.0361328125,
+        "mean_abs_error": 0.0012207248946651816,
+        "rmse": 0.0024816081811689207,
+        "psnr_db": 52.105335755610525,
+        "ssim": 0.9989941984749569,
+        "nan_count": 0,
+        "inf_count": 0,
+        "ref_std": 0.20186223089694977,
+        "hybrid_std": 0.20220203697681427,
+        "mismatch_count": 9736,
+        "frames": 4,
+        "resolution": [
+          128,
+          128
+        ],
+        "flicker_reference": 0.2224493771791458,
+        "flicker_mode": 0.2228233814239502,
+        "non_constant_reference": true,
+        "non_constant_mode": true,
+        "all_black_mode": false,
+        "all_white_mode": false
+      }
+    },
+    "full_ncnn_core": {
+      "latent": {
+        "label": "latent",
+        "max_abs_error": 0.171875,
+        "mean_abs_error": 0.015291962772607803,
+        "rmse": 0.020580555133707434,
+        "psnr_db": 33.7308582977358,
+        "nan_count": 0,
+        "inf_count": 0
+      },
+      "pixels": {
+        "max_abs_error": 0.052734375,
+        "mean_abs_error": 0.0013716536341235042,
+        "rmse": 0.002755829604531604,
+        "psnr_db": 51.19495277519693,
+        "ssim": 0.9989820619186188,
+        "nan_count": 0,
+        "inf_count": 0,
+        "ref_std": 0.20186223089694977,
+        "hybrid_std": 0.20142777264118195,
+        "mismatch_count": 15085,
+        "frames": 4,
+        "resolution": [
+          128,
+          128
+        ],
+        "flicker_reference": 0.2224493771791458,
+        "flicker_mode": 0.22161149978637695,
+        "non_constant_reference": true,
+        "non_constant_mode": true,
+        "all_black_mode": false,
+        "all_white_mode": false
+      }
+    }
+  },
+  "error_budget": {
+    "phase": 17,
+    "encoder_contribution": 2.166160386847363e-06,
+    "dit_contribution": 0.0029710192723948203,
+    "decoder_contribution": 2.0777902127834184e-05,
+    "combined_contribution": 0.002755829604531604,
+    "largest_contributor": "dit",
+    "first_abnormal_stage": "none (all stages within relative <1e-3 budget)",
+    "note": "contributions measured at A profile; dit contribution is the latent-space RMSE relative max of the Phase 16 full ncnn DiT chain"
+  },
+  "thresholds": {
+    "full_ncnn_core_pixel_psnr_min_db": 40.0,
+    "full_ncnn_core_pixel_ssim_min": 0.98,
+    "pixel_max_abs_sanity": 0.25,
+    "latent_max_abs_sanity": 0.5,
+    "latent_mean_abs_sanity": 0.05,
+    "amplify_factor": 25.0
+  },
+  "full_ncnn_core_pass": true,
+  "decoder_hybrid_pass": true,
+  "overall_pass": true,
+  "verdict": "PASS",
+  "outputs": {
+    "input_dir": "00_input",
+    "reference_dir": "01_pytorch_reference",
+    "phase16_baseline_dir": "02_phase16_dit_ncnn_vae_pytorch",
+    "decoder_ncnn_dir": "03_dit_ncnn_decoder_ncnn",
+    "full_ncnn_core_dir": "04_full_ncnn_core",
+    "diff_decoder_dir": "05_diff_decoder",
+    "diff_full_dir": "06_diff_full",
+    "side_by_side_dir": "07_side_by_side"
+  },
+  "scheduler_host_or_pytorch": true,
+  "full_pure_ncnn_application": false,
+  "max_resident_weighted_dit_blocks": 1,
+  "max_resident_vae_model_sets": 1,
+  "android_vulkan": false,
+  "large_artifacts_committed": false
+}

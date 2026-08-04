@@ -1,0 +1,73 @@
+{
+  "phase": 17,
+  "real_seedvr2_weights": true,
+  "real_vae_weights": true,
+  "checkpoint_sha256": "c7df8a67e68b7f9aca3d5d2153d2ce8ab4373687741a0f9ce87cb356ace51cac",
+  "official_slicing": {
+    "class": "VideoAutoencoderKLWrapper",
+    "slicing_sample_min_size": 4,
+    "temporal_downsample_factor": 4,
+    "memory_state_path": "causal_conv_slice_inputs / causal_conv_gather_outputs",
+    "whole_tensor_used_in_phase17": true,
+    "profiles_use_4k1_padded_convention": true
+  },
+  "slicing_equivalence": {
+    "T9": {
+      "whole_shape": [
+        1,
+        16,
+        3,
+        24,
+        32
+      ],
+      "sliced_shape": [
+        1,
+        16,
+        3,
+        24,
+        32
+      ],
+      "max_abs_diff": 8.344650268554688e-07,
+      "equal": false
+    },
+    "T17": {
+      "whole_shape": [
+        1,
+        16,
+        5,
+        16,
+        16
+      ],
+      "sliced_shape": [
+        1,
+        16,
+        5,
+        16,
+        16
+      ],
+      "max_abs_diff": 7.152557373046875e-07,
+      "equal": false
+    }
+  },
+  "t8_sliced_crash": {
+    "crashed": true,
+    "error_type": "RuntimeError",
+    "error": "Calculated padded input size per channel: (2 x 33 x 33). Kernel size: (3 x 3 x 3). Kernel size can't be greater than actual input size",
+    "note": "official split_size=4 slicing on raw T=8 input; Profile B uses the official T=9 padded convention."
+  },
+  "temporal_padding_rule": {
+    "rule": "pad by repeating the last frame until T = 4k+1 (cut_videos in the official runner)",
+    "profile_a": "4 frames -> T=5",
+    "profile_b": "8 frames -> T=9"
+  },
+  "host_managed": [
+    "dynamic shape",
+    "tiling",
+    "chunking",
+    "padding",
+    "temporal cut"
+  ],
+  "ncnn_scope": "per-stage FP32 models consume the padded whole tensor; no ncnn-side tiling is needed for the validated profiles",
+  "tiling_semantics_match_official": true,
+  "android_vulkan": false
+}

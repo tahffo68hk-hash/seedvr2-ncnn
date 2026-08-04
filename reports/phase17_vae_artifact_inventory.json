@@ -1,0 +1,338 @@
+{
+  "phase": 17,
+  "real_seedvr2_weights": true,
+  "checkpoint_sha256": "c7df8a67e68b7f9aca3d5d2153d2ce8ab4373687741a0f9ce87cb356ace51cac",
+  "pnnx_command": "pnnx model.pt inputshape=[...] fp16=0",
+  "fp16": 0,
+  "profiles": {
+    "A": {
+      "enc_conv_in": {
+        "ncnn_param_bytes": 484,
+        "ncnn_bin_bytes": 41988,
+        "sha256_param": "9da395435c8c62e1b447c5d1152d2f4c3573d208220677c292630a19ff9589f1",
+        "sha256_bin": "54efcb52ecce40f43eb851a264247eae157370e669703512cbc0a29418449e44",
+        "stage": "enc_conv_in",
+        "export_time_s": 0.0,
+        "source_keys": []
+      },
+      "enc_down0": {
+        "ncnn_param_bytes": 3994,
+        "ncnn_bin_bytes": 7690772,
+        "sha256_param": "a8853b979ad366b552723619009f82ad213e551b64603f007ee8dcfd9f77547b",
+        "sha256_bin": "5f18940921ee6ca3b472e879bebf75ad94b92dd35c33698aa0fc25b5accb7aa7",
+        "stage": "enc_down0",
+        "export_time_s": 0.0,
+        "source_keys": []
+      },
+      "enc_down1": {
+        "ncnn_param_bytes": 4411,
+        "ncnn_bin_bytes": 32023576,
+        "sha256_param": "cbfa824450b537d369ff2b6ea7622f61440b950dfc5ba616aabcf27a81dfd3a7",
+        "sha256_bin": "3a15266f86ed68a55b0cf3df53bd4017c4ded5c53ed5ee2a8aca4c0b2d2e7b6c",
+        "stage": "enc_down1",
+        "export_time_s": 0.0,
+        "source_keys": []
+      },
+      "enc_down2": {
+        "ncnn_param_bytes": 4409,
+        "ncnn_bin_bytes": 127981592,
+        "sha256_param": "af9ad704f456f17ae075d27a0cdd2f872eea9cb95874ad9c5e3efe113059c0d9",
+        "sha256_bin": "bfd7aced9dcfa79e3e805f1cfaa44de22680470dbc0c77a961d2dd7873f08a8d",
+        "stage": "enc_down2",
+        "export_time_s": 0.0,
+        "source_keys": []
+      },
+      "enc_down3": {
+        "ncnn_param_bytes": 3761,
+        "ncnn_bin_bytes": 113287184,
+        "sha256_param": "0061ee1b81fb3135c812e1edd69e1ae31e1b8222f16b09ccb58fced8520003c2",
+        "sha256_bin": "46607113d32c0ba4e7e9dbba1c705f0a6c791a0f94fce867f96b2437e8ee9fa9",
+        "stage": "enc_down3",
+        "export_time_s": 0.0,
+        "source_keys": []
+      },
+      "enc_mid": {
+        "ncnn_param_bytes": 5189,
+        "ncnn_bin_bytes": 121700400,
+        "sha256_param": "93d48a199dd93f1915f4d2b5fcc37f80f0a3eb71d12058f748672fcdea3732fe",
+        "sha256_bin": "b083c539361690d3bb7bbe0067d3ed3f73d1618fab7bcd551930f0bae7dd43f8",
+        "stage": "enc_mid",
+        "export_time_s": 0.0,
+        "source_keys": []
+      },
+      "enc_out": {
+        "ncnn_param_bytes": 916,
+        "ncnn_bin_bytes": 1777796,
+        "sha256_param": "edcf64b4a94a98dea3ae705b58e622ca603368fa189a1192a467c46ba059ad32",
+        "sha256_bin": "c84babeb52d71fbc1edbaaeedc353fc043cfd88af89e3aef338c9d68df019224",
+        "stage": "enc_out",
+        "export_time_s": 0.0,
+        "source_keys": []
+      },
+      "dec_conv_in": {
+        "ncnn_param_bytes": 485,
+        "ncnn_bin_bytes": 886788,
+        "sha256_param": "9c0ef697d9b36d5d17a2abc3cc4ea96a1b1950ecdca4aa54072836ca5755da36",
+        "sha256_bin": "932f18f53349207a73b4c5185cb6182fd25215d8c0378d1b676146f6f87def52",
+        "stage": "dec_conv_in",
+        "export_time_s": 0.0,
+        "source_keys": []
+      },
+      "dec_mid": {
+        "ncnn_param_bytes": 5189,
+        "ncnn_bin_bytes": 121700400,
+        "sha256_param": "93d48a199dd93f1915f4d2b5fcc37f80f0a3eb71d12058f748672fcdea3732fe",
+        "sha256_bin": "997bc0d1695b074a65a5f98040c6844bb34f02c4644c4ad1fd8102d980b90fff",
+        "stage": "dec_mid",
+        "export_time_s": 0.0,
+        "source_keys": []
+      },
+      "dec_up0": {
+        "ncnn_param_bytes": 6656,
+        "ncnn_bin_bytes": 206651424,
+        "sha256_param": "7f9a4b40ff3b3f971b502715e6cf29bc4e86c96245247fc4c69e7147c45da49c",
+        "sha256_bin": "46ed9df5c97c5c0c1dabfca76110c7a7e0ef61a06fa72fab6ff8fc2ff54d1672",
+        "stage": "dec_up0",
+        "export_time_s": 0.0,
+        "source_keys": []
+      },
+      "dec_up1": {
+        "ncnn_param_bytes": 6656,
+        "ncnn_bin_bytes": 206686240,
+        "sha256_param": "08826ecd86cb8c96670773bb75f32a659c2c2ead9c110d4c5ac913a4f78d85c0",
+        "sha256_bin": "b239dc8c69c804dc358b2b08e13cdd137aaab085cc116ea9ffa07b9a8b1b728c",
+        "stage": "dec_up1",
+        "export_time_s": 0.0,
+        "source_keys": []
+      },
+      "dec_up2": {
+        "ncnn_param_bytes": 6472,
+        "ncnn_bin_bytes": 58361892,
+        "sha256_param": "c91e5d5f1fc198cdd17e5bdd007be802b195b6cb9f0cbed8cf59d1037745c06c",
+        "sha256_bin": "d76c0d772cdd4e86c38a8126d778bb222f3f1072ceb78ada40e677454259d3c0",
+        "stage": "dec_up2",
+        "export_time_s": 0.0,
+        "source_keys": []
+      },
+      "dec_up3": {
+        "ncnn_param_bytes": 5761,
+        "ncnn_bin_bytes": 12556828,
+        "sha256_param": "79d1ca45ba537fa99e77e91f798130506ff6f2d2ac603d4217ebeab287fd009e",
+        "sha256_bin": "e21535b5b3247547f381649ebd6427f8b0a8eeb383aa6744d961d6cbc7d11861",
+        "stage": "dec_up3",
+        "export_time_s": 0.0,
+        "source_keys": []
+      },
+      "dec_out": {
+        "ncnn_param_bytes": 917,
+        "ncnn_bin_bytes": 46608,
+        "sha256_param": "8f98fd8182fc162e9b5eacb3bf77e1d9471d9aca506b53eead201cbd94ddd465",
+        "sha256_bin": "094c456c7e39d62999416d38889c9731c1532662607092354ae6310f8b8e986d",
+        "stage": "dec_out",
+        "export_time_s": 0.0,
+        "source_keys": []
+      }
+    },
+    "B": {
+      "enc_conv_in": {
+        "ncnn_param_bytes": 484,
+        "ncnn_bin_bytes": 41988,
+        "sha256_param": "9da395435c8c62e1b447c5d1152d2f4c3573d208220677c292630a19ff9589f1",
+        "sha256_bin": "54efcb52ecce40f43eb851a264247eae157370e669703512cbc0a29418449e44",
+        "stage": "enc_conv_in",
+        "export_time_s": 0.0,
+        "source_keys": []
+      },
+      "enc_down0": {
+        "ncnn_param_bytes": 4002,
+        "ncnn_bin_bytes": 7707156,
+        "sha256_param": "8ed032bbd02567539473763ec270d282e895496188aa2c9975fb7c7618b2a135",
+        "sha256_bin": "ad391a174191ce6f5e21db14cfe7bab0c6db51e79449d202f97f35ecaaacdb07",
+        "stage": "enc_down0",
+        "export_time_s": 0.0,
+        "source_keys": []
+      },
+      "enc_down1": {
+        "ncnn_param_bytes": 4421,
+        "ncnn_bin_bytes": 32052248,
+        "sha256_param": "6345c122f8fd0e19d4a3295629a72f99080b0ba3146454a8cff34399f92ddfdd",
+        "sha256_bin": "eeed5930e251fafecfbc72ac7f5dc3cc0ded87067cbb655b3cfc1a84b32e30fd",
+        "stage": "enc_down1",
+        "export_time_s": 0.0,
+        "source_keys": []
+      },
+      "enc_down2": {
+        "ncnn_param_bytes": 4415,
+        "ncnn_bin_bytes": 128010264,
+        "sha256_param": "1debb4b01eb7606587b09d9e69ae335aae9d0632f5cf858f6ce417ce0c6c60f7",
+        "sha256_bin": "9782aa96a66f3adb81a4a2420c75b07d753b9d82381dedaef098057b33024941",
+        "stage": "enc_down2",
+        "export_time_s": 0.0,
+        "source_keys": []
+      },
+      "enc_down3": {
+        "ncnn_param_bytes": 3761,
+        "ncnn_bin_bytes": 113303568,
+        "sha256_param": "d7ed2abd93a86f11eb2705190e3ba8a25c19569686c83164c58ae5a6e94c4e53",
+        "sha256_bin": "be2e30497378888d0d2cfd8753a3f31f98ccedb250788d6b0906f26a89f54e0a",
+        "stage": "enc_down3",
+        "export_time_s": 0.0,
+        "source_keys": []
+      },
+      "enc_mid": {
+        "ncnn_param_bytes": 5732,
+        "ncnn_bin_bytes": 125923392,
+        "sha256_param": "6b89754f133d20ed416b3cc83186a290d82a11962140f663545bbfd1d49d29a5",
+        "sha256_bin": "71aff529c5a3baea561c31e3b750e9f63ac95b8986fca9dd8f53ccec8da4b68d",
+        "stage": "enc_mid",
+        "export_time_s": 0.0,
+        "source_keys": []
+      },
+      "enc_out": {
+        "ncnn_param_bytes": 916,
+        "ncnn_bin_bytes": 1781892,
+        "sha256_param": "f07b73e11411dbf18a344319ec37447e28f3fc66e2c44fdc01cebe66a7eb02cc",
+        "sha256_bin": "4103d520b867ae85cc572d6a027f49e26231c7370b21e2d6dc428cbd1b77c0fe",
+        "stage": "enc_out",
+        "export_time_s": 0.0,
+        "source_keys": []
+      },
+      "dec_conv_in": {
+        "ncnn_param_bytes": 485,
+        "ncnn_bin_bytes": 886788,
+        "sha256_param": "9c0ef697d9b36d5d17a2abc3cc4ea96a1b1950ecdca4aa54072836ca5755da36",
+        "sha256_bin": "932f18f53349207a73b4c5185cb6182fd25215d8c0378d1b676146f6f87def52",
+        "stage": "dec_conv_in",
+        "export_time_s": 0.0,
+        "source_keys": []
+      },
+      "dec_mid": {
+        "ncnn_param_bytes": 5732,
+        "ncnn_bin_bytes": 125923392,
+        "sha256_param": "6b89754f133d20ed416b3cc83186a290d82a11962140f663545bbfd1d49d29a5",
+        "sha256_bin": "ed6d5b25224a447bf164b66c85a789ab27a20d67de10bd971e2674252d423493",
+        "stage": "dec_mid",
+        "export_time_s": 0.0,
+        "source_keys": []
+      },
+      "dec_up0": {
+        "ncnn_param_bytes": 6656,
+        "ncnn_bin_bytes": 206683168,
+        "sha256_param": "e75f46c854186b0c1dec62aed35d2d83fde64b1b2426516c0b98122437e37f37",
+        "sha256_bin": "51695bc61b1defadc10c279eb85be64a712a5415e895863af36b5c183a76dec3",
+        "stage": "dec_up0",
+        "export_time_s": 0.0,
+        "source_keys": []
+      },
+      "dec_up1": {
+        "ncnn_param_bytes": 6662,
+        "ncnn_bin_bytes": 206784544,
+        "sha256_param": "ef221c592028af30bd3743c9973b62c001c6a911cc715f2197f1461d369b7962",
+        "sha256_bin": "b06a3a761309b9de36e875c44946a0e122e832d0328e4cc6a68bed11e18c9e64",
+        "stage": "dec_up1",
+        "export_time_s": 0.0,
+        "source_keys": []
+      },
+      "dec_up2": {
+        "torchscript_bytes": 58411505,
+        "pnnx_param_bytes": 10916,
+        "pnnx_bin_bytes": 58785228,
+        "ncnn_param_bytes": 6485,
+        "ncnn_bin_bytes": 58779684,
+        "sha256_param": "4ed2fcf9c374bfd8edbf08ec72b4b362dff7183cd767c8f10dd435e63d089c27",
+        "sha256_bin": "660c3a47144621bf087d260b1c8f393347dc72354fa21fac4862eded5b8becf9",
+        "stage": "dec_up2",
+        "export_time_s": 0.0,
+        "source_keys": []
+      },
+      "dec_up3": {
+        "torchscript_bytes": 12642986,
+        "pnnx_param_bytes": 9916,
+        "pnnx_bin_bytes": 12590346,
+        "ncnn_param_bytes": 5771,
+        "ncnn_bin_bytes": 12585500,
+        "sha256_param": "d689baf409a9cf63b0dd08475e98b336f0758594e67bf33c062a65931e7b6a45",
+        "sha256_bin": "d8e414257726c725819316c57ad7098339390aa9287f8a3633c20cc9801c817d",
+        "stage": "dec_up3",
+        "export_time_s": 884.079,
+        "input_shape": [
+          1,
+          256,
+          9,
+          192,
+          256
+        ],
+        "output_shape": [
+          1,
+          128,
+          9,
+          192,
+          256
+        ],
+        "source_keys": [
+          "resnets.0.norm1.weight",
+          "resnets.0.norm1.bias",
+          "resnets.0.conv1.weight",
+          "resnets.0.conv1.bias",
+          "resnets.0.norm2.weight",
+          "resnets.0.norm2.bias",
+          "resnets.0.conv2.weight",
+          "resnets.0.conv2.bias",
+          "resnets.0.conv_shortcut.weight",
+          "resnets.0.conv_shortcut.bias",
+          "resnets.1.norm1.weight",
+          "resnets.1.norm1.bias",
+          "resnets.1.conv1.weight",
+          "resnets.1.conv1.bias",
+          "resnets.1.norm2.weight",
+          "resnets.1.norm2.bias",
+          "resnets.1.conv2.weight",
+          "resnets.1.conv2.bias",
+          "resnets.2.norm1.weight",
+          "resnets.2.norm1.bias",
+          "resnets.2.conv1.weight",
+          "resnets.2.conv1.bias",
+          "resnets.2.norm2.weight",
+          "resnets.2.norm2.bias",
+          "resnets.2.conv2.weight",
+          "resnets.2.conv2.bias"
+        ],
+        "smoke_max_abs_diff": 0.0048828125,
+        "smoke_rel_max": 1.0521229052101442e-06
+      },
+      "dec_out": {
+        "torchscript_bytes": 62043,
+        "pnnx_param_bytes": 1621,
+        "pnnx_bin_bytes": 51494,
+        "ncnn_param_bytes": 919,
+        "ncnn_bin_bytes": 50704,
+        "sha256_param": "2df6d3577b768568748559577fbaa650ae0e04ff20375624c0c1ce6a671a2d34",
+        "sha256_bin": "b5c7ab4335ee7b769f2ec4ddefeadee993f2774e7475033e0f6dc156e4db70f0",
+        "stage": "dec_out",
+        "export_time_s": 5.359,
+        "input_shape": [
+          1,
+          128,
+          9,
+          192,
+          256
+        ],
+        "output_shape": [
+          1,
+          3,
+          9,
+          192,
+          256
+        ],
+        "source_keys": [
+          "conv_norm_out.weight",
+          "conv_norm_out.bias",
+          "conv_out.weight",
+          "conv_out.bias"
+        ],
+        "smoke_max_abs_diff": 6.4373016357421875e-06,
+        "smoke_rel_max": 1.647711274116543e-06
+      }
+    }
+  }
+}

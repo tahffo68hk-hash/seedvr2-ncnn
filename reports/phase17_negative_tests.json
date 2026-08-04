@@ -1,0 +1,363 @@
+{
+  "phase": 17,
+  "real_seedvr2_weights": true,
+  "real_vae_weights": true,
+  "checkpoint_sha256": "c7df8a67e68b7f9aca3d5d2153d2ce8ab4373687741a0f9ce87cb356ace51cac",
+  "tests": {
+    "aba_non_determinism_rejected": {
+      "rejected": true,
+      "pass": true,
+      "detail": ""
+    },
+    "artifact_sha_wrong_rejected": {
+      "rejected": true,
+      "pass": true,
+      "detail": ""
+    },
+    "output_all_black_rejected": {
+      "rejected": true,
+      "pass": true,
+      "detail": ""
+    },
+    "blend_weight_wrong_rejected": {
+      "rejected": true,
+      "pass": true,
+      "detail": ""
+    },
+    "enc_dec_both_resident_rejected": {
+      "rejected": true,
+      "pass": true,
+      "detail": ""
+    },
+    "cache_not_cleared_rejected": {
+      "rejected": true,
+      "pass": true,
+      "detail": ""
+    },
+    "causal_direction_wrong_rejected": {
+      "rejected": true,
+      "pass": true,
+      "detail": ""
+    },
+    "chunk_boundary_frame_wrong_rejected": {
+      "rejected": true,
+      "pass": true,
+      "detail": ""
+    },
+    "chunk_order_wrong_rejected": {
+      "rejected": true,
+      "pass": true,
+      "detail": ""
+    },
+    "ckpt_in_git_rejected": {
+      "rejected": true,
+      "pass": true,
+      "detail": ""
+    },
+    "ckpt_missing_rejected": {
+      "rejected": true,
+      "pass": true,
+      "detail": ""
+    },
+    "ckpt_sha_wrong_rejected": {
+      "rejected": true,
+      "pass": true,
+      "detail": ""
+    },
+    "output_constant_rejected": {
+      "rejected": true,
+      "pass": true,
+      "detail": ""
+    },
+    "continue_dit_after_failure_rejected": {
+      "rejected": true,
+      "pass": true,
+      "detail": ""
+    },
+    "conv2d_layout_wrong_rejected": {
+      "rejected": true,
+      "pass": true,
+      "detail": ""
+    },
+    "conv3d_layout_wrong_rejected": {
+      "rejected": true,
+      "pass": true,
+      "detail": ""
+    },
+    "crop_wrong_rejected": {
+      "rejected": true,
+      "pass": true,
+      "detail": ""
+    },
+    "continue_decoder_after_failure_rejected": {
+      "rejected": true,
+      "pass": true,
+      "detail": ""
+    },
+    "decoder_artifact_missing_rejected": {
+      "rejected": true,
+      "pass": true,
+      "detail": ""
+    },
+    "decoder_key_missing_rejected": {
+      "rejected": true,
+      "pass": true,
+      "detail": ""
+    },
+    "decoder_silent_fallback_rejected": {
+      "rejected": true,
+      "pass": true,
+      "detail": ""
+    },
+    "deconv_layout_wrong_rejected": {
+      "rejected": true,
+      "pass": true,
+      "detail": ""
+    },
+    "diag_param_pollution_rejected": {
+      "rejected": true,
+      "pass": true,
+      "detail": ""
+    },
+    "dilation_wrong_rejected": {
+      "rejected": true,
+      "pass": true,
+      "detail": ""
+    },
+    "downsample_rate_wrong_rejected": {
+      "rejected": true,
+      "pass": true,
+      "detail": ""
+    },
+    "output_dtype_wrong_rejected": {
+      "rejected": true,
+      "pass": true,
+      "detail": ""
+    },
+    "duplicate_mapping_rejected": {
+      "rejected": true,
+      "pass": true,
+      "detail": ""
+    },
+    "dynshape_metadata_pollution_rejected": {
+      "rejected": true,
+      "pass": true,
+      "detail": ""
+    },
+    "encoder_artifact_missing_rejected": {
+      "rejected": true,
+      "pass": true,
+      "detail": ""
+    },
+    "encoder_key_missing_rejected": {
+      "rejected": true,
+      "pass": true,
+      "detail": ""
+    },
+    "encoder_silent_fallback_rejected": {
+      "rejected": true,
+      "pass": true,
+      "detail": ""
+    },
+    "file_handle_not_released_rejected": {
+      "rejected": true,
+      "pass": true,
+      "detail": ""
+    },
+    "flicker_over_limit_rejected": {
+      "rejected": true,
+      "pass": true,
+      "detail": ""
+    },
+    "frame_count_wrong_rejected": {
+      "rejected": true,
+      "pass": true,
+      "detail": ""
+    },
+    "output_frame_shape_wrong_rejected": {
+      "rejected": true,
+      "pass": true,
+      "detail": ""
+    },
+    "fullcore_pytorch_vae_rejected": {
+      "rejected": true,
+      "pass": true,
+      "detail": ""
+    },
+    "groups_wrong_rejected": {
+      "rejected": true,
+      "pass": true,
+      "detail": ""
+    },
+    "output_inf_rejected": {
+      "rejected": true,
+      "pass": true,
+      "detail": ""
+    },
+    "input_range_wrong_rejected": {
+      "rejected": true,
+      "pass": true,
+      "detail": ""
+    },
+    "input_sha_inconsistent_rejected": {
+      "rejected": true,
+      "pass": true,
+      "detail": ""
+    },
+    "latent_channel_wrong_rejected": {
+      "rejected": true,
+      "pass": true,
+      "detail": ""
+    },
+    "latent_in_git_rejected": {
+      "rejected": true,
+      "pass": true,
+      "detail": ""
+    },
+    "latent_scale_wrong_rejected": {
+      "rejected": true,
+      "pass": true,
+      "detail": ""
+    },
+    "output_latent_shape_wrong_rejected": {
+      "rejected": true,
+      "pass": true,
+      "detail": ""
+    },
+    "latent_shift_wrong_rejected": {
+      "rejected": true,
+      "pass": true,
+      "detail": ""
+    },
+    "metadata_ckpt_sha_inconsistent_rejected": {
+      "rejected": true,
+      "pass": true,
+      "detail": ""
+    },
+    "output_nan_rejected": {
+      "rejected": true,
+      "pass": true,
+      "detail": ""
+    },
+    "ncnn_decoder_count_insufficient_rejected": {
+      "rejected": true,
+      "pass": true,
+      "detail": ""
+    },
+    "ncnn_encoder_count_insufficient_rejected": {
+      "rejected": true,
+      "pass": true,
+      "detail": ""
+    },
+    "output_clamp_wrong_rejected": {
+      "rejected": true,
+      "pass": true,
+      "detail": ""
+    },
+    "overlap_wrong_rejected": {
+      "rejected": true,
+      "pass": true,
+      "detail": ""
+    },
+    "phase17_dirs_in_git_rejected": {
+      "rejected": true,
+      "pass": true,
+      "detail": ""
+    },
+    "png_video_in_git_rejected": {
+      "rejected": true,
+      "pass": true,
+      "detail": ""
+    },
+    "profile_config_inconsistent_rejected": {
+      "rejected": true,
+      "pass": true,
+      "detail": ""
+    },
+    "pure_ncnn_orchestration_claim_rejected": {
+      "rejected": true,
+      "pass": true,
+      "detail": ""
+    },
+    "pytorch_decoder_unexpected_call_rejected": {
+      "rejected": true,
+      "pass": true,
+      "detail": ""
+    },
+    "pytorch_encoder_unexpected_call_rejected": {
+      "rejected": true,
+      "pass": true,
+      "detail": ""
+    },
+    "schema_unknown_key_rejected": {
+      "rejected": true,
+      "pass": true,
+      "detail": ""
+    },
+    "seed_inconsistent_rejected": {
+      "rejected": true,
+      "pass": true,
+      "detail": ""
+    },
+    "shape_mismatch_rejected": {
+      "rejected": true,
+      "pass": true,
+      "detail": ""
+    },
+    "spatial_padding_wrong_rejected": {
+      "rejected": true,
+      "pass": true,
+      "detail": ""
+    },
+    "stride_wrong_rejected": {
+      "rejected": true,
+      "pass": true,
+      "detail": ""
+    },
+    "temporal_order_wrong_rejected": {
+      "rejected": true,
+      "pass": true,
+      "detail": ""
+    },
+    "temporal_padding_wrong_rejected": {
+      "rejected": true,
+      "pass": true,
+      "detail": ""
+    },
+    "tile_size_wrong_rejected": {
+      "rejected": true,
+      "pass": true,
+      "detail": ""
+    },
+    "unmapped_key_rejected": {
+      "rejected": true,
+      "pass": true,
+      "detail": ""
+    },
+    "upsample_rate_wrong_rejected": {
+      "rejected": true,
+      "pass": true,
+      "detail": ""
+    },
+    "vae_bin_in_git_rejected": {
+      "rejected": true,
+      "pass": true,
+      "detail": ""
+    },
+    "vae_multidit_resident_rejected": {
+      "rejected": true,
+      "pass": true,
+      "detail": ""
+    },
+    "output_all_white_rejected": {
+      "rejected": true,
+      "pass": true,
+      "detail": ""
+    }
+  },
+  "total": 70,
+  "passed": 70,
+  "overall_pass": true,
+  "overall_status": "PASS",
+  "min_required": 50
+}

@@ -1,0 +1,282 @@
+{
+  "phase": 17,
+  "real_seedvr2_weights": true,
+  "real_vae_weights": true,
+  "logical_filename": "ema_vae.pth",
+  "bytes": 1002691902,
+  "sha256": "c7df8a67e68b7f9aca3d5d2153d2ce8ab4373687741a0f9ce87cb356ace51cac",
+  "expected_sha256": "c7df8a67e68b7f9aca3d5d2153d2ce8ab4373687741a0f9ce87cb356ace51cac",
+  "sha256_verified": true,
+  "top_level_type": "OrderedDict",
+  "top_level_keys": [
+    "encoder.conv_in.weight",
+    "encoder.conv_in.bias",
+    "encoder.down_blocks.0.resnets.0.norm1.weight",
+    "encoder.down_blocks.0.resnets.0.norm1.bias",
+    "encoder.down_blocks.0.resnets.0.conv1.weight",
+    "encoder.down_blocks.0.resnets.0.conv1.bias",
+    "encoder.down_blocks.0.resnets.0.norm2.weight",
+    "encoder.down_blocks.0.resnets.0.norm2.bias",
+    "encoder.down_blocks.0.resnets.0.conv2.weight",
+    "encoder.down_blocks.0.resnets.0.conv2.bias"
+  ],
+  "tensor_count": 250,
+  "parameter_tensor_count": 250,
+  "buffer_count": 0,
+  "non_tensor_entries": {},
+  "total_numel": 250648227,
+  "dtype_distribution": {
+    "float32": 250
+  },
+  "shape_distribution": {
+    "torch.Size([128, 3, 3, 3, 3])": 1,
+    "torch.Size([128])": 35,
+    "torch.Size([128, 128, 3, 3, 3])": 9,
+    "torch.Size([128, 128, 1, 3, 3])": 1,
+    "torch.Size([256, 128, 3, 3, 3])": 1,
+    "torch.Size([256])": 34,
+    "torch.Size([256, 256, 3, 3, 3])": 10,
+    "torch.Size([256, 128, 1, 1, 1])": 1,
+    "torch.Size([512, 256, 3, 3, 3])": 1,
+    "torch.Size([512])": 103,
+    "torch.Size([512, 512, 3, 3, 3])": 30,
+    "torch.Size([512, 256, 1, 1, 1])": 1,
+    "torch.Size([512, 512])": 8,
+    "torch.Size([32, 512, 3, 3, 3])": 1,
+    "torch.Size([32])": 1,
+    "torch.Size([512, 16, 3, 3, 3])": 1,
+    "torch.Size([4096, 512, 1, 1, 1])": 2,
+    "torch.Size([4096])": 2,
+    "torch.Size([256, 512, 3, 3, 3])": 1,
+    "torch.Size([256, 512, 1, 1, 1])": 1,
+    "torch.Size([1024, 256, 1, 1, 1])": 1,
+    "torch.Size([1024])": 1,
+    "torch.Size([128, 256, 3, 3, 3])": 1,
+    "torch.Size([128, 256, 1, 1, 1])": 1,
+    "torch.Size([3, 128, 3, 3, 3])": 1,
+    "torch.Size([3])": 1
+  },
+  "prefix_tree": {
+    "encoder": {
+      "conv_in": {
+        "weight": {
+          "__count__": 1
+        },
+        "bias": {
+          "__count__": 1
+        }
+      },
+      "down_blocks": {
+        "0": {
+          "__count__": 18
+        },
+        "1": {
+          "__count__": 20
+        },
+        "2": {
+          "__count__": 20
+        },
+        "3": {
+          "__count__": 16
+        }
+      },
+      "mid_block": {
+        "attentions": {
+          "__count__": 10
+        },
+        "resnets": {
+          "__count__": 16
+        }
+      },
+      "conv_norm_out": {
+        "weight": {
+          "__count__": 1
+        },
+        "bias": {
+          "__count__": 1
+        }
+      },
+      "conv_out": {
+        "weight": {
+          "__count__": 1
+        },
+        "bias": {
+          "__count__": 1
+        }
+      }
+    },
+    "decoder": {
+      "conv_in": {
+        "weight": {
+          "__count__": 1
+        },
+        "bias": {
+          "__count__": 1
+        }
+      },
+      "up_blocks": {
+        "0": {
+          "__count__": 28
+        },
+        "1": {
+          "__count__": 28
+        },
+        "2": {
+          "__count__": 30
+        },
+        "3": {
+          "__count__": 26
+        }
+      },
+      "mid_block": {
+        "attentions": {
+          "__count__": 10
+        },
+        "resnets": {
+          "__count__": 16
+        }
+      },
+      "conv_norm_out": {
+        "weight": {
+          "__count__": 1
+        },
+        "bias": {
+          "__count__": 1
+        }
+      },
+      "conv_out": {
+        "weight": {
+          "__count__": 1
+        },
+        "bias": {
+          "__count__": 1
+        }
+      }
+    }
+  },
+  "encoder_key_count": 106,
+  "decoder_key_count": 144,
+  "shared_key_count": 0,
+  "unclassified_keys": [],
+  "non_finite_tensor_count": 0,
+  "strict_load": {
+    "missing_keys": [],
+    "unexpected_keys": []
+  },
+  "architecture": {
+    "vae_class": "VideoAutoencoderKLWrapper",
+    "source_file": "models/video_vae_v3/modules/attn_video_vae.py",
+    "config_file": "models/video_vae_v3/s8_c16_t4_inflation_sd3.yaml",
+    "in_channels": 3,
+    "latent_channels": 16,
+    "out_channels": 3,
+    "block_out_channels": [
+      128,
+      256,
+      512,
+      512
+    ],
+    "layers_per_block": 2,
+    "norm_num_groups": 32,
+    "act_fn": "silu",
+    "spatial_downsample_factor": 8,
+    "temporal_downsample_factor": 4,
+    "temporal_scale_num": 2,
+    "inflation_mode": "pad",
+    "use_quant_conv": false,
+    "use_post_quant_conv": false,
+    "slicing_sample_min_size": 4,
+    "slicing_latent_min_size": 1,
+    "attention_present": true,
+    "attention_heads": 1,
+    "attention_head_dim": 512,
+    "attention_qkv_shape": [
+      512,
+      512
+    ],
+    "encoder_block_count": 4,
+    "decoder_block_count": 4,
+    "encoder_resnets_per_block": [
+      2,
+      2,
+      2,
+      2
+    ],
+    "decoder_resnets_per_block": [
+      3,
+      3,
+      3,
+      3
+    ],
+    "encoder_downsample_temporal": [
+      false,
+      true,
+      true,
+      false
+    ],
+    "encoder_downsample_spatial": [
+      true,
+      true,
+      true,
+      false
+    ],
+    "decoder_upsample_temporal": [
+      true,
+      true,
+      false,
+      false
+    ],
+    "decoder_upsample_spatial": [
+      true,
+      true,
+      true,
+      false
+    ],
+    "conv_in_kernel": [
+      128,
+      3,
+      3,
+      3,
+      3
+    ],
+    "conv_out_kernel": [
+      32,
+      512,
+      3,
+      3,
+      3
+    ],
+    "decoder_conv_in_kernel": [
+      512,
+      16,
+      3,
+      3,
+      3
+    ],
+    "decoder_conv_out_kernel": [
+      3,
+      128,
+      3,
+      3,
+      3
+    ],
+    "mid_attention_encoder": 1,
+    "mid_attention_decoder": 1,
+    "causal_conv_count": 62,
+    "causal_direction": "past-only (causal, head extend then valid conv)",
+    "temporal_padding_mode": "extend_head (tile first frame) then conv with temporal padding 0"
+  },
+  "parameter_count": 250648227,
+  "load_info": {
+    "load_seconds": 0.017
+  },
+  "flags": {
+    "vae_attention_present": true,
+    "use_quant_conv": false,
+    "use_post_quant_conv": false,
+    "causal_temporal_conv": true,
+    "tiling_chunking": "temporal slicing split_size=4 (official), causal memory"
+  },
+  "json_finite": true,
+  "json_nonfinite_paths": []
+}

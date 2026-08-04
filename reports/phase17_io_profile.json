@@ -1,0 +1,28 @@
+{
+  "phase": 17,
+  "real_seedvr2_weights": true,
+  "real_vae_weights": true,
+  "checkpoint_sha256": "c7df8a67e68b7f9aca3d5d2153d2ce8ab4373687741a0f9ce87cb356ace51cac",
+  "profiles": {
+    "A": {
+      "encoder_artifact_bytes": 404526472,
+      "decoder_artifact_bytes": 606922316,
+      "vae_total_physical_bytes": 1011448788,
+      "weight_free_shared_bytes": 0,
+      "note": "ncnn bins hold pnnx-baked FP32 weights + constants"
+    },
+    "B": {
+      "encoder_artifact_bytes": 408844239,
+      "decoder_artifact_bytes": 611726490,
+      "vae_total_physical_bytes": 1020570729,
+      "weight_free_shared_bytes": 0,
+      "note": "ncnn bins hold pnnx-baked FP32 weights + constants"
+    }
+  },
+  "note": {
+    "physical_bytes": "sum of stage model.ncnn.bin + .param on disk",
+    "logical_bytes": "sum of state-dict weights consumed by the stages",
+    "current_pc_fp32_artifact_size_is_not_mobile_final": true
+  },
+  "overall_pass": true
+}

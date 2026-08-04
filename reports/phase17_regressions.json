@@ -1,0 +1,82 @@
+{
+  "phase": "phase17",
+  "target": "phase17_historical_regressions",
+  "real_seedvr2_weights": true,
+  "real_vae_weights": true,
+  "phase16_cpu_light": {
+    "phase16_block_schedule": {
+      "exit": 0,
+      "pass": true
+    },
+    "phase16_all_block_mapping": {
+      "exit": 0,
+      "pass": true
+    },
+    "phase16_artifact_inventory": {
+      "exit": 0,
+      "pass": true
+    },
+    "phase16_last_layer_parity": {
+      "exit": 0,
+      "pass": true
+    },
+    "phase16_negative_tests": {
+      "exit": 0,
+      "pass": true
+    },
+    "phase16_git_protection": {
+      "exit": 0,
+      "pass": true
+    }
+  },
+  "phase16_gpu_baselines_cited": {
+    "phase16_chain_8_parity.json": {
+      "exists": true,
+      "pass": true
+    },
+    "phase16_chain_16_parity.json": {
+      "exists": true,
+      "pass": true
+    },
+    "phase16_chain_full_parity.json": {
+      "exists": true,
+      "pass": true
+    },
+    "phase16_chain_parity_summary.json": {
+      "exists": true,
+      "pass": true
+    },
+    "full_dit_visual_comparison.json": {
+      "exists": true,
+      "pass": true
+    },
+    "full_dit_error_growth.json": {
+      "exists": true,
+      "pass": true
+    }
+  },
+  "phase14_matrix": {
+    "exit": 0,
+    "pass": true
+  },
+  "phase15_matrix": {
+    "exit": 0,
+    "pass": true
+  },
+  "overall_pass": true,
+  "overall_status": "PASS",
+  "android_vulkan": false,
+  "large_artifacts_committed": false,
+  "historical_reports_restored": [
+    "reports/phase16_block_schedule.json",
+    "reports/phase16_all_block_mapping.json",
+    "reports/phase16_artifact_inventory.json",
+    "reports/phase16_last_layer_parity.json",
+    "reports/phase16_negative_tests.json",
+    "reports/phase16_git_protection.json",
+    "reports/phase14_regressions.json",
+    "reports/phase15_regressions.json",
+    "reports/realwidth_phase13_regressions.json",
+    "reports/phase14_checkpoint_schema_probe.json"
+  ]
+}

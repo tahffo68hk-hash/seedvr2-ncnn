@@ -90,6 +90,24 @@ evidence ncnn=8/16/32, original=0, silent_fallback=false,
 protection PASS. See [full-dit-streaming-report.md](D:/AIProjects/seedvr2-ncnn/docs/full-dit-streaming-report.md)
 and [full-dit-error-growth-report.md](D:/AIProjects/seedvr2-ncnn/docs/full-dit-error-growth-report.md).
 
+Phase 17 real-weight SeedVR2 VAE-in-ncnn + full video restoration is **READY**:
+the official `ema_vae.pth` (sha256 `c7df8a67...`, 250 fp32 tensors,
+250,648,227 numel, Phase 14 download 5/5 verified) is exported as 14 FP32 ncnn
+stage chains (7 encoder + 7 decoder, `pnnx fp16=0`, profiles A/B). Stage parity
+14/14 (rel max ~2.1e-6); encoder parity A 2.166e-6 / B 1.897e-6; decoder parity
+A/B rel 2.08e-5 / 1.73e-5 with PNG PSNR 117.9 / 119.3 dB and SSIM 1.0; full-VAE
+roundtrip A/B pixel PSNR ~116.7 / 117.8 dB, SSIM 1.0, ncnn encoder 7 / decoder
+14 calls, no silent fallback; weight mapping 250/250 (mapped_numel ==
+source_numel); tiling / streaming-lifecycle / latency / memory / IO contracts
+PASS; negatives 70/70; regressions PASS. Official-pipeline full video
+restoration (4 frames 128x128, seed 20260803, steps 1, cfg 1.0, scheduler/host
+conditioning stays PyTorch): `full_ncnn_core` (ncnn VAE encode + 32-block ncnn
+DiT + ncnn VAE decode) pixel PSNR 51.195 dB (>=40) / SSIM 0.9990 (>=0.98),
+latent RMSE 0.0206, NaN/Inf=0; `dit_ncnn_vae_pytorch` 51.998 dB / 0.9989;
+`dit_ncnn_decoder_ncnn` 52.105 dB / 0.9990; adapter evidence ncnn encoder=1 /
+decoder=1 / original=0 / silent_fallback=false / max_resident_weighted_dit_blocks=1.
+See [vae-ncnn-full-video-restoration-report.md](D:/AIProjects/seedvr2-ncnn/docs/vae-ncnn-full-video-restoration-report.md).
+
 This is a SeedVR2-style attention subsystem with a single-block, small
 multi-block (1/2/4), and full 32-block (8/16/all) streaming ncnn runtime,
 not a complete SeedVR2 port.
@@ -198,10 +216,10 @@ Heavy real-width artifacts stay in the git-ignored `.phase13_local_artifacts/`
 directory; only manifests, the mapping contract, scripts, tests and reports are
 committed (see `tests/seedvr2_weight_mapping/check_no_large_tracked_artifacts.py`).
 
-TODO (Phase 17, not started - explicit authorization required): VAE-in-ncnn /
-full video restoration, Android/Vulkan targets (Pad 7 Pro NOT validated), and
-direct fused-kernel parity. Phase 16 committed evidence: full 32-block
-real-weight DiT streaming chain parity (chain_8 5.65e-4 / chain_16 2.10e-3 /
-chain_full 5.02e-3 relative, limits 1e-2/2e-2/5e-2), official-pipeline visual
-8/16/full (pixel PSNR 51.05..52.55 dB, SSIM 0.9972..0.9976), negatives 80/80,
-regressions 27/27, git protection PASS.
+TODO (Phase 18, not started - explicit authorization required): Android/Vulkan
+targets (Pad 7 Pro NOT validated), direct fused-kernel parity (flash_attn/apex),
+and full_pure_ncnn_application (scheduler/timestep/conditioning in ncnn). Phase 17
+committed evidence: real-weight VAE-in-ncnn full video restoration - full_ncnn_core
+pixel PSNR 51.195 dB / SSIM 0.9990 (>=40 / >=0.98), latent RMSE 0.0206, stage
+parity 14/14 rel <=2.1e-6, encoder/decoder parity rel 1.9e-6 / 1.7e-5, negatives
+70/70, regressions PASS, git protection PASS.

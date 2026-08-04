@@ -1,0 +1,29 @@
+{
+  "phase": "phase17",
+  "target": "git_protection",
+  "large_binary_threshold_bytes": 10485760,
+  "checks": {
+    "no_phase_dirs_tracked": true,
+    "no_build_third_party_env_tracked": true,
+    "no_weight_files_tracked": true,
+    "no_bin_png_video_tracked": true,
+    "no_large_binary_tracked": true,
+    "phase17_local_dirs_ignored": true,
+    "no_conflict_markers": true,
+    "no_secrets_in_reports_docs_tests": true,
+    "phase17_reports_json_finite": true,
+    "historical_ready_reports_unchanged": true
+  },
+  "details": {
+    "no_phase_dirs_tracked": "tracked=1550",
+    "no_bin_png_video_tracked": "whitelist=tracked .bin under tests/ only",
+    "no_large_binary_tracked": "threshold=10485760"
+  },
+  "overall_pass": true,
+  "overall_status": "PASS",
+  "real_seedvr2_weights": true,
+  "real_vae_weights": true,
+  "checkpoint_sha256": "c7df8a67e68b7f9aca3d5d2153d2ce8ab4373687741a0f9ce87cb356ace51cac",
+  "large_artifacts_committed": false,
+  "android_vulkan": false
+}

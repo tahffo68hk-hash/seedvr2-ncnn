@@ -59,3 +59,11 @@ toolchain-test/*.exe
 .phase16_runtime_traces/
 .phase16_diag/
 .phase16_memory_profiles/
+
+# Phase 17 real-weight VAE ncnn + full video restoration (never commit)
+.phase17_local_artifacts/
+.phase17_export_tmp/
+.phase17_visual_outputs/
+.phase17_runtime_traces/
+.phase17_memory_profiles/
+.phase17_diag/
