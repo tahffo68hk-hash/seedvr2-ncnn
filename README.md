@@ -223,3 +223,6 @@ committed evidence: real-weight VAE-in-ncnn full video restoration - full_ncnn_c
 pixel PSNR 51.195 dB / SSIM 0.9990 (>=40 / >=0.98), latent RMSE 0.0206, stage
 parity 14/14 rel <=2.1e-6, encoder/decoder parity rel 1.9e-6 / 1.7e-5, negatives
 70/70, regressions PASS, git protection PASS.
+# Phase 18A Android ARM64 scaffold
+
+Phase 18A is **READY_FOR_DEVICE** on `codex/phase18a-android-arm64-scaffold`; full Phase 18 is **NOT READY**. The device-free [`android/`](android/) project builds Debug and unsigned Release APKs containing only AArch64 `libseededge.so`, with pinned ncnn/Vulkan source integration, five JSON JNI endpoints, a deterministic synthetic CPU test, and an external model-manifest contract. No Xiaomi Pad, Android runtime, Vulkan inference, VAE/DiT, or full restoration execution occurred. See [`docs/android-phase18a-build-and-scaffold-report.md`](docs/android-phase18a-build-and-scaffold-report.md).

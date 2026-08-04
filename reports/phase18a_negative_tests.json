@@ -1,0 +1,85 @@
+{
+  "phase": "18A",
+  "overall_pass": true,
+  "device_required": false,
+  "device_executed": false,
+  "passed": 15,
+  "failed": 0,
+  "results": [
+    {
+      "name": "missing SDK",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "missing NDK",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "wrong JAVA_HOME",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "wrong ABI",
+      "pass": true,
+      "detail": "exit=1"
+    },
+    {
+      "name": "missing model manifest",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "manifest invalid JSON",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "wrong format version",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "missing model file",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "wrong file size",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "wrong SHA256 format",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "path traversal",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "APK model weight rejection",
+      "pass": true,
+      "detail": "exit=1"
+    },
+    {
+      "name": "APK non-arm64 ABI rejection",
+      "pass": true,
+      "detail": "exit=1"
+    },
+    {
+      "name": "JNI JSON parse contract",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "synthetic finite guard",
+      "pass": true,
+      "detail": ""
+    }
+  ]
+}

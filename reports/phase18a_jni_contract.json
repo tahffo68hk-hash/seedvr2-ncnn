@@ -1,0 +1,1 @@
+{"phase":"18A","overall_pass":true,"device_required":true,"device_executed":false,"jni_compiled":true,"json_contract_static_tested":true,"interfaces":["nativeGetVersion","nativeGetBuildInfo","nativeRunSyntheticCpuTest","nativeGetNcnnInfo","nativeProbeVulkanSupport"],"android_jni_invoked":false}

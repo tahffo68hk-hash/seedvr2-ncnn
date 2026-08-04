@@ -67,3 +67,22 @@ toolchain-test/*.exe
 .phase17_runtime_traces/
 .phase17_memory_profiles/
 .phase17_diag/
+
+# Phase 18 Android (never commit SDK/toolchain/build outputs)
+android/.gradle/
+android/.idea/
+android/.cxx/
+android/**/.cxx/
+android/.kotlin/
+android/build/
+android/**/build/
+android/local.properties
+android/**/*.apk
+android/**/*.aab
+android/**/*.so
+android/**/*.keystore
+android/**/*.jks
+android/**/*.a
+android/**/*.aar
+.externalNativeBuild/
+.phase18_*

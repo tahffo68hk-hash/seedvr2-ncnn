@@ -1,0 +1,109 @@
+{
+    "phase":  18,
+    "task":  "android_d_drive_environment_setup",
+    "status":  "PREPARED",
+    "generated_at":  "2026-08-04T16:14:26+08:00",
+    "paths":  {
+                  "android_studio":  "D:\\Android\\AndroidStudio",
+                  "android_studio_version":  "AI-261.26222.65.2613.15948027",
+                  "sdk":  "D:\\Android\\sdk",
+                  "sdk_cmdline_tools":  "D:\\Android\\sdk\\cmdline-tools\\latest",
+                  "sdk_build_tools":  [
+                                          "35.0.0",
+                                          "36.0.0"
+                                      ],
+                  "sdk_platforms":  [
+                                        "android-35",
+                                        "android-36"
+                                    ],
+                  "sdk_platform_tools":  "D:\\Android\\sdk\\platform-tools",
+                  "sdk_cmake":  "D:\\Android\\sdk\\cmake\\3.22.1",
+                  "ndk":  "D:\\Android\\sdk\\ndk\\26.3.11579264",
+                  "ndk_version":  "26.3.11579264",
+                  "ndk_abi_target":  "arm64-v8a",
+                  "java":  "D:\\Android\\jdk",
+                  "java_version":  "OpenJDK 17.0.20+8 (Temurin)",
+                  "gradle_user_home":  "D:\\Android\\gradle-cache",
+                  "android_user_home":  "D:\\Android\\user-config",
+                  "ninja":  "D:\\Android\\ninja\\ninja.exe",
+                  "ninja_version":  "1.11.1",
+                  "standalone_ndk_dir":  "D:\\Android\\ndk (reserved, empty; NDK lives under sdk)",
+                  "standalone_cmake_dir":  "D:\\Android\\cmake (reserved, empty; cmake lives under sdk)"
+              },
+    "env_vars":  {
+                     "ANDROID_HOME":  "D:\\Android\\sdk",
+                     "ANDROID_SDK_ROOT":  "D:\\Android\\sdk",
+                     "ANDROID_USER_HOME":  "D:\\Android\\user-config",
+                     "JAVA_HOME":  "D:\\Android\\jdk",
+                     "GRADLE_USER_HOME":  "D:\\Android\\gradle-cache",
+                     "user_path_entries":  [
+                                               "D:\\Android\\jdk\\bin",
+                                               "D:\\Android\\sdk\\platform-tools",
+                                               "D:\\Android\\sdk\\cmdline-tools\\latest\\bin",
+                                               "D:\\Android\\ninja"
+                                           ]
+                 },
+    "verification":  {
+                         "sdkmanager_version":  "19.0",
+                         "sdkmanager_probe":  "OK with JAVA_HOME=D:\\Android\\jdk",
+                         "licenses_accepted":  true,
+                         "ndk_toolchains_present":  true,
+                         "sdk_cmake_exe_present":  true,
+                         "ninja_exe_present":  true
+                     },
+    "c_drive_checks":  {
+                           "C:\\Program Files\\Android":  false,
+                           "C:\\Program Files (x86)\\Android":  false,
+                           "C:\\Android":  false,
+                           "C:\\Users\\<user>\\.gradle":  false,
+                           "C:\\Users\\<user>\\.android":  true,
+                           "C:\\Users\\<user>\\AppData\\Local\\Android":  false,
+                           "C:\\Users\\<user>\\AppData\\Local\\Google\\AndroidStudio2026.1.3":  false,
+                           "C:\\Users\\<user>\\AppData\\Roaming\\Google\\AndroidStudio2026.1.3":  false,
+                           "C:\\Program Files\\Java":  false,
+                           "C:\\Program Files\\Eclipse Adoptium":  false,
+                           "note":  "No SDK/NDK/Gradle-cache/Android-Studio install found on C:. Legacy C:\\Users\\<user>\\.android exists (adb config only) and is redirected to D:\\Android\\user-config via ANDROID_USER_HOME.",
+                           "c_drive_core_android_components":  "NONE"
+                       },
+    "d_drive_checks":  {
+                           "android_studio_installed":  true,
+                           "sdk_installed":  true,
+                           "ndk_installed":  true,
+                           "cmake_installed":  true,
+                           "ninja_installed":  true,
+                           "jdk_installed":  true,
+                           "gradle_cache_ready":  true,
+                           "android_user_config_ready":  true
+                       },
+    "android_project":  {
+                            "path":  "D:\\AIProjects\\seedvr2-ncnn\\android",
+                            "status":  "not_created",
+                            "note":  "Environment prepared; Android project scaffold has not been created yet (next Phase 18 step)."
+                        },
+    "apk_build_readiness":  {
+                                "status":  "ENVIRONMENT_PREPARED",
+                                "ready_to_build":  false,
+                                "missing":  [
+                                                "android project scaffold",
+                                                "gradle wrapper + distribution (downloads land in D:\\Android\\gradle-cache)"
+                                            ]
+                            },
+    "git_protection":  {
+                           "gitignore_updated":  true,
+                           "ignored_patterns":  [
+                                                    "android/.gradle/",
+                                                    "android/.idea/",
+                                                    "android/.cxx/",
+                                                    "android/build/",
+                                                    "android/**/build/",
+                                                    "android/local.properties",
+                                                    "android/**/*.apk",
+                                                    "android/**/*.aab",
+                                                    "android/**/*.so",
+                                                    "android/**/*.keystore",
+                                                    "android/**/*.jks"
+                                                ],
+                           "sdk_ndk_studio_gradle_cache_committed":  false,
+                           "note":  "SDK/NDK/Android Studio/Gradle cache live outside the repo under D:\\Android and are never committed."
+                       }
+}
