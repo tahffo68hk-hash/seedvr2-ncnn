@@ -1,0 +1,18 @@
+{
+  "status": "PASS_VISIBLE_VAE_ROUNDTRIP",
+  "execution": "host",
+  "device": "not_an_Android_result",
+  "input_source": "android/app/src/main/assets/phase18c_demo/frame_000.png",
+  "outputs_root": ".phase18_visible_results",
+  "outputs": ["input.png", "output.png", "side_by_side.png", "diff.png", "output_frame_000.png", "output_frame_001.png", "output_frame_002.png", "output_frame_003.png"],
+  "modules": {"vae_encoder": "real ncnn CPU FP32", "vae_decoder": "real ncnn CPU FP32", "dit": "not run", "scheduler": "not run"},
+  "shapes": {"input": [1, 3, 5, 128, 128], "latent": [1, 16, 2, 16, 16], "decoded": [5, 128, 128, 3]},
+  "finite": true,
+  "nan_count": 0,
+  "inf_count": 0,
+  "input_stats": {"min": 0, "max": 255, "mean": 132.54923502604166, "std": 71.63904442822569},
+  "output_stats": {"min": 0, "max": 255, "mean": 132.3834431966146, "std": 67.45732915431785},
+  "pixel_diff": {"mean_abs": 15.656962394714355, "max_abs": 255},
+  "super_resolution_claim": false,
+  "note": "This is a real visible ncnn VAE roundtrip milestone, not a completed SeedVR2 DiT enhancement or Android output."
+}

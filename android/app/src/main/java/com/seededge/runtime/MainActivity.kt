@@ -53,7 +53,7 @@ class MainActivity : Activity() {
     }
 
     private fun inspectModel() { runButton.isEnabled = false; executor.execute { val result = NativeRuntime.nativeInspectModel(modelRoot.absolutePath); handler.post { status.text = "Model: $result"; runButton.isEnabled = true } } }
-    private fun inspectCheckpoint() { executor.execute { val result = NativeRuntime.nativeInspectCheckpoints(outputRoot.absolutePath); handler.post { status.append("\nCheckpoint: $result"); decoderRadio.isEnabled = JSONObject(result).optBoolean("decoder_bridge_verified", false) } } }
+    private fun inspectCheckpoint() { executor.execute { val result = NativeRuntime.nativeInspectCheckpoints(outputRoot.absolutePath); handler.post { status.append("\nCheckpoint: $result"); decoderRadio.isEnabled = JSONObject(result).optBoolean("checkpoint_verified", false) } } }
     private fun runSelected(mode: Int) {
         if (!running.compareAndSet(false, true)) return
         runButton.isEnabled = false; cancelButton.isEnabled = true; startPolling()
