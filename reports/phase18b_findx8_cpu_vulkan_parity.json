@@ -1,0 +1,19 @@
+{
+  "schema_version": 2,
+  "phase": "18B Find X8 runtime validation",
+  "device": {"model": "PKB110", "android": "16", "api": 36, "abi": "arm64-v8a", "temporary_device": true, "is_final_xiaomi_pad_target": false},
+  "device_executed": true,
+  "same_network": true,
+  "same_input": true,
+  "cpu_backend": "FP32 single-thread",
+  "vulkan_backend": "FP32 forced",
+  "shape_equal": true,
+  "finite": true,
+  "max_abs_error": 0,
+  "mean_abs_error": 0,
+  "first_mismatch_index": null,
+  "tolerance": 0.0001,
+  "parity": true,
+  "silent_cpu_fallback": false,
+  "overall_pass": true
+}

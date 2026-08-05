@@ -1,0 +1,21 @@
+{
+  "schema_version": 2,
+  "phase": "18B Find X8 runtime validation",
+  "device": {"model": "PKB110", "android": "16", "api": 36, "abi": "arm64-v8a", "temporary_device": true, "is_final_xiaomi_pad_target": false},
+  "device_executed": true,
+  "android_ui_app_smoke": "PASS",
+  "jni_smoke": "PASS",
+  "cpu_synthetic": "PASS",
+  "cpu_synthetic_20": "PASS",
+  "vulkan_device": "PASS",
+  "vulkan_synthetic_10": "PASS",
+  "cpu_vulkan_parity": "PASS",
+  "silent_fallback": false,
+  "app_stability": "PASS",
+  "fatal_count": 0,
+  "native_crash_count": 0,
+  "phase18b_findx8_runtime_validation": "PASS",
+  "complete_phase18": "NOT READY",
+  "remaining": ["real VAE stage", "real DiT block", "2/4 block streaming", "32 block streaming", "minimal full video restoration", "Xiaomi Pad 7 Pro final validation"],
+  "overall_pass": true
+}

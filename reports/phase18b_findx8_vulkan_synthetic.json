@@ -1,0 +1,22 @@
+{
+  "schema_version": 2,
+  "phase": "18B Find X8 runtime validation",
+  "device": {"model": "PKB110", "android": "16", "api": 36, "abi": "arm64-v8a", "temporary_device": true, "is_final_xiaomi_pad_target": false},
+  "device_executed": true,
+  "executions": 10,
+  "passed_executions": 10,
+  "gpu_name": "Mali-G925-Immortalis MC12",
+  "fp32_forced": true,
+  "gpu_upload_executed": true,
+  "vulkan_command_executed": true,
+  "gpu_download_executed": true,
+  "synthetic_inference_executed": true,
+  "output_shape": [4],
+  "output": [-0.200000003, -0.100000001, 2, 3],
+  "finite": true,
+  "silent_cpu_fallback": false,
+  "cleanup_pass": true,
+  "error_stage": null,
+  "error_code": 0,
+  "overall_pass": true
+}

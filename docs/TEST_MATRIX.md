@@ -151,3 +151,16 @@ Acceptance (Phase 17 READY): official `ema_vae.pth` (sha256 `c7df8a67...`) expor
 | Phase 18B PKB110 synthetic ncnn CPU correctness | FAIL | max abs 4.8831e-5, finite/repeat false; independent blocker |
 | Phase 18B PKB110 Vulkan instance probe | PARTIAL | instance + gpu_count=1; no device/fp16/inference |
 | Phase 18 final Xiaomi Pad validation | NOT RUN | Find X8 is temporary device only |
+# Phase 18B Find X8 runtime matrix
+
+| Gate | Executed | Result |
+|---|---:|---:|
+| Android unit tests / ARM64 Debug build | yes | PASS |
+| CPU FP32 synthetic, three independent runs | 20 executions | PASS |
+| ncnn Vulkan device + blob/staging allocators | 10 executions | PASS |
+| Explicit GPU upload / inference / download | 10 executions | PASS |
+| CPU/Vulkan parity, tolerance 1e-4 | max error 0 | PASS |
+| Silent CPU fallback | forbidden/false | PASS |
+| Final crash buffer | FATAL 0 / native crash 0 | PASS |
+| Find X8 temporary runtime validation | yes | PASS |
+| Complete Phase 18 / Xiaomi Pad final | no | NOT READY |

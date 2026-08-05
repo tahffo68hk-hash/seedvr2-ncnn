@@ -15,3 +15,6 @@ Phase 18A is READY_FOR_DEVICE; Phase 17 remains READY and full Phase 18 is NOT R
 # Phase 18B follow-ups after Android 16 UI fix
 
 Investigate the independent PKB110 ARM64 synthetic CPU finite/determinism failure, then extend the Vulkan probe to report device/GPU/driver/fp16 and run a no-fallback synthetic Vulkan inference. After those gates, continue real VAE/DiT/streaming/full-chain validation and repeat final acceptance on Xiaomi Pad 7 Pro. The Find X8 UI smoke does not replace Xiaomi Pad validation.
+# Phase 18B runtime checkpoint
+
+Find X8 PKB110 temporary runtime validation is PASS (CPU 20/20, Vulkan 10/10, parity max error 0, no fallback). Complete Phase 18 remains NOT READY. Next run real VAE stage, real DiT block, 2/4 and 32-block streaming, minimal video restoration, then repeat final acceptance on Xiaomi Pad 7 Pro.

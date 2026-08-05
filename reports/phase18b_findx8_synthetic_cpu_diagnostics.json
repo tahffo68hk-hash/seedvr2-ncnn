@@ -1,0 +1,18 @@
+{
+  "schema_version": 2,
+  "phase": "18B Find X8 runtime validation",
+  "device": {"model": "PKB110", "android": "16", "api": 36, "abi": "arm64-v8a", "temporary_device": true, "is_final_xiaomi_pad_target": false},
+  "device_executed": true,
+  "original_failure": {"finite_reported": false, "actual_non_finite_observed": false, "max_abs_error": 0.0000488311052, "repeat_reported": false},
+  "root_causes": ["ncnn Option defaults enabled fp16 packed/storage/arithmetic", "finite was incorrectly assigned from the combined pass flag", "short-circuit prevented run two after run one parity failure", "repeat compared max-error scalars instead of output elements"],
+  "first_non_finite_run": null,
+  "first_non_finite_index": null,
+  "first_non_finite_value": null,
+  "max_error_ignored_non_finite": false,
+  "extractor_reused": false,
+  "mat_reused": false,
+  "allocator_reused": false,
+  "fix": "Explicit CPU FP32 single-thread options and three independent Net/Extractor/Mat executions with separate finite, expected, bitwise and numeric-repeat diagnostics.",
+  "negative_contracts": ["NaN/positive-infinity/negative-infinity are classified before error arithmetic", "non-finite JSON values serialize as strings", "bitwise and numeric repeat are independent"],
+  "overall_pass": true
+}
