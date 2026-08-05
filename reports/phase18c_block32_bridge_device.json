@@ -1,0 +1,1 @@
+{"block32_bridge_verified":false,"device_parity":false,"backend":"cpu_fp32","silent_cpu_fallback":false,"reason":"Pad not connected; no device bridge execution"}

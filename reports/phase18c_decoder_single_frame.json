@@ -1,0 +1,1 @@
+{"decoder_single_frame_pass":false,"png_generated":false,"reason":"Device decoder-only run pending; implementation writes frame_000.rgb and bridge metadata, PNG conversion remains pending"}

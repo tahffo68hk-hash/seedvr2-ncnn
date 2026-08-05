@@ -12,4 +12,6 @@ object NativeRuntime {
     external fun nativeRequestCancel(): String
     external fun nativeInspectModel(modelRoot: String): String
     external fun nativeInspectCheckpoints(outputRoot: String): String
+    external fun nativeRunDecoderOnly(modelRoot: String, checkpointRoot: String, outputRoot: String, configJson: String): String
+    external fun nativeRunProgressSimulation(): String
 }

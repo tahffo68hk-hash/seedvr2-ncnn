@@ -1,0 +1,1 @@
+{"block32_bridge_verified":false,"host_reference_generated":false,"reason":"Bridge implementation is present, but no new host reference tensor run was authorized/available in this turn","block32_vid_shape":[128,2560],"block32_txt_shape":[58,2560],"decoder_input_shape":[16,2,16,16],"scale_factor":0.9152,"dtype":"fp32","layout":"C,T,H,W"}
