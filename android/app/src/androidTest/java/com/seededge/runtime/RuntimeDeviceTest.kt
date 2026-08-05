@@ -7,6 +7,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import java.io.File
 
 class RuntimeDeviceTest {
     private val context get() = InstrumentationRegistry.getInstrumentation().targetContext
@@ -57,6 +58,39 @@ class RuntimeDeviceTest {
         context.openFileOutput("phase18b_vulkan_diagnostic.json", 0).bufferedWriter().use { it.write(result) }
         val json = JSONObject(result)
         assertTrue(json.toString(), json.getBoolean("overall_pass"))
+    }
+
+    @Test fun phase18c3RealDecoderStageThreadBenchmark() {
+        val probes = listOf(1, 2, 4, 5, 6, 8).map { requested ->
+            val json = JSONObject(NativeRuntime.nativeRunOpenMpThreadProbe(requested))
+            assertTrue(json.toString(), json.getBoolean("openmp_compiled"))
+            assertTrue(json.toString(), json.getBoolean("overall_pass"))
+            if (requested > 1) assertTrue(json.toString(), json.getInt("observed_worker_threads") > 1)
+            json
+        }
+        val external = requireNotNull(context.getExternalFilesDir(null))
+        val result = JSONObject(NativeRuntime.nativeRunDecoderStageBenchmark(
+            File(external, "models/phase18c").absolutePath,
+            File(external, "output/phase18c").absolutePath))
+        File(external, "output/phase18c/phase18c3_openmp_thread_probe.json").bufferedWriter().use {
+            it.write(probes.joinToString(prefix = "[", postfix = "]") { item -> item.toString() })
+        }
+        assertTrue(result.toString(), result.getBoolean("overall_pass"))
+        assertEquals(6, result.getJSONArray("runs").length())
+        Log.i("Phase18C3", "DECODER_STAGE_THREAD_BENCHMARK_PASS $result")
+    }
+
+    @Test fun phase18c3DecoderOnlyWritesPng() {
+        val external = requireNotNull(context.getExternalFilesDir(null))
+        val modelRoot = File(external, "models/phase18c")
+        val outputRoot = File(external, "output/phase18c")
+        val result = JSONObject(NativeRuntime.nativeRunDecoderOnly(
+            modelRoot.absolutePath, outputRoot.absolutePath, outputRoot.absolutePath, "{\"mode\":\"decoder_only\"}"))
+        assertTrue(result.toString(), result.getBoolean("overall_pass"))
+        val png = File(outputRoot, "frame_000.png")
+        assertTrue("RGB to PNG conversion failed", DecoderOutput.writeRgb24Png(File(outputRoot, "frame_000.rgb"), png))
+        assertTrue("PNG is empty", png.length() > 0)
+        Log.i("Phase18C3", "DECODER_ONLY_PNG_PASS ${png.length()}")
     }
 
     @Test fun phase18cMinimalVideoDemo() {

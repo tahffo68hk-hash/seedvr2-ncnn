@@ -14,4 +14,6 @@ object NativeRuntime {
     external fun nativeInspectCheckpoints(outputRoot: String): String
     external fun nativeRunDecoderOnly(modelRoot: String, checkpointRoot: String, outputRoot: String, configJson: String): String
     external fun nativeRunProgressSimulation(): String
+    external fun nativeRunOpenMpThreadProbe(requestedThreads: Int): String
+    external fun nativeRunDecoderStageBenchmark(modelRoot: String, outputRoot: String): String
 }

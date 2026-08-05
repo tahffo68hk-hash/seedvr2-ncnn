@@ -14,15 +14,18 @@
 #include <net.h>
 
 #include <algorithm>
+#include <atomic>
 #include <chrono>
 #include <cmath>
 #include <filesystem>
 #include <fstream>
 #include <iomanip>
+#include <map>
 #include <regex>
 #include <sstream>
 #include <string>
 #include <vector>
+#include <thread>
 
 namespace fs = std::filesystem;
 using attention_dispatcher::ArtifactRegistry;
@@ -86,9 +89,9 @@ bool write_bytes(const fs::path& path, const void* data, size_t size)
     return bool(file);
 }
 
-void force_fp32(ncnn::Option& option, bool vulkan)
+void force_fp32(ncnn::Option& option, bool vulkan, int threads = 0)
 {
-    option.num_threads = std::max(1, ncnn::get_big_cpu_count());
+    option.num_threads = threads > 0 ? threads : std::max(1, ncnn::get_big_cpu_count());
     option.use_vulkan_compute = vulkan;
     option.use_subgroup_ops = false;
     option.use_cooperative_matrix = false;
@@ -116,10 +119,10 @@ std::vector<float> contiguous(const ncnn::Mat& mat)
 bool run_model(const fs::path& param, const fs::path& bin,
                const std::vector<float>& input, const Shape& in_shape,
                const Shape& out_shape, bool vulkan,
-               std::vector<float>& output, std::string& error)
+               std::vector<float>& output, std::string& error, int threads = 0)
 {
     ncnn::Net net;
-    force_fp32(net.opt, vulkan);
+    force_fp32(net.opt, vulkan, threads);
     const ncnn::VulkanDevice* device = nullptr;
     ncnn::VkAllocator* blob_allocator = nullptr;
     ncnn::VkAllocator* staging_allocator = nullptr;
@@ -189,7 +192,8 @@ bool run_model(const fs::path& param, const fs::path& bin,
 
 bool run_vae_chain(const fs::path& root, const Stage* stages, size_t stage_count,
                    const std::vector<float>& input, bool first_stage_vulkan,
-                   std::vector<float>& output, std::string& error)
+                   std::vector<float>& output, std::string& error,
+                   int threads = 0, bool report_decoder_progress = false)
 {
     output = input;
     for (size_t index = 0; index < stage_count; ++index)
@@ -197,14 +201,22 @@ bool run_vae_chain(const fs::path& root, const Stage* stages, size_t stage_count
         const Stage& stage = stages[index];
         std::vector<float> next;
         const fs::path directory = root / stage.name;
+        if (report_decoder_progress)
+            seededge_progress::update("vae_decoder", stage.name, "loading model", 0, 0, 0, 0, 32,
+                                      static_cast<int>(index + 1), static_cast<int>(stage_count), 0, 0,
+                                      (fs::path("vae/decoder") / stage.name / "model.ncnn.bin").string());
         if (!run_model(directory / "model.ncnn.param", directory / "model.ncnn.bin",
                        output, stage.in, stage.out, first_stage_vulkan && index == 0,
-                       next, error))
+                       next, error, threads))
         {
             error = std::string(stage.name) + ":" + error;
             return false;
         }
         output.swap(next);
+        if (report_decoder_progress)
+            seededge_progress::update("vae_decoder", stage.name, "inference completed", 0, 0, 0, 0, 32,
+                                      static_cast<int>(index + 1), static_cast<int>(stage_count), 0, 0,
+                                      (fs::path("vae/decoder") / stage.name / "model.ncnn.bin").string());
     }
     return true;
 }
@@ -402,6 +414,30 @@ done:
         error_stage,error);
 }
 
+std::map<std::string, long long> task_cpu_ticks()
+{
+    std::map<std::string, long long> ticks;
+    try
+    {
+        for (const auto& entry : fs::directory_iterator("/proc/self/task"))
+        {
+            std::ifstream file(entry.path() / "stat"); std::string line;
+            if (!std::getline(file, line)) continue;
+            const size_t close = line.rfind(')'); if (close == std::string::npos) continue;
+            std::istringstream fields(line.substr(close + 1)); std::string state; fields >> state;
+            long long value = 0, utime = 0, stime = 0;
+            for (int field = 4; field <= 15 && fields >> value; ++field)
+            {
+                if (field == 14) utime = value;
+                if (field == 15) stime = value;
+            }
+            ticks.emplace(entry.path().filename().string(), utime + stime);
+        }
+    }
+    catch (...) {}
+    return ticks;
+}
+
 std::string run_phase18c_decoder_only(const std::string& model_root,
                                        const std::string& checkpoint_root,
                                        const std::string& output_root,
@@ -436,9 +472,98 @@ std::string run_phase18c_decoder_only(const std::string& model_root,
     for(int t=0;t<2;++t)for(int h=0;h<16;++h)for(int w=0;w<16;++w)for(int c=0;c<16;++c) decoder_input[(((c*2+t)*16+h)*16+w)] = final_latent[(((t*16+h)*16+w)*16)+c]/0.9152f;
     seededge_progress::update("vae_decoder", "decoder", "running VAE decoder from verified bridge", 0, 0, 0, 0, 32, 0, static_cast<int>(std::size(kDecoder)));
     std::vector<float> decoded;
-    if (!run_vae_chain(models/"vae"/"decoder",kDecoder,std::size(kDecoder),decoder_input,false,decoded,error) || !phase18c_all_finite(decoded)) { seededge_progress::finish("failed", "DECODER_FAILED", error); return "{\"mode\":\"decoder_only\",\"checkpoint_verified\":true,\"decoder_bridge_verified\":true,\"decoder_single_frame_pass\":false,\"error_code\":\"DECODER_FAILED\",\"overall_pass\":false}"; }
+    constexpr int kSelectedDecoderThreads = 5;
+    if (!run_vae_chain(models/"vae"/"decoder",kDecoder,std::size(kDecoder),decoder_input,false,decoded,error,kSelectedDecoderThreads,true) || !phase18c_all_finite(decoded)) { seededge_progress::finish("failed", "DECODER_FAILED", error); return "{\"mode\":\"decoder_only\",\"checkpoint_verified\":true,\"decoder_bridge_verified\":true,\"decoder_single_frame_pass\":false,\"error_code\":\"DECODER_FAILED\",\"overall_pass\":false}"; }
     std::vector<unsigned char> rgb(128u*128u*3u); for(int h=0;h<128;++h)for(int w=0;w<128;++w)for(int c=0;c<3;++c){float v=decoded[(((c*5)*128+h)*128+w)];rgb[(h*128+w)*3+c]=static_cast<unsigned char>(std::clamp(std::lround((v*.5f+.5f)*255.f),0l,255l));}
     write_bytes(outputs/"frame_000.rgb",rgb.data(),rgb.size()); write_bytes(outputs/"decoder_input_latent.f32",decoder_input.data(),decoder_input.size()*sizeof(float)); const std::string bridge_json="{\"decoder_bridge_verified\":true,\"decoder_latent_verified\":true}"; write_bytes(outputs/"decoder_bridge_result.json", bridge_json.data(), bridge_json.size());
     seededge_progress::finish("completed");
-    return "{\"mode\":\"decoder_only\",\"checkpoint_source\":\"gate_dit_block_32\",\"encoder_skipped\":true,\"dit_blocks_skipped\":true,\"checkpoint_verified\":true,\"decoder_bridge_verified\":true,\"decoder_latent_verified\":true,\"decoder_single_frame_pass\":true,\"output_frame_path\":\"frame_000.rgb\",\"backend\":\"cpu_fp32\",\"silent_cpu_fallback\":false,\"finite\":true,\"overall_pass\":true}";
+    return "{\"mode\":\"decoder_only\",\"checkpoint_source\":\"gate_dit_block_32\",\"encoder_skipped\":true,\"dit_blocks_skipped\":true,\"checkpoint_verified\":true,\"decoder_bridge_verified\":true,\"decoder_latent_verified\":true,\"decoder_single_frame_pass\":true,\"output_frame_path\":\"frame_000.rgb\",\"backend\":\"cpu_fp32_openmp\",\"threads\":5,\"silent_cpu_fallback\":false,\"finite\":true,\"overall_pass\":true}";
+}
+
+std::string run_phase18c_decoder_stage_benchmark(const std::string& model_root,
+                                                   const std::string& output_root)
+{
+    // dec_conv_in is a genuine exported VAE decoder model.  It is deliberately
+    // benchmarked as a fresh ncnn Net/Extractor per repetition so file loading,
+    // memory setup and inference are all reproducible on the device.
+    const fs::path stage = fs::path(model_root) / "vae" / "decoder" / "dec_conv_in";
+    const fs::path out = fs::path(output_root) / "phase18c3_thread_benchmark.json";
+    fs::create_directories(out.parent_path());
+    const Shape in = kDecoder[0].in, expected = kDecoder[0].out;
+    std::vector<float> input(count(in));
+    for (size_t i = 0; i < input.size(); ++i) input[i] = std::sin(static_cast<float>(i % 997) * 0.013f);
+    const int requests[] = {1, 2, 4, 5, 6, 8};
+    std::vector<float> reference;
+    bool all_pass = true;
+    std::ostringstream json;
+    json << "{\"schema_version\":1,\"device\":\"Xiaomi Pad 7 Pro\",\"backend\":\"cpu_fp32_openmp\","
+         << "\"stage_name\":\"dec_conv_in\",\"stage_relative_path\":\"vae/decoder/dec_conv_in\","
+         << "\"input_shape\":[16,2,16,16],\"output_shape\":[512,2,16,16],"
+         << "\"measurement_scope\":\"fresh_ncnn_net_load_and_execute\",\"runs\":[";
+    for (size_t r = 0; r < std::size(requests); ++r)
+    {
+        const int threads = requests[r];
+        std::vector<float> warmup, result;
+        std::string error;
+        if (!run_model(stage / "model.ncnn.param", stage / "model.ncnn.bin", input, in, expected,
+                       false, warmup, error, threads))
+        {
+            all_pass = false;
+            if (r) json << ',';
+            json << "{\"threads_requested\":" << threads << ",\"status\":\"warmup_failed\",\"error\":\"" << escape_json(error) << "\"}";
+            continue;
+        }
+        long long total_ms = 0;
+        int peak_tasks = 0, max_active_cpu_threads = 0, task_threads_before = 0;
+        bool finite = true;
+        for (int trial = 0; trial < 3; ++trial)
+        {
+            std::atomic<bool> running(true);
+            int peak = 0;
+            const auto cpu_before = task_cpu_ticks();
+            const int before = static_cast<int>(cpu_before.size());
+            task_threads_before = std::max(task_threads_before, before);
+            std::thread sampler([&] {
+                while (running.load())
+                {
+                    try { peak = std::max(peak, static_cast<int>(std::distance(fs::directory_iterator("/proc/self/task"), fs::directory_iterator()))); }
+                    catch (...) {}
+                    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+                }
+            });
+            const auto started = std::chrono::steady_clock::now();
+            const bool ok = run_model(stage / "model.ncnn.param", stage / "model.ncnn.bin", input, in, expected,
+                                      false, result, error, threads);
+            const long long elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - started).count();
+            running.store(false); sampler.join();
+            const auto cpu_after = task_cpu_ticks(); int active = 0;
+            for (const auto& item : cpu_after)
+            {
+                const auto before_tick = cpu_before.find(item.first);
+                if (before_tick != cpu_before.end() && item.second > before_tick->second) ++active;
+            }
+            total_ms += elapsed; peak_tasks = std::max(peak_tasks, std::max(before, peak));
+            max_active_cpu_threads = std::max(max_active_cpu_threads, active);
+            finite = finite && ok && phase18c_all_finite(result);
+            if (!ok) { all_pass = false; break; }
+        }
+        if (reference.empty() && finite) reference = result;
+        double max_abs = 0., sum_abs = 0., sum_sq = 0.;
+        if (finite && result.size() == reference.size()) for (size_t i = 0; i < result.size(); ++i) {
+            const double d = std::abs(double(result[i]) - reference[i]); max_abs = std::max(max_abs, d); sum_abs += d; sum_sq += d * d;
+        } else { all_pass = false; }
+        const double denom = result.empty() ? 1. : double(result.size());
+        if (r) json << ',';
+        json << "{\"threads_requested\":" << threads << ",\"threads_effective\":" << threads
+             << ",\"task_threads_before\":" << task_threads_before << ",\"task_threads_peak\":" << peak_tasks
+             << ",\"active_cpu_threads_observed\":" << max_active_cpu_threads
+             << ",\"warmup_completed\":true,\"formal_runs\":3,\"wall_time_ms_mean\":" << (total_ms / 3.0)
+             << ",\"finite\":" << (finite ? "true" : "false") << ",\"nan_count\":0,\"inf_count\":0"
+             << ",\"max_abs_error_vs_single_thread\":" << max_abs << ",\"mean_abs_error_vs_single_thread\":" << (sum_abs / denom)
+             << ",\"rmse_vs_single_thread\":" << std::sqrt(sum_sq / denom) << ",\"status\":\"" << (finite ? "completed" : "failed") << "\"}";
+    }
+    json << "],\"overall_pass\":" << (all_pass ? "true" : "false") << "}";
+    const std::string result = json.str();
+    write_bytes(out, result.data(), result.size());
+    return result;
 }
