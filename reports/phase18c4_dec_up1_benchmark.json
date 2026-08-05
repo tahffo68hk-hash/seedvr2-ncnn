@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "device": "Xiaomi Pad 7 Pro",
+  "backend": "cpu_fp32_openmp_fast_conv3d",
+  "configured_threads": 5,
+  "observed_active_threads": "multiple; 225%-491% process CPU during long runs; Phase18C.3 /proc per-thread probe proves exactly 5 active workers for the selected configuration",
+  "thread_sweep_reference": "reports/phase18c3_thread_benchmark.json",
+  "thread_sweep_ms_dec_conv_in": {"1":519.667,"2":310.667,"4":159.667,"5":149.667,"6":178.333,"8":145.667},
+  "selected_threads": 5,
+  "selection_reason": "balanced: within 2.7% of 8-thread minimum and matches ncnn big-core capacity",
+  "dec_up1_runs": [
+    {"run":1,"source":"same dec_up0 checkpoint","wall_time_ms":153406,"sha256":"e1b01576df1c5f5e0b17118acdff6a4f8ce91403545904c168dd45ec217476ae"},
+    {"run":2,"source":"same dec_up0 checkpoint reloaded","wall_time_ms":32832,"sha256":"e1b01576df1c5f5e0b17118acdff6a4f8ce91403545904c168dd45ec217476ae"}
+  ],
+  "peak_rss_observed_mb_approx": 1126,
+  "swap_observed_kb": 291,
+  "temperature": "not captured",
+  "fatal": false,"native_crash": false,"anr": false,"bit_identical_repeat": true,"overall_pass": true
+}

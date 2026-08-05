@@ -86,3 +86,5 @@ android/**/*.a
 android/**/*.aar
 .externalNativeBuild/
 .phase18_*
+/.phase18c4_host_reference/
+/device_outputs/

@@ -2,6 +2,7 @@
 #include "minimal_video_pipeline.h"
 #include "runtime_progress.h"
 #include "model_manifest.h"
+#include "fast_convolution3d.h"
 #include <jni.h>
 #include <filesystem>
 #include <fstream>
@@ -48,3 +49,4 @@ observed=0;
 #endif
  return js(e,"{\"requested_threads\":"+std::to_string(threads)+",\"observed_worker_threads\":"+std::to_string(observed)+",\"checksum\":"+std::to_string(checksum)+",\"openmp_compiled\":"+(compiled?"true":"false")+",\"overall_pass\":"+((observed>1||threads==1)?std::string("true"):std::string("false"))+"}");}
 extern "C" JNIEXPORT jstring JNICALL Java_com_seededge_runtime_NativeRuntime_nativeRunDecoderStageBenchmark(JNIEnv*e,jobject,jstring model,jstring output){const char*m=e->GetStringUTFChars(model,nullptr),*o=e->GetStringUTFChars(output,nullptr);auto r=run_phase18c_decoder_stage_benchmark(m,o);e->ReleaseStringUTFChars(model,m);e->ReleaseStringUTFChars(output,o);return js(e,r);}
+extern "C" JNIEXPORT jstring JNICALL Java_com_seededge_runtime_NativeRuntime_nativeTestFastConvolution3D(JNIEnv*e,jobject){return js(e,seededge::fast_convolution3d_test_json());}

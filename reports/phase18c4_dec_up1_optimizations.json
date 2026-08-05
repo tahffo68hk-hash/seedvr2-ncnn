@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "experiments": [
+    {"name":"ARM optimized temporal-plane Conv3D","kept":true,"implementation":"three optimized ncnn Conv2D temporal planes plus FP32 accumulation","third_party_modified":false,"real_pad_host_max_abs":0.000244140625,"result":"PASS"},
+    {"name":"temporal-plane Deconvolution3D","kept":false,"small_synthetic_test":"PASS","real_513_channel_reference_sha256":"e1b01576df1c5f5e0b17118acdff6a4f8ce91403545904c168dd45ec217476ae","experimental_sha256":"20485d8a7059b4d47cca9160dc7545a0bf4c241f0d1fb6f7b99e0c672cfbf040","reason":"real output changed; removed immediately"}
+  ],
+  "packing": {"global_ncnn_packing":false,"internal_conv2d_packing":true,"reason":"generic Conv3D has no ARM packing support; internal optimized 2D kernels do"},
+  "allocator": {"custom_pool_allocator":false,"reason":"no isolated parity/performance evidence; default stage-scoped ncnn allocators retained"},
+  "lightmode": {"changed":false,"reason":"checkpoint/debug output correctness prioritized; no isolated parity benchmark"},
+  "affinity": {"changed":false,"reason":"Phase18C.3 balanced 5-thread configuration retained; no new affinity sweep"},
+  "model_loads_per_stage_run": 1,
+  "silent_fallback": false
+}

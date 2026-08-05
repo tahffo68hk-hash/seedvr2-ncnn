@@ -16,4 +16,5 @@ object NativeRuntime {
     external fun nativeRunProgressSimulation(): String
     external fun nativeRunOpenMpThreadProbe(requestedThreads: Int): String
     external fun nativeRunDecoderStageBenchmark(modelRoot: String, outputRoot: String): String
+    external fun nativeTestFastConvolution3D(): String
 }

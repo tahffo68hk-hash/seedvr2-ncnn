@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "stage": "dec_up1",
+  "input_shape": [512,3,32,32],
+  "output_shape": [512,5,64,64],
+  "actual_boundaries": [
+    {"name":"resblock_a","operator_range":"GN/SiLU/Conv3D/GN/SiLU/Conv3D/add","input_shape":[512,3,32,32],"output_shape":[512,3,32,32],"conv3d_ms":[520,455]},
+    {"name":"resblock_b","operator_range":"GN/SiLU/Conv3D/GN/SiLU/Conv3D/add","input_shape":[512,3,32,32],"output_shape":[512,3,32,32],"conv3d_ms":[470,546]},
+    {"name":"resblock_c","operator_range":"GN/SiLU/Conv3D/GN/SiLU/Conv3D/add","input_shape":[512,3,32,32],"output_shape":[512,3,32,32],"conv3d_ms":[436,491]},
+    {"name":"upsample_deconvolution","operator_range":"constant-channel concat + Deconvolution3D 2x2x2 stride2 + temporal crop/concat","input_shape":[513,3,32,32],"output_shape":[512,5,64,64],"wall_time_ms":"included in 26849 ms non-Conv3D stage remainder"},
+    {"name":"output_conv","operator_range":"temporal crop/concat + Conv3D 3x3x3","input_shape":[512,5,64,64],"output_shape":[512,5,64,64],"conv3d_ms":[3065]}
+  ],
+  "stage_wall_time_ms": 32832,
+  "instrumented_conv3d_total_ms": 5983,
+  "non_conv3d_and_lifecycle_remainder_ms": 26849,
+  "slowest_segment": "upsample Deconvolution3D segment (residual after individually instrumented Conv3D calls)",
+  "limitations": ["GroupNorm/SiLU/crop/concat were not individually timed.", "The Deconvolution3D replacement experiment was rejected because real 513-channel output failed parity."],
+  "status": "PASS_WITH_DISCLOSED_PROFILING_GRANULARITY"
+}

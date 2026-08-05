@@ -94,6 +94,11 @@ bool is_safe_relative_path(const std::string& relative)
 }
 }
 
+std::string runtime_sha256_file(const std::string& path)
+{
+    return sha256_file(fs::path(path));
+}
+
 std::string validate_model_manifest(const std::string& root)
 {
     const fs::path base(root);

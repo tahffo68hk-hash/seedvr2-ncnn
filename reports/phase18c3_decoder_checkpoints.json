@@ -1,0 +1,13 @@
+{
+  "schema_version": 2,
+  "backend": "cpu_fp32_openmp_fast_conv3d",
+  "threads": 5,
+  "checkpoints": [
+    {"stage":"dec_up0","shape":[512,3,32,32],"byte_count":6291456,"sha256":"7a5a8d254e7b3d0e075e5aff4138481a7c51d8dd88712a5d65206c4f3c78b412","finite":true,"nan_count":0,"inf_count":0,"min":-58.6248779,"max":66.4636154,"mean":-0.0393558349,"std":3.13798052,"reload_exact":true},
+    {"stage":"dec_up1","shape":[512,5,64,64],"byte_count":41943040,"sha256":"e1b01576df1c5f5e0b17118acdff6a4f8ce91403545904c168dd45ec217476ae","finite":true,"nan_count":0,"inf_count":0,"min":-128.699341,"max":114.86042,"mean":-0.211360788,"std":11.0198842,"reload_exact":true}
+  ],
+  "app_restart_persistence": true,
+  "resume_without_prior_stage_recompute": true,
+  "metadata_refresh_recomputed_decoder_stages": 0,
+  "status": "PASS"
+}

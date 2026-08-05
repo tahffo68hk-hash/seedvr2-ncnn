@@ -3,6 +3,7 @@
 #include "model_manifest.h"
 #include "phase18c_contract.h"
 #include "runtime_progress.h"
+#include "fast_convolution3d.h"
 
 #include "artifact_registry.h"
 #include "hybrid_dit_block_runtime.h"
@@ -119,10 +120,16 @@ std::vector<float> contiguous(const ncnn::Mat& mat)
 bool run_model(const fs::path& param, const fs::path& bin,
                const std::vector<float>& input, const Shape& in_shape,
                const Shape& out_shape, bool vulkan,
-               std::vector<float>& output, std::string& error, int threads = 0)
+               std::vector<float>& output, std::string& error, int threads = 0,
+               std::vector<long long>* conv3d_profile_ms = nullptr)
 {
     ncnn::Net net;
     force_fp32(net.opt, vulkan, threads);
+    if (!vulkan)
+        net.register_custom_layer(ncnn::layer_to_index("Convolution3D"),
+                                  seededge::fast_convolution3d_creator,
+                                  seededge::fast_convolution3d_destroyer);
+    if (conv3d_profile_ms) seededge::reset_fast_convolution3d_profile();
     const ncnn::VulkanDevice* device = nullptr;
     ncnn::VkAllocator* blob_allocator = nullptr;
     ncnn::VkAllocator* staging_allocator = nullptr;
@@ -187,6 +194,7 @@ bool run_model(const fs::path& param, const fs::path& bin,
         device->reclaim_staging_allocator(staging_allocator);
         ncnn::destroy_gpu_instance();
     }
+    if (conv3d_profile_ms) *conv3d_profile_ms = seededge::fast_convolution3d_profile_ms();
     return rc == 0;
 }
 
@@ -414,6 +422,77 @@ done:
         error_stage,error);
 }
 
+bool write_decoder_checkpoint(const fs::path& root, const Stage& stage,
+                              const std::vector<float>& values,
+                              std::string& sha256, std::string& error)
+{
+    if (values.size() != count(stage.out) || !phase18c_all_finite(values))
+    {
+        error = "checkpoint tensor shape/finite validation failed";
+        return false;
+    }
+    fs::create_directories(root);
+    const fs::path tensor = root / (std::string("decoder_after_") + stage.name + ".f32");
+    const fs::path metadata = root / (std::string("decoder_after_") + stage.name + ".json");
+    if (!write_bytes(tensor, values.data(), values.size() * sizeof(float)))
+    {
+        error = "checkpoint tensor write failed";
+        return false;
+    }
+    sha256 = runtime_sha256_file(tensor.string());
+    std::vector<float> reloaded;
+    if (sha256.empty() || !read_floats(tensor, reloaded) || reloaded != values)
+    {
+        error = "checkpoint exact reload validation failed";
+        return false;
+    }
+    const auto bounds = std::minmax_element(values.begin(), values.end());
+    double sum = 0., sum_sq = 0.;
+    for (float value : values) { sum += value; sum_sq += double(value) * value; }
+    const double mean = sum / values.size();
+    const double variance = std::max(0., sum_sq / values.size() - mean * mean);
+    std::ostringstream json;
+    json << std::setprecision(9)
+         << "{\"schema_version\":1,\"stage\":\"" << stage.name
+         << "\",\"dtype\":\"float32\",\"layout\":\"CTHW_ncnn_w_h_d_c_channel_major\",\"shape\":["
+         << stage.out.c << ',' << stage.out.t << ',' << stage.out.h << ',' << stage.out.w
+         << "],\"element_count\":" << values.size() << ",\"byte_count\":" << values.size() * sizeof(float)
+         << ",\"sha256\":\"" << sha256 << "\",\"finite\":true,\"nan_count\":0,\"inf_count\":0,\"min\":" << *bounds.first
+         << ",\"max\":" << *bounds.second << ",\"mean\":" << mean << ",\"std\":" << std::sqrt(variance)
+         << ",\"backend\":\"cpu_fp32_openmp_fast_conv3d\",\"threads\":5,\"reload_exact\":true}";
+    const std::string body = json.str();
+    if (!write_bytes(metadata, body.data(), body.size()))
+    {
+        error = "checkpoint metadata write failed";
+        return false;
+    }
+    return true;
+}
+
+bool read_decoder_checkpoint(const fs::path& root, const Stage& stage,
+                             std::vector<float>& values, std::string& sha256,
+                             std::string& error)
+{
+    const fs::path tensor = root / (std::string("decoder_after_") + stage.name + ".f32");
+    const fs::path metadata = root / (std::string("decoder_after_") + stage.name + ".json");
+    std::ifstream file(metadata); std::stringstream buffer; buffer << file.rdbuf();
+    const std::string json = buffer.str(); std::smatch match;
+    if (!read_floats(tensor, values) || values.size() != count(stage.out) ||
+        !phase18c_all_finite(values) ||
+        !std::regex_search(json, match, std::regex(R"xx("sha256"\s*:\s*"([0-9a-f]{64})")xx")))
+    {
+        error = "checkpoint file/metadata validation failed";
+        return false;
+    }
+    sha256 = runtime_sha256_file(tensor.string());
+    if (sha256 != match[1].str())
+    {
+        error = "checkpoint sha256 mismatch";
+        return false;
+    }
+    return true;
+}
+
 std::map<std::string, long long> task_cpu_ticks()
 {
     std::map<std::string, long long> ticks;
@@ -446,38 +525,114 @@ std::string run_phase18c_decoder_only(const std::string& model_root,
     seededge_progress::reset("decoder_only", output_root);
     const fs::path models(model_root), checkpoints(checkpoint_root), outputs(output_root);
     fs::create_directories(outputs);
-    const fs::path frame_dir = checkpoints / "frames";
-    const fs::path vid_gate = frame_dir / "gate_dit_block_32_vid.f32";
-    const fs::path txt_gate = frame_dir / "gate_dit_block_32_txt.f32";
-    std::vector<float> vid, txt, noise, emb, norm_weight, out_shift, out_scale;
+    std::smatch config_match;
+    std::string resume_from, stop_after;
+    if (std::regex_search(config_json, config_match, std::regex(R"cfg("resume_from"\s*:\s*"(dec_up[01])")cfg")))
+        resume_from = config_match[1].str();
+    if (std::regex_search(config_json, config_match, std::regex(R"cfg("stop_after"\s*:\s*"(dec_up[01])")cfg")))
+        stop_after = config_match[1].str();
+
+    std::vector<float> decoder_values;
     std::string error;
-    if (!read_floats(vid_gate, vid) || vid.size() != 128u * 2560u ||
-        !read_floats(txt_gate, txt) || txt.size() != 58u * 2560u)
-    { seededge_progress::finish("failed", "CHECKPOINT_SIZE_MISMATCH", "Block 32 gate shape mismatch"); return "{\"mode\":\"decoder_only\",\"checkpoint_verified\":false,\"error_code\":\"CHECKPOINT_SIZE_MISMATCH\",\"overall_pass\":false}"; }
-    seededge_progress::update("verifying_checkpoint", "gate_dit_block_32", "checkpoint shape verified", 0, 0, 0, 0, 32);
-    if (!read_floats(models/"constants"/"noise.f32", noise) || !read_floats(models/"constants"/"emb.f32", emb) ||
-        !read_floats(models/"dit"/"post"/"norm_weight.f32", norm_weight) ||
-        !read_floats(models/"dit"/"post"/"out_shift.f32", out_shift) ||
-        !read_floats(models/"dit"/"post"/"out_scale.f32", out_scale) ||
-        noise.size() != 2u*16u*16u*16u || emb.size() != 15360u || norm_weight.size() != 2560u || out_shift.size() != 2560u || out_scale.size() != 2560u)
-    { seededge_progress::finish("failed", "BRIDGE_INPUT_MISSING", "post-head constants missing"); return "{\"mode\":\"decoder_only\",\"checkpoint_verified\":true,\"decoder_bridge_verified\":false,\"error_code\":\"BRIDGE_INPUT_MISSING\",\"overall_pass\":false}"; }
-    seededge_progress::update("block32_bridge", "vid_out_norm", "running post-head norm and Ada modulation", 0, 0, 0, 0, 32);
-    for (int row=0; row<128; ++row) { double sq=0.; for(int c=0;c<2560;++c){float v=vid[row*2560+c];sq+=double(v)*v;} float inv=1.f/std::sqrt(float(sq/2560.)+1e-5f); for(int c=0;c<2560;++c){float n=vid[row*2560+c]*inv*norm_weight[c]; vid[row*2560+c]=n*(emb[c*3+1]+out_scale[c])+(emb[c*3]+out_shift[c]);} }
-    std::vector<float> prediction_patched;
-    if (!run_linear_model(models/"dit"/"vid_out", vid, 128, 2560, 64, false, prediction_patched, error)) { seededge_progress::finish("failed", "BRIDGE_VID_OUT_FAILED", error); return "{\"mode\":\"decoder_only\",\"checkpoint_verified\":true,\"decoder_bridge_verified\":false,\"error_code\":\"BRIDGE_VID_OUT_FAILED\",\"overall_pass\":false}"; }
-    const std::vector<float> prediction=phase18c_unpatchify_thwc(prediction_patched,2,8,8,16,2,2);
-    const std::vector<float> final_latent=phase18c_euler_endpoint(noise,prediction);
-    if (!phase18c_all_finite(final_latent)) { seededge_progress::finish("failed", "NON_FINITE_OUTPUT", "scheduler endpoint non-finite"); return "{\"mode\":\"decoder_only\",\"checkpoint_verified\":true,\"decoder_bridge_verified\":false,\"error_code\":\"NON_FINITE_OUTPUT\",\"overall_pass\":false}"; }
-    std::vector<float> decoder_input(16u*2u*16u*16u);
-    for(int t=0;t<2;++t)for(int h=0;h<16;++h)for(int w=0;w<16;++w)for(int c=0;c<16;++c) decoder_input[(((c*2+t)*16+h)*16+w)] = final_latent[(((t*16+h)*16+w)*16)+c]/0.9152f;
-    seededge_progress::update("vae_decoder", "decoder", "running VAE decoder from verified bridge", 0, 0, 0, 0, 32, 0, static_cast<int>(std::size(kDecoder)));
-    std::vector<float> decoded;
+    std::string source_sha;
+    size_t first_stage = 0;
+    if (!resume_from.empty())
+    {
+        const size_t source_index = resume_from == "dec_up0" ? 2 : 3;
+        if (!read_decoder_checkpoint(checkpoints, kDecoder[source_index], decoder_values, source_sha, error))
+        {
+            seededge_progress::finish("failed", "DECODER_CHECKPOINT_INVALID", error);
+            return "{\"mode\":\"decoder_only\",\"checkpoint_verified\":false,\"error_code\":\"DECODER_CHECKPOINT_INVALID\",\"overall_pass\":false}";
+        }
+        first_stage = source_index + 1;
+        seededge_progress::update("verifying_checkpoint", resume_from, "decoder checkpoint SHA-256 and shape verified", 0, 0, 0, 0, 32, static_cast<int>(first_stage), static_cast<int>(std::size(kDecoder)));
+    }
+    else
+    {
+        const fs::path frame_dir = checkpoints / "frames";
+        std::vector<float> vid, txt, noise, emb, norm_weight, out_shift, out_scale;
+        if (!read_floats(frame_dir / "gate_dit_block_32_vid.f32", vid) || vid.size() != 128u * 2560u ||
+            !read_floats(frame_dir / "gate_dit_block_32_txt.f32", txt) || txt.size() != 58u * 2560u)
+        { seededge_progress::finish("failed", "CHECKPOINT_SIZE_MISMATCH", "Block 32 gate shape mismatch"); return "{\"mode\":\"decoder_only\",\"checkpoint_verified\":false,\"error_code\":\"CHECKPOINT_SIZE_MISMATCH\",\"overall_pass\":false}"; }
+        seededge_progress::update("verifying_checkpoint", "gate_dit_block_32", "checkpoint shape verified", 0, 0, 0, 0, 32);
+        if (!read_floats(models/"constants"/"noise.f32", noise) || !read_floats(models/"constants"/"emb.f32", emb) ||
+            !read_floats(models/"dit"/"post"/"norm_weight.f32", norm_weight) ||
+            !read_floats(models/"dit"/"post"/"out_shift.f32", out_shift) ||
+            !read_floats(models/"dit"/"post"/"out_scale.f32", out_scale) ||
+            noise.size() != 2u*16u*16u*16u || emb.size() != 15360u || norm_weight.size() != 2560u || out_shift.size() != 2560u || out_scale.size() != 2560u)
+        { seededge_progress::finish("failed", "BRIDGE_INPUT_MISSING", "post-head constants missing"); return "{\"mode\":\"decoder_only\",\"checkpoint_verified\":true,\"decoder_bridge_verified\":false,\"error_code\":\"BRIDGE_INPUT_MISSING\",\"overall_pass\":false}"; }
+        seededge_progress::update("block32_bridge", "vid_out_norm", "running post-head norm and Ada modulation", 0, 0, 0, 0, 32);
+        for (int row=0; row<128; ++row) { double sq=0.; for(int c=0;c<2560;++c){float v=vid[row*2560+c];sq+=double(v)*v;} float inv=1.f/std::sqrt(float(sq/2560.)+1e-5f); for(int c=0;c<2560;++c){float n=vid[row*2560+c]*inv*norm_weight[c]; vid[row*2560+c]=n*(emb[c*3+1]+out_scale[c])+(emb[c*3]+out_shift[c]);} }
+        std::vector<float> prediction_patched;
+        if (!run_linear_model(models/"dit"/"vid_out", vid, 128, 2560, 64, false, prediction_patched, error)) { seededge_progress::finish("failed", "BRIDGE_VID_OUT_FAILED", error); return "{\"mode\":\"decoder_only\",\"checkpoint_verified\":true,\"decoder_bridge_verified\":false,\"error_code\":\"BRIDGE_VID_OUT_FAILED\",\"overall_pass\":false}"; }
+        const std::vector<float> prediction=phase18c_unpatchify_thwc(prediction_patched,2,8,8,16,2,2);
+        const std::vector<float> final_latent=phase18c_euler_endpoint(noise,prediction);
+        if (!phase18c_all_finite(final_latent)) { seededge_progress::finish("failed", "NON_FINITE_OUTPUT", "scheduler endpoint non-finite"); return "{\"mode\":\"decoder_only\",\"checkpoint_verified\":true,\"decoder_bridge_verified\":false,\"error_code\":\"NON_FINITE_OUTPUT\",\"overall_pass\":false}"; }
+        decoder_values.resize(16u*2u*16u*16u);
+        for(int t=0;t<2;++t)for(int h=0;h<16;++h)for(int w=0;w<16;++w)for(int c=0;c<16;++c) decoder_values[(((c*2+t)*16+h)*16+w)] = final_latent[(((t*16+h)*16+w)*16)+c]/0.9152f;
+        write_bytes(outputs/"decoder_input_latent.f32",decoder_values.data(),decoder_values.size()*sizeof(float));
+    }
+
+    size_t last_stage = std::size(kDecoder) - 1;
+    if (stop_after == "dec_up0") last_stage = 2;
+    if (stop_after == "dec_up1") last_stage = 3;
+    if (first_stage > last_stage)
+    {
+        const size_t source_index = resume_from == "dec_up0" ? 2 : 3;
+        if (stop_after == resume_from && write_decoder_checkpoint(outputs, kDecoder[source_index], decoder_values, source_sha, error))
+        {
+            seededge_progress::finish("completed");
+            return "{\"mode\":\"decoder_checkpoint_metadata_refresh\",\"checkpoint_stage\":\"" + resume_from +
+                   "\",\"checkpoint_sha256\":\"" + source_sha + "\",\"recomputed_decoder_stages\":0,\"overall_pass\":true}";
+        }
+        seededge_progress::finish("failed", "INVALID_DECODER_RANGE", error.empty() ? "resume point is after stop point" : error);
+        return "{\"mode\":\"decoder_only\",\"error_code\":\"INVALID_DECODER_RANGE\",\"overall_pass\":false}";
+    }
+
     constexpr int kSelectedDecoderThreads = 5;
-    if (!run_vae_chain(models/"vae"/"decoder",kDecoder,std::size(kDecoder),decoder_input,false,decoded,error,kSelectedDecoderThreads,true) || !phase18c_all_finite(decoded)) { seededge_progress::finish("failed", "DECODER_FAILED", error); return "{\"mode\":\"decoder_only\",\"checkpoint_verified\":true,\"decoder_bridge_verified\":true,\"decoder_single_frame_pass\":false,\"error_code\":\"DECODER_FAILED\",\"overall_pass\":false}"; }
-    std::vector<unsigned char> rgb(128u*128u*3u); for(int h=0;h<128;++h)for(int w=0;w<128;++w)for(int c=0;c<3;++c){float v=decoded[(((c*5)*128+h)*128+w)];rgb[(h*128+w)*3+c]=static_cast<unsigned char>(std::clamp(std::lround((v*.5f+.5f)*255.f),0l,255l));}
-    write_bytes(outputs/"frame_000.rgb",rgb.data(),rgb.size()); write_bytes(outputs/"decoder_input_latent.f32",decoder_input.data(),decoder_input.size()*sizeof(float)); const std::string bridge_json="{\"decoder_bridge_verified\":true,\"decoder_latent_verified\":true}"; write_bytes(outputs/"decoder_bridge_result.json", bridge_json.data(), bridge_json.size());
+    std::ostringstream stages_json; stages_json << '[';
+    std::string output_sha;
+    for (size_t index = first_stage; index <= last_stage; ++index)
+    {
+        const Stage& stage = kDecoder[index];
+        seededge_progress::update("vae_decoder", stage.name, "running checkpointed decoder stage", 0, 0, 0, 0, 32, static_cast<int>(index + 1), static_cast<int>(std::size(kDecoder)));
+        std::vector<float> next; std::vector<long long> conv_profile;
+        const auto started = std::chrono::steady_clock::now();
+        if (!run_model(models/"vae"/"decoder"/stage.name/"model.ncnn.param",
+                       models/"vae"/"decoder"/stage.name/"model.ncnn.bin",
+                       decoder_values, stage.in, stage.out, false, next, error,
+                       kSelectedDecoderThreads, &conv_profile) || !phase18c_all_finite(next))
+        {
+            seededge_progress::finish("failed", "DECODER_FAILED", std::string(stage.name) + ':' + error);
+            return "{\"mode\":\"decoder_only\",\"checkpoint_verified\":true,\"decoder_bridge_verified\":true,\"decoder_single_frame_pass\":false,\"error_code\":\"DECODER_FAILED\",\"failed_stage\":\"" + std::string(stage.name) + "\",\"overall_pass\":false}";
+        }
+        const long long elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - started).count();
+        decoder_values.swap(next);
+        if (index == 2 || index == 3)
+            if (!write_decoder_checkpoint(outputs, stage, decoder_values, output_sha, error))
+            {
+                seededge_progress::finish("failed", "CHECKPOINT_WRITE_FAILED", error);
+                return "{\"mode\":\"decoder_only\",\"error_code\":\"CHECKPOINT_WRITE_FAILED\",\"overall_pass\":false}";
+            }
+        if (index != first_stage) stages_json << ',';
+        stages_json << "{\"stage\":\"" << stage.name << "\",\"wall_time_ms\":" << elapsed << ",\"conv3d_ms\":[";
+        for (size_t p = 0; p < conv_profile.size(); ++p) { if (p) stages_json << ','; stages_json << conv_profile[p]; }
+        stages_json << "]}";
+    }
+    stages_json << ']';
+
+    if (last_stage < std::size(kDecoder) - 1)
+    {
+        seededge_progress::finish("completed");
+        return "{\"mode\":\"decoder_checkpoint\",\"checkpoint_source\":\"" + (resume_from.empty() ? std::string("gate_dit_block_32") : resume_from) +
+               "\",\"encoder_skipped\":true,\"dit_blocks_skipped\":true,\"checkpoint_verified\":true,\"checkpoint_stage\":\"" + std::string(kDecoder[last_stage].name) +
+               "\",\"checkpoint_sha256\":\"" + output_sha + "\",\"finite\":true,\"stage_profiles\":" + stages_json.str() + ",\"overall_pass\":true}";
+    }
+
+    std::vector<unsigned char> rgb(128u*128u*3u); for(int h=0;h<128;++h)for(int w=0;w<128;++w)for(int c=0;c<3;++c){float v=decoder_values[(((c*5)*128+h)*128+w)];rgb[(h*128+w)*3+c]=static_cast<unsigned char>(std::clamp(std::lround((v*.5f+.5f)*255.f),0l,255l));}
+    write_bytes(outputs/"frame_000.rgb",rgb.data(),rgb.size()); const std::string bridge_json="{\"decoder_bridge_verified\":true,\"decoder_latent_verified\":true}"; write_bytes(outputs/"decoder_bridge_result.json", bridge_json.data(), bridge_json.size());
     seededge_progress::finish("completed");
-    return "{\"mode\":\"decoder_only\",\"checkpoint_source\":\"gate_dit_block_32\",\"encoder_skipped\":true,\"dit_blocks_skipped\":true,\"checkpoint_verified\":true,\"decoder_bridge_verified\":true,\"decoder_latent_verified\":true,\"decoder_single_frame_pass\":true,\"output_frame_path\":\"frame_000.rgb\",\"backend\":\"cpu_fp32_openmp\",\"threads\":5,\"silent_cpu_fallback\":false,\"finite\":true,\"overall_pass\":true}";
+    return "{\"mode\":\"decoder_only\",\"checkpoint_source\":\"" + (resume_from.empty() ? std::string("gate_dit_block_32") : resume_from) + "\",\"encoder_skipped\":true,\"dit_blocks_skipped\":true,\"checkpoint_verified\":true,\"decoder_bridge_verified\":true,\"decoder_latent_verified\":true,\"decoder_single_frame_pass\":true,\"output_frame_path\":\"frame_000.rgb\",\"backend\":\"cpu_fp32_openmp_fast_conv3d\",\"threads\":5,\"stage_profiles\":" + stages_json.str() + ",\"silent_cpu_fallback\":false,\"finite\":true,\"overall_pass\":true}";
 }
 
 std::string run_phase18c_decoder_stage_benchmark(const std::string& model_root,

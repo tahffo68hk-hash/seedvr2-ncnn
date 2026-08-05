@@ -1,0 +1,3 @@
+{
+  "schema_version":1,"device":"Xiaomi Pad 7 Pro","checkpoint_source":"dec_up1","encoder_skipped":true,"dit_blocks_skipped":true,"stages":[{"name":"dec_up2","wall_time_ms":24755},{"name":"dec_up3","wall_time_ms":6748},{"name":"dec_out","wall_time_ms":892}],"stage_total_ms":32395,"instrumentation_total_ms":34183,"finite":true,"nan_count":0,"inf_count":0,"output_rgb_bytes":49152,"output_png_bytes":34338,"fatal":false,"native_crash":false,"anr":false,"silent_cpu_fallback":false,"overall_pass":true
+}

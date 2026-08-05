@@ -1,0 +1,6 @@
+cmake_minimum_required(VERSION 3.18)
+project(phase18c4_host_reference LANGUAGES CXX)
+find_package(ncnn REQUIRED)
+add_executable(phase18c4_dec_up1_host_reference dec_up1_host_reference.cpp)
+target_link_libraries(phase18c4_dec_up1_host_reference PRIVATE ncnn)
+target_compile_features(phase18c4_dec_up1_host_reference PRIVATE cxx_std_17)

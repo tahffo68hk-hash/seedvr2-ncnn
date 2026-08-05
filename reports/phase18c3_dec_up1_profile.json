@@ -1,0 +1,16 @@
+{
+  "schema_version": 2,
+  "stage": "dec_up1",
+  "input_shape_cthw": [512, 3, 32, 32],
+  "output_shape_cthw": [512, 5, 64, 64],
+  "artifact_bytes": 206686240,
+  "structure": {"residual_blocks": 3, "conv3d_3x3x3": 7, "group_norm": 6, "swish": 6, "deconvolution3d_2x2x2": 1, "attention": 0},
+  "shape_audit": {"temporal_3_to_5": "one deconvolution followed by reference crop/concat", "spatial_32_to_64": "one deconvolution only", "duplicate_upsample": false, "host_phase17_shape_match": true},
+  "root_cause": "Pinned ncnn has no ARM Convolution3D implementation; generic scalar Convolution3D parallelizes only across output channels. The seven convolutions dominate the original black-box run. Deconvolution3D remains generic scalar and is the largest residual segment after Conv3D optimization.",
+  "optimization": "Project-local exact temporal-plane decomposition into ARM-optimized ncnn Convolution2D; no third_party changes; unsupported contracts reject explicitly.",
+  "pad_two_run_ms": [153406, 32832],
+  "pad_two_run_sha256": "e1b01576df1c5f5e0b17118acdff6a4f8ce91403545904c168dd45ec217476ae",
+  "bit_identical_repeat": true,
+  "host_parity_max_abs": 0.000244140625,
+  "status": "PASS"
+}
