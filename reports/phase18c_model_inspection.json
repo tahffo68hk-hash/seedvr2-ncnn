@@ -1,0 +1,1 @@
+{"phase":"18C.1","status":"IMPLEMENTED_NOT_DEVICE_VERIFIED","fast_inspection":"nativeInspectModel currently performs manifest validation when requested; app startup does not invoke it automatically","model_root_relative":"models/phase18c","full_hash":"explicit_user_action_only"}

@@ -8,3 +8,5 @@ if($LASTEXITCODE -ne 0){throw "host test build failed"}
 if($LASTEXITCODE -ne 0){throw "host manifest tests failed"}
 & "$build\Release\synthetic_cpu_host_test.exe"
 if($LASTEXITCODE -ne 0){throw "host synthetic ncnn CPU test failed"}
+& "$build\Release\phase18c_contract_test.exe"
+if($LASTEXITCODE -ne 0){throw "Phase 18C contract tests failed"}

@@ -1,0 +1,1 @@
+{"phase":"18C","device":"Xiaomi Pad 7 Pro (24091RPADC/muyu)","status":"PASS","files":1366,"listed_bytes":14341119711,"remote_du_bytes":14343417335,"manifest_sha256":"9310cce229ef76ef3dd5f242ed9c81c71742160ddf9ffc475de4420385a292","notes":"Current deployed text artifacts are CRLF-restored bytes; manifest was regenerated to match deployed bytes. No model binaries were changed."}

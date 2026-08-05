@@ -8,3 +8,6 @@ add_executable(synthetic_cpu_host_test synthetic_cpu_host_test.cpp ../src/synthe
 target_include_directories(synthetic_cpu_host_test PRIVATE ../include)
 target_link_libraries(synthetic_cpu_host_test PRIVATE ncnn)
 target_compile_features(synthetic_cpu_host_test PRIVATE cxx_std_17)
+add_executable(phase18c_contract_test phase18c_contract_test.cpp ../src/phase18c_contract.cpp)
+target_include_directories(phase18c_contract_test PRIVATE ../include)
+target_compile_features(phase18c_contract_test PRIVATE cxx_std_17)

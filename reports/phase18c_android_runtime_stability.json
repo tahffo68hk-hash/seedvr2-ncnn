@@ -1,0 +1,1 @@
+{"phase":"18C","device":"Xiaomi Pad 7 Pro","status":"PARTIAL","cpu_synthetic_runs":20,"vulkan_synthetic_runs":10,"real_long_run":{"crash":false,"anr_logged":false,"oom_logged":false,"instrumentation_finished":false,"external_timeout_seconds":7204},"thermal":{"last_battery_percent":64,"last_temperature_c":35.0}}

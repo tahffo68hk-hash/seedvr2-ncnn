@@ -1,0 +1,1 @@
+{"phase":"18C","device":"Xiaomi Pad 7 Pro","status":"PASS","backend":"cpu_fp32_explicit","evidence":"block 1/2/4 gate tensors present; strict stream reached block 32"}

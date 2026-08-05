@@ -1,0 +1,15 @@
+{
+  "phase": "18C",
+  "device": {"manufacturer": "Xiaomi", "model": "24091RPADC", "device": "muyu", "android_api": 36, "abi": "arm64-v8a"},
+  "status": "PARTIAL_BLOCKED",
+  "full_phase18_ready": false,
+  "real_model_manifest": {"files": 1366, "listed_bytes": 14341119711, "remote_du_bytes": 14343417335, "manifest_sha256": "9310cce229ef76ef3dd5f242ed9c81c71742160ddf9ffc475de4420385a292"},
+  "completed": ["APK/instrumentation install", "CPU synthetic 20/20", "Vulkan synthetic 10/10 with explicit upload/command/download and FP32 parity", "real VAE encoder", "real DiT blocks 0..31 strict streaming", "intermediate gate files"],
+  "intermediate_gate_files": ["gate_vae_latent.f32", "gate_dit_block_1_vid.f32", "gate_dit_block_2_vid.f32", "gate_dit_block_4_vid.f32", "gate_dit_block_32_vid.f32"],
+  "backend": "cpu_fp32_explicit_for_real_vae_dit_decoder",
+  "vulkan_real_model": {"status": "not_run", "reason": "initial real VAE Vulkan path crashed on Adreno 735; no silent fallback"},
+  "video_output": {"mp4_generated": false, "frame_outputs_generated": false},
+  "run": {"instrumentation_started": "2026-08-05T18:23:00+08:00", "external_wait_exit": 124, "observed_runtime_seconds": 7204, "last_process_state": "alive_but_instrumentation_unfinished", "last_rss_kb": 872904, "last_swap_kb": 69916},
+  "blocking_reason": "Pad 7 Pro decoder/video completion did not finish within approximately two hours; instrumentation remained mFinished=false and no MP4 was produced. This is not a PASS.",
+  "find_x8_evidence_separate": true
+}

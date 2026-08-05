@@ -58,4 +58,22 @@ class RuntimeDeviceTest {
         val json = JSONObject(result)
         assertTrue(json.toString(), json.getBoolean("overall_pass"))
     }
+
+    @Test fun phase18cMinimalVideoDemo() {
+        val result = MinimalVideoDemo.run(context)
+        context.openFileOutput("phase18c_result.json", 0).bufferedWriter().use { it.write(result) }
+        val json = JSONObject(result)
+        assertTrue(json.toString(), json.getBoolean("model_set_verified"))
+        assertTrue(json.toString(), json.getBoolean("vae_encoder_executed"))
+        assertEquals(32, json.getInt("dit_blocks_executed"))
+        assertEquals(1, json.getInt("dit_max_resident_blocks"))
+        assertTrue(json.toString(), json.getBoolean("vae_decoder_executed"))
+        assertEquals(4, json.getInt("output_frames_written"))
+        assertTrue(json.toString(), json.getBoolean("video_encoded"))
+        assertTrue(json.toString(), json.getBoolean("media_extractor_readable"))
+        assertEquals(4, json.getInt("video_frame_count"))
+        assertFalse(json.getBoolean("silent_cpu_fallback"))
+        assertTrue(json.toString(), json.getBoolean("overall_pass"))
+        Log.i("Phase18C", "MINIMAL_VIDEO_DEMO_PASS")
+    }
 }

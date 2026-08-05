@@ -1,0 +1,1 @@
+{"phase":"18C.1","status":"PARTIAL","mode":"decoder_only","checkpoint_source":"gate_dit_block_32","encoder_skipped":true,"dit_blocks_skipped":true,"decoder_entry":"UI/API scaffolding only; real decoder-only tensor bridge remains pending"}

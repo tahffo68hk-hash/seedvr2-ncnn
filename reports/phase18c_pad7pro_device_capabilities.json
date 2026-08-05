@@ -1,0 +1,40 @@
+{
+  "phase": "18C",
+  "device_role": "final_target_candidate",
+  "previous_findx8_results_inherited": false,
+  "manufacturer": "Xiaomi",
+  "model": "24091RPADC",
+  "device": "muyu",
+  "android_release": "16",
+  "api_level": 36,
+  "abi": "arm64-v8a",
+  "display": "2136x3200",
+  "gpu_surfaceflinger": "Qualcomm Adreno (TM) 735",
+  "opengles": "OpenGL ES 3.2",
+  "vulkan_features": [
+    "android.hardware.vulkan.compute",
+    "android.hardware.vulkan.level=1",
+    "android.hardware.vulkan.version=4206592"
+  ],
+  "memory": {
+    "mem_total_kb": 11787112,
+    "mem_available_kb": 4281004,
+    "swap_total_kb": 12582908,
+    "swap_free_kb": 8476652
+  },
+  "storage": {
+    "path": "/storage/emulated",
+    "available_kb": 245824632
+  },
+  "battery": {
+    "level_percent": 91,
+    "temperature_decicelsius": 302,
+    "status": 2
+  },
+  "thermal": {
+    "thermal_status": 0,
+    "note": "Initial dumpsys thermalservice included cached per-sensor values; no severe/critical aggregate status was reported."
+  },
+  "captured_from_adb": true,
+  "serial_recorded": false
+}

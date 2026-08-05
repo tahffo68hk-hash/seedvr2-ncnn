@@ -1,0 +1,1 @@
+{"phase":"18C","device":"Xiaomi Pad 7 Pro","status":"PASS","backend":"cpu_fp32_explicit","evidence":"gate_vae_latent.f32 present","vulkan_real_model":"not_run_after_initial_Adreno_crash"}

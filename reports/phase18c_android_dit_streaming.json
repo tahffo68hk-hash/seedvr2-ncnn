@@ -1,0 +1,1 @@
+{"phase":"18C","device":"Xiaomi Pad 7 Pro","status":"PASS_PARTIAL","blocks_reached":[1,2,4,32],"strict_streaming":true,"max_resident_weighted_blocks":1,"backend":"cpu_fp32_explicit"}
