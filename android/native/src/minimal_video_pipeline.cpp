@@ -9,6 +9,7 @@
 #include "model_cache.h"
 
 #include <command.h>
+#include <cpu.h>
 #include <gpu.h>
 #include <net.h>
 
@@ -87,7 +88,7 @@ bool write_bytes(const fs::path& path, const void* data, size_t size)
 
 void force_fp32(ncnn::Option& option, bool vulkan)
 {
-    option.num_threads = 1;
+    option.num_threads = std::max(1, ncnn::get_big_cpu_count());
     option.use_vulkan_compute = vulkan;
     option.use_subgroup_ops = false;
     option.use_cooperative_matrix = false;

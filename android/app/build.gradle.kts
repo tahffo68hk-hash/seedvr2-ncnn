@@ -12,7 +12,7 @@ android {
         versionName = "18A.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         ndk { abiFilters += listOf("arm64-v8a") }
-        externalNativeBuild { cmake { arguments += listOf("-DANDROID_STL=c++_static", "-DNCNN_VULKAN=ON", "-DNCNN_OPENMP=OFF"); cppFlags += listOf("-std=c++17", "-fexceptions", "-fno-rtti") } }
+        externalNativeBuild { cmake { arguments += listOf("-DANDROID_STL=c++_static", "-DNCNN_VULKAN=ON", "-DNCNN_OPENMP=ON"); cppFlags += listOf("-std=c++17", "-fexceptions", "-fno-rtti") } }
     }
     externalNativeBuild { cmake { path = file("../CMakeLists.txt"); cmake.version = "3.22.1" } }
     buildTypes {

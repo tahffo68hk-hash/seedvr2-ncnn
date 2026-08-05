@@ -8,7 +8,7 @@ set(NCNN_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 set(NCNN_BUILD_TOOLS OFF CACHE BOOL "" FORCE)
 set(NCNN_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(NCNN_VULKAN ON CACHE BOOL "" FORCE)
-set(NCNN_OPENMP OFF CACHE BOOL "" FORCE)
+set(NCNN_OPENMP ON CACHE BOOL "" FORCE)
 set(NCNN_SHARED_LIB OFF CACHE BOOL "" FORCE)
 set(NCNN_DISABLE_EXCEPTION OFF CACHE BOOL "" FORCE)
 set(NCNN_DISABLE_RTTI ON CACHE BOOL "" FORCE)
@@ -24,6 +24,8 @@ add_library(seededge SHARED native/src/jni_runtime.cpp native/src/runtime_info.c
 target_include_directories(seededge PRIVATE native/include ../tests/attention_dispatcher ../tests/seedvr2_dit_block_ncnn)
 target_link_libraries(seededge PRIVATE ncnn android log)
 target_compile_features(seededge PRIVATE cxx_std_17)
+target_compile_options(seededge PRIVATE -fopenmp)
+target_link_options(seededge PRIVATE -fopenmp -static-openmp)
 # Device validation uses a Debug APK for run-as access, but the real-weight
 # manifest hashes more than 14 GB.  Keep assertions/debuggability while
 # compiling the native runtime's numerical and SHA-256 hot loops efficiently.
