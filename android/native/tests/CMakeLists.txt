@@ -53,6 +53,19 @@ target_compile_features(
   phase18d_full_photo_contract_test
   PRIVATE
   cxx_std_17)
+add_executable(phase18d_image_artifacts_test
+  phase18d_image_artifacts_test.cpp
+  ../src/phase18d_image_artifacts.cpp
+  ../third_party/stb/stb_impl.cpp)
+target_include_directories(
+  phase18d_image_artifacts_test
+  PRIVATE
+  ../include
+  ../third_party/stb)
+target_compile_features(
+  phase18d_image_artifacts_test
+  PRIVATE
+  cxx_std_17)
 add_executable(phase18d_model_bundle_test phase18d_model_bundle_test.cpp ../src/model_manifest.cpp)
 target_include_directories(phase18d_model_bundle_test PRIVATE ../include)
 target_compile_features(phase18d_model_bundle_test PRIVATE cxx_std_17)
