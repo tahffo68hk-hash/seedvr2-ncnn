@@ -3,9 +3,15 @@
 #include <algorithm>
 #include <array>
 #include <cmath>
+
+#include <cstddef>
+#include <cstdint>
 #include <iomanip>
 #include <limits>
 #include <sstream>
+
+#include <string>
+#include <vector>
 
 namespace seededge::phase18d {
 namespace {
@@ -120,6 +126,83 @@ float axis_weight(const TilePlan& plan, const TileSpec& tile, int global, bool h
         }
     }
     return 1.f;
+}
+
+bool phase18d_fusion_fail(
+    std::string* error,
+    const std::string& message) {
+
+    if (error != nullptr) {
+        *error = message;
+    }
+
+    return false;
+}
+
+bool phase18d_checked_multiply(
+    size_t left,
+    size_t right,
+    size_t* result) {
+
+    if (result == nullptr) {
+        return false;
+    }
+
+    if (left != 0u &&
+        right > std::numeric_limits<size_t>::max() / left) {
+        return false;
+    }
+
+    *result = left * right;
+    return true;
+}
+
+const TileSpec* phase18d_find_tile_by_grid(
+    const TilePlan& plan,
+    int grid_x,
+    int grid_y) {
+
+    for (const TileSpec& tile : plan.tiles) {
+        if (tile.grid_x == grid_x &&
+            tile.grid_y == grid_y) {
+            return &tile;
+        }
+    }
+
+    return nullptr;
+}
+
+bool phase18d_validate_overlap(
+    int overlap,
+    int current_extent,
+    int neighbor_extent,
+    const char* label,
+    int* validated_overlap,
+    std::string* error) {
+
+    if (validated_overlap == nullptr) {
+        return phase18d_fusion_fail(
+            error,
+            "validated overlap output is null");
+    }
+
+    if (overlap <= 0) {
+        return phase18d_fusion_fail(
+            error,
+            std::string(label) +
+                " neighbor does not overlap the current tile");
+    }
+
+    if (overlap > current_extent ||
+        overlap > neighbor_extent) {
+        return phase18d_fusion_fail(
+            error,
+            std::string(label) +
+                " overlap exceeds a tile valid extent");
+    }
+
+    *validated_overlap = overlap;
+    return true;
 }
 
 }  // namespace
@@ -306,6 +389,515 @@ bool is_valid_tile_state_transition(const std::string& from, const std::string& 
     if (from == "decoder") return to == "writing_output" || to == "cancelled" || to == "failed";
     if (from == "writing_output") return to == "completed" || to == "failed";
     return false;
+}
+
+bool make_axis_fusion_weights(
+    int extent,
+    int leading_overlap,
+    int trailing_overlap,
+    std::vector<float>* weights,
+    std::string* error) {
+
+    if (error != nullptr) {
+        error->clear();
+    }
+
+    if (weights == nullptr) {
+        return phase18d_fusion_fail(
+            error,
+            "fusion weights output is null");
+    }
+
+    weights->clear();
+
+    if (extent <= 0) {
+        return phase18d_fusion_fail(
+            error,
+            "fusion weight extent must be positive");
+    }
+
+    if (leading_overlap < 0 ||
+        trailing_overlap < 0) {
+        return phase18d_fusion_fail(
+            error,
+            "fusion overlap must not be negative");
+    }
+
+    if (leading_overlap > extent ||
+        trailing_overlap > extent) {
+        return phase18d_fusion_fail(
+            error,
+            "fusion overlap exceeds valid extent");
+    }
+
+    constexpr float kPi =
+        3.14159265358979323846f;
+
+    std::vector<float> generated(
+        static_cast<size_t>(extent),
+        1.0f);
+
+    // Left/top overlap: sin^2 ramp from near zero toward one.
+    for (int index = 0;
+         index < leading_overlap;
+         ++index) {
+
+        const float t =
+            (static_cast<float>(index) + 0.5f) /
+            static_cast<float>(leading_overlap);
+
+        const float angle =
+            0.5f * kPi * t;
+
+        const float sine = std::sin(angle);
+        const float ramp = sine * sine;
+
+        if (!std::isfinite(ramp) || ramp <= 0.0f) {
+            return phase18d_fusion_fail(
+                error,
+                "leading fusion ramp is not finite and positive");
+        }
+
+        generated[static_cast<size_t>(index)] *= ramp;
+    }
+
+    // Right/bottom overlap: cos^2 ramp from near one toward zero.
+    for (int overlap_index = 0;
+         overlap_index < trailing_overlap;
+         ++overlap_index) {
+
+        const float t =
+            (static_cast<float>(overlap_index) + 0.5f) /
+            static_cast<float>(trailing_overlap);
+
+        const float angle =
+            0.5f * kPi * t;
+
+        const float cosine = std::cos(angle);
+        const float ramp = cosine * cosine;
+
+        if (!std::isfinite(ramp) || ramp <= 0.0f) {
+            return phase18d_fusion_fail(
+                error,
+                "trailing fusion ramp is not finite and positive");
+        }
+
+        const int index =
+            extent - trailing_overlap + overlap_index;
+
+        generated[static_cast<size_t>(index)] *= ramp;
+    }
+
+    for (float weight : generated) {
+        if (!std::isfinite(weight) || weight <= 0.0f) {
+            return phase18d_fusion_fail(
+                error,
+                "combined fusion weight is not finite and positive");
+        }
+    }
+
+    *weights = std::move(generated);
+    return true;
+}
+
+bool weighted_fuse_rgb8(
+    const TilePlan& plan,
+    const std::vector<std::vector<uint8_t>>& tile_outputs,
+    FusionResult* result,
+    std::string* error) {
+
+    if (error != nullptr) {
+        error->clear();
+    }
+
+    if (result == nullptr) {
+        return phase18d_fusion_fail(
+            error,
+            "fusion result output is null");
+    }
+
+    *result = FusionResult{};
+
+    if (plan.image_width <= 0 ||
+        plan.image_height <= 0) {
+        return phase18d_fusion_fail(
+            error,
+            "fusion image dimensions must be positive");
+    }
+
+    if (plan.tiles.empty()) {
+        return phase18d_fusion_fail(
+            error,
+            "fusion tile plan is empty");
+    }
+
+    if (tile_outputs.size() != plan.tiles.size()) {
+        return phase18d_fusion_fail(
+            error,
+            "tile output count does not match tile plan");
+    }
+
+    size_t pixel_count = 0u;
+    size_t rgb_count = 0u;
+
+    if (!phase18d_checked_multiply(
+            static_cast<size_t>(plan.image_width),
+            static_cast<size_t>(plan.image_height),
+            &pixel_count) ||
+        !phase18d_checked_multiply(
+            pixel_count,
+            3u,
+            &rgb_count)) {
+        return phase18d_fusion_fail(
+            error,
+            "fusion output size overflows size_t");
+    }
+
+    // Reject ambiguous plans. Neighbor lookup is based on grid coordinates.
+    for (size_t left = 0u;
+         left < plan.tiles.size();
+         ++left) {
+
+        for (size_t right = left + 1u;
+             right < plan.tiles.size();
+             ++right) {
+
+            if (plan.tiles[left].grid_x ==
+                    plan.tiles[right].grid_x &&
+                plan.tiles[left].grid_y ==
+                    plan.tiles[right].grid_y) {
+                return phase18d_fusion_fail(
+                    error,
+                    "tile plan contains duplicate grid coordinates");
+            }
+        }
+    }
+
+    // Double accumulation reduces order-dependent rounding. Public output
+    // remains float to preserve the existing FusionResult ABI.
+    std::vector<double> rgb_sum(rgb_count, 0.0);
+    std::vector<double> weight_sum(pixel_count, 0.0);
+
+    for (size_t tile_position = 0u;
+         tile_position < plan.tiles.size();
+         ++tile_position) {
+
+        const TileSpec& tile =
+            plan.tiles[tile_position];
+
+        if (tile.grid_x < 0 || tile.grid_y < 0) {
+            return phase18d_fusion_fail(
+                error,
+                "tile grid coordinate must not be negative");
+        }
+
+        if (tile.source_left < 0 ||
+            tile.source_top < 0 ||
+            tile.source_right > plan.image_width ||
+            tile.source_bottom > plan.image_height ||
+            tile.source_right <= tile.source_left ||
+            tile.source_bottom <= tile.source_top) {
+            return phase18d_fusion_fail(
+                error,
+                "tile source bounds are invalid");
+        }
+
+        const int bounds_width =
+            tile.source_right - tile.source_left;
+
+        const int bounds_height =
+            tile.source_bottom - tile.source_top;
+
+        if (tile.valid_width != bounds_width ||
+            tile.valid_height != bounds_height ||
+            tile.valid_width <= 0 ||
+            tile.valid_height <= 0) {
+            return phase18d_fusion_fail(
+                error,
+                "tile valid dimensions do not match source bounds");
+        }
+
+        size_t tile_pixel_count = 0u;
+        size_t expected_tile_bytes = 0u;
+
+        if (!phase18d_checked_multiply(
+                static_cast<size_t>(tile.valid_width),
+                static_cast<size_t>(tile.valid_height),
+                &tile_pixel_count) ||
+            !phase18d_checked_multiply(
+                tile_pixel_count,
+                3u,
+                &expected_tile_bytes)) {
+            return phase18d_fusion_fail(
+                error,
+                "tile output size overflows size_t");
+        }
+
+        const std::vector<uint8_t>& tile_rgb =
+            tile_outputs[tile_position];
+
+        if (tile_rgb.size() != expected_tile_bytes) {
+            return phase18d_fusion_fail(
+                error,
+                "tile output byte count does not match valid dimensions");
+        }
+
+        const TileSpec* left_neighbor =
+            phase18d_find_tile_by_grid(
+                plan,
+                tile.grid_x - 1,
+                tile.grid_y);
+
+        const TileSpec* right_neighbor =
+            phase18d_find_tile_by_grid(
+                plan,
+                tile.grid_x + 1,
+                tile.grid_y);
+
+        const TileSpec* top_neighbor =
+            phase18d_find_tile_by_grid(
+                plan,
+                tile.grid_x,
+                tile.grid_y - 1);
+
+        const TileSpec* bottom_neighbor =
+            phase18d_find_tile_by_grid(
+                plan,
+                tile.grid_x,
+                tile.grid_y + 1);
+
+        int left_overlap = 0;
+        int right_overlap = 0;
+        int top_overlap = 0;
+        int bottom_overlap = 0;
+
+        if (left_neighbor != nullptr) {
+            const int overlap =
+                left_neighbor->source_right -
+                tile.source_left;
+
+            if (!phase18d_validate_overlap(
+                    overlap,
+                    tile.valid_width,
+                    left_neighbor->valid_width,
+                    "left",
+                    &left_overlap,
+                    error)) {
+                return false;
+            }
+        }
+
+        if (right_neighbor != nullptr) {
+            const int overlap =
+                tile.source_right -
+                right_neighbor->source_left;
+
+            if (!phase18d_validate_overlap(
+                    overlap,
+                    tile.valid_width,
+                    right_neighbor->valid_width,
+                    "right",
+                    &right_overlap,
+                    error)) {
+                return false;
+            }
+        }
+
+        if (top_neighbor != nullptr) {
+            const int overlap =
+                top_neighbor->source_bottom -
+                tile.source_top;
+
+            if (!phase18d_validate_overlap(
+                    overlap,
+                    tile.valid_height,
+                    top_neighbor->valid_height,
+                    "top",
+                    &top_overlap,
+                    error)) {
+                return false;
+            }
+        }
+
+        if (bottom_neighbor != nullptr) {
+            const int overlap =
+                tile.source_bottom -
+                bottom_neighbor->source_top;
+
+            if (!phase18d_validate_overlap(
+                    overlap,
+                    tile.valid_height,
+                    bottom_neighbor->valid_height,
+                    "bottom",
+                    &bottom_overlap,
+                    error)) {
+                return false;
+            }
+        }
+
+        std::vector<float> x_weights;
+        std::vector<float> y_weights;
+        std::string weight_error;
+
+        if (!make_axis_fusion_weights(
+                tile.valid_width,
+                left_overlap,
+                right_overlap,
+                &x_weights,
+                &weight_error)) {
+            return phase18d_fusion_fail(
+                error,
+                "failed to build x fusion weights: " +
+                    weight_error);
+        }
+
+        if (!make_axis_fusion_weights(
+                tile.valid_height,
+                top_overlap,
+                bottom_overlap,
+                &y_weights,
+                &weight_error)) {
+            return phase18d_fusion_fail(
+                error,
+                "failed to build y fusion weights: " +
+                    weight_error);
+        }
+
+        for (int local_y = 0;
+             local_y < tile.valid_height;
+             ++local_y) {
+
+            const int global_y =
+                tile.source_top + local_y;
+
+            for (int local_x = 0;
+                 local_x < tile.valid_width;
+                 ++local_x) {
+
+                const int global_x =
+                    tile.source_left + local_x;
+
+                const double weight =
+                    static_cast<double>(
+                        x_weights[
+                            static_cast<size_t>(local_x)]) *
+                    static_cast<double>(
+                        y_weights[
+                            static_cast<size_t>(local_y)]);
+
+                if (!std::isfinite(weight) ||
+                    weight <= 0.0) {
+                    return phase18d_fusion_fail(
+                        error,
+                        "tile fusion weight is not finite and positive");
+                }
+
+                const size_t global_pixel =
+                    static_cast<size_t>(global_y) *
+                        static_cast<size_t>(plan.image_width) +
+                    static_cast<size_t>(global_x);
+
+                const size_t local_pixel =
+                    static_cast<size_t>(local_y) *
+                        static_cast<size_t>(tile.valid_width) +
+                    static_cast<size_t>(local_x);
+
+                weight_sum[global_pixel] += weight;
+
+                for (size_t channel = 0u;
+                     channel < 3u;
+                     ++channel) {
+
+                    const size_t global_rgb =
+                        global_pixel * 3u + channel;
+
+                    const size_t local_rgb =
+                        local_pixel * 3u + channel;
+
+                    rgb_sum[global_rgb] +=
+                        static_cast<double>(
+                            tile_rgb[local_rgb]) *
+                        weight;
+                }
+            }
+        }
+    }
+
+    FusionResult fused;
+    fused.weight_sum.resize(pixel_count, 0.0f);
+
+    for (size_t pixel = 0u;
+         pixel < pixel_count;
+         ++pixel) {
+
+        const double weight = weight_sum[pixel];
+
+        if (!std::isfinite(weight) ||
+            weight <= 0.0) {
+
+            ++fused.uncovered_pixel_count;
+
+            if (weight == 0.0) {
+                ++fused.zero_weight_pixel_count;
+            }
+
+            continue;
+        }
+
+        fused.weight_sum[pixel] =
+            static_cast<float>(weight);
+    }
+
+    if (fused.uncovered_pixel_count != 0u ||
+        fused.zero_weight_pixel_count != 0u) {
+
+        *result = std::move(fused);
+
+        return phase18d_fusion_fail(
+            error,
+            "fusion produced uncovered or zero-weight pixels");
+    }
+
+    fused.rgb.resize(rgb_count, 0.0f);
+
+    for (size_t pixel = 0u;
+         pixel < pixel_count;
+         ++pixel) {
+
+        const double weight = weight_sum[pixel];
+
+        for (size_t channel = 0u;
+             channel < 3u;
+             ++channel) {
+
+            const size_t rgb_index =
+                pixel * 3u + channel;
+
+            double value =
+                rgb_sum[rgb_index] / weight;
+
+            if (!std::isfinite(value)) {
+                return phase18d_fusion_fail(
+                    error,
+                    "normalized fusion value is not finite");
+            }
+
+            value = std::clamp(
+                value,
+                0.0,
+                255.0);
+
+            fused.rgb[rgb_index] =
+                static_cast<float>(value);
+        }
+    }
+
+    // max_abs_error belongs to identity/reference comparisons. Weighted
+    // fusion has no independent reference image at this layer.
+    fused.max_abs_error = 0.0f;
+
+    *result = std::move(fused);
+    return true;
 }
 
 }  // namespace seededge::phase18d

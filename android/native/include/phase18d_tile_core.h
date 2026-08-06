@@ -82,6 +82,25 @@ std::string sha256_hex(const uint8_t* data, size_t byte_count);
 bool identity_fuse_rgb8(const TilePlan& plan, const uint8_t* image_rgb,
                         size_t byte_count, FusionResult* result, std::string* error);
 
+// Builds one-dimensional fusion weights for a valid tile extent.
+// Leading overlap uses a pixel-centered sin^2 ramp.
+// Trailing overlap uses a pixel-centered cos^2 ramp.
+bool make_axis_fusion_weights(
+    int extent,
+    int leading_overlap,
+    int trailing_overlap,
+    std::vector<float>* weights,
+    std::string* error);
+
+// Fuses valid RGB8 tile outputs into a full-resolution float RGB image.
+// tile_outputs[i] corresponds to plan.tiles[i] and contains exactly
+// valid_width * valid_height * 3 bytes without padded pixels.
+bool weighted_fuse_rgb8(
+    const TilePlan& plan,
+    const std::vector<std::vector<uint8_t>>& tile_outputs,
+    FusionResult* result,
+    std::string* error);
+
 bool validate_checkpoint_identity(const CheckpointIdentity& expected,
                                   const CheckpointIdentity& actual,
                                   std::string* error_code, std::string* error);
