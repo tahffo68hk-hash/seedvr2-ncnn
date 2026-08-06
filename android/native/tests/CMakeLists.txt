@@ -66,6 +66,38 @@ target_compile_features(
   phase18d_image_artifacts_test
   PRIVATE
   cxx_std_17)
+add_executable(phase18d_full_photo_artifacts_test
+  phase18d_full_photo_artifacts_test.cpp
+  ../src/minimal_video_pipeline.cpp
+  ../src/model_manifest.cpp
+  ../src/phase18c_contract.cpp
+  ../src/runtime_progress.cpp
+  ../src/fast_convolution3d.cpp
+  ../src/phase18d_tile_core.cpp
+  ../src/phase18d_image_artifacts.cpp
+  ../src/phase18d_full_photo_artifacts.cpp
+  ../third_party/stb/stb_impl.cpp
+  ../../../tests/attention_dispatcher/artifact_registry.cpp
+  ../../../tests/attention_dispatcher/model_cache.cpp
+  ../../../tests/seedvr2_dit_block_ncnn/hybrid_dit_block_runtime.cpp)
+
+target_include_directories(
+  phase18d_full_photo_artifacts_test
+  PRIVATE
+  ../include
+  ../third_party/stb
+  ../../../tests/attention_dispatcher
+  ../../../tests/seedvr2_dit_block_ncnn)
+
+target_link_libraries(
+  phase18d_full_photo_artifacts_test
+  PRIVATE
+  ncnn)
+
+target_compile_features(
+  phase18d_full_photo_artifacts_test
+  PRIVATE
+  cxx_std_17)
 add_executable(phase18d_model_bundle_test phase18d_model_bundle_test.cpp ../src/model_manifest.cpp)
 target_include_directories(phase18d_model_bundle_test PRIVATE ../include)
 target_compile_features(phase18d_model_bundle_test PRIVATE cxx_std_17)
