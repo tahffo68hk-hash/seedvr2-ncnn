@@ -366,6 +366,132 @@ size_t select_content_tile(const uint8_t* rgb, int width, int height,
 }
 } // namespace
 
+namespace
+{
+std::string full_photo_error(const std::string& code, const std::string& message)
+{
+    return "{\"schema_version\":1,\"mode\":\"phase18d_full_photo\",\"state\":\"failed\",\"error_code\":\"" +
+           escape_json(code) + "\",\"error_message\":\"" + escape_json(message) +
+           "\",\"tile_count\":0,\"completed_tiles\":0,\"silent_fallback\":false,\"overall_pass\":false}";
+}
+
+std::string tile_dir_name(int index)
+{
+    std::ostringstream name;
+    name << "tile_" << std::setw(4) << std::setfill('0') << index;
+    return name.str();
+}
+
+// The model consumes C,T,H,W FP32 in [-1, 1].  Repeating the padded tile into
+// five temporal slots matches the existing 128x128 SeedVR2 VAE contract.
+std::vector<float> make_five_frame_model_input(const seededge::phase18d::PaddedTile& padded)
+{
+    std::vector<float> model_input(count(kEncoder[0].in));
+    for (int c = 0; c < 3; ++c)
+        for (int t = 0; t < 5; ++t)
+            for (int y = 0; y < 128; ++y)
+                for (int x = 0; x < 128; ++x)
+                    model_input[(((c * 5 + t) * 128 + y) * 128 + x)] =
+                        static_cast<float>(padded.rgb[(static_cast<size_t>(y) * 128 + x) * 3 + c]) / 127.5f - 1.f;
+    return model_input;
+}
+
+// Replays the canonical tile stage chain against the reported result flags.
+// A tile can only be recorded as completed when the full chain was reached.
+std::string reached_tile_state(const seededge::phase18d::Phase18dTileExecutionResult& result)
+{
+    std::string state = "pending";
+    if (seededge::phase18d::is_valid_tile_state_transition(state, "preparing")) state = "preparing";
+    if (result.encoder_completed && seededge::phase18d::is_valid_tile_state_transition(state, "encoder")) state = "encoder";
+    if (result.dit_block_completed >= 32 && seededge::phase18d::is_valid_tile_state_transition(state, "dit")) state = "dit";
+    if (result.scheduler_completed && seededge::phase18d::is_valid_tile_state_transition(state, "scheduler")) state = "scheduler";
+    if (result.decoder_completed && seededge::phase18d::is_valid_tile_state_transition(state, "decoder")) state = "decoder";
+    if (seededge::phase18d::is_valid_tile_state_transition(state, "writing_output")) state = "writing_output";
+    return state;
+}
+
+std::string full_photo_tile_status(
+    const std::string& task_id,
+    const std::string& model_version,
+    const std::string& manifest_sha,
+    const std::string& normalized_sha,
+    const std::string& tile_sha,
+    const seededge::phase18d::TileSpec& tile,
+    const std::string& state,
+    const seededge::phase18d::Phase18dTileExecutionResult& result,
+    const std::string& output_sha,
+    const std::string& error_code,
+    const std::string& error_message)
+{
+    std::ostringstream status;
+    status << "{\"schema_version\":1,\"task_id\":\"" << escape_json(task_id)
+           << "\",\"normalized_image_sha256\":\"" << normalized_sha
+           << "\",\"tile_index\":" << tile.tile_index
+           << ",\"tile_input_sha256\":\"" << tile_sha
+           << "\",\"model_version\":\"" << escape_json(model_version)
+           << "\",\"model_manifest_sha256\":\"" << manifest_sha
+           << "\",\"tile_bounds\":{\"left\":" << tile.source_left
+           << ",\"top\":" << tile.source_top << ",\"right\":" << tile.source_right
+           << ",\"bottom\":" << tile.source_bottom
+           << "},\"checkpoint_root\":null,\"state\":\"" << state << "\""
+           << ",\"encoder_completed\":" << (result.encoder_completed ? "true" : "false")
+           << ",\"dit_block_completed\":" << result.dit_block_completed
+           << ",\"scheduler_completed\":" << (result.scheduler_completed ? "true" : "false")
+           << ",\"decoder_completed\":" << (result.decoder_completed ? "true" : "false")
+           << ",\"target_frame_index\":0,\"finite\":" << (result.finite ? "true" : "false")
+           << ",\"nan_count\":" << result.nan_count
+           << ",\"inf_count\":" << result.inf_count
+           << ",\"output_valid_sha256\":";
+    if (output_sha.empty()) status << "null"; else status << "\"" << output_sha << "\"";
+    status << ",\"pipeline_result\":";
+    if (result.pipeline_result_json.empty()) status << "null"; else status << result.pipeline_result_json;
+    status << ",\"error_code\":";
+    if (error_code.empty()) status << "null"; else status << "\"" << escape_json(error_code) << "\"";
+    status << ",\"error_message\":";
+    if (error_message.empty()) status << "null"; else status << "\"" << escape_json(error_message) << "\"";
+    status << "}";
+    return status.str();
+}
+
+std::string full_photo_task_status(
+    const std::string& task_id,
+    const std::string& model_version,
+    const std::string& manifest_sha,
+    const std::string& normalized_sha,
+    int tile_count,
+    int completed_tiles,
+    const std::string& state,
+    const std::string& output_full_sha,
+    const std::string& error_code,
+    const std::string& error_message)
+{
+    const bool pass = state == "completed" && !output_full_sha.empty();
+    std::ostringstream status;
+    status << "{\"schema_version\":1,\"mode\":\"phase18d_full_photo\",\"state\":\"" << state
+           << "\",\"task_id\":\"" << escape_json(task_id)
+           << "\",\"model_version\":\"" << escape_json(model_version)
+           << "\",\"model_manifest_sha256\":\"" << manifest_sha
+           << "\",\"normalized_image_sha256\":\"" << normalized_sha
+           << "\",\"tile_count\":" << tile_count
+           << ",\"completed_tiles\":" << completed_tiles
+           << ",\"silent_fallback\":false"
+           << ",\"output_full_sha256\":";
+    if (output_full_sha.empty()) status << "null"; else status << "\"" << output_full_sha << "\"";
+    status << ",\"error_code\":";
+    if (error_code.empty()) status << "null"; else status << "\"" << escape_json(error_code) << "\"";
+    status << ",\"error_message\":";
+    if (error_message.empty()) status << "null"; else status << "\"" << escape_json(error_message) << "\"";
+    status << ",\"overall_pass\":" << (pass ? "true" : "false") << "}";
+    return status.str();
+}
+
+std::string persist_task_status(const fs::path& task_path, const std::string& status_text)
+{
+    if (write_bytes(task_path / "status.json", status_text.data(), status_text.size()))
+        return status_text;
+    return full_photo_error("STATUS_WRITE_FAILED", "could not persist task-local status");
+}
+} // namespace
 std::string run_phase18d_single_photo_tile(const std::string& model_root,
                                            const std::string& task_root,
                                            const uint8_t* normalized_rgb,
@@ -425,11 +551,7 @@ std::string run_phase18d_single_photo_tile(const std::string& model_root,
     // The model consumes C,T,H,W FP32 in [-1, 1].  Repeating the source tile
     // into five temporal slots is deliberate and matches the existing 128x128
     // SeedVR2 VAE contract.
-    std::vector<float> model_input(count(kEncoder[0].in));
-    for (int c = 0; c < 3; ++c) for (int t = 0; t < 5; ++t)
-        for (int y = 0; y < 128; ++y) for (int x = 0; x < 128; ++x)
-            model_input[(((c * 5 + t) * 128 + y) * 128 + x)] =
-                static_cast<float>(padded.rgb[(static_cast<size_t>(y) * 128 + x) * 3 + c]) / 127.5f - 1.f;
+    const std::vector<float> model_input = make_five_frame_model_input(padded);
     if (!write_bytes(tile_root / "input_norm.f32", model_input.data(), model_input.size() * sizeof(float)))
         return single_tile_error("MODEL_INPUT_WRITE_FAILED", "could not persist normalized model input");
 
@@ -481,10 +603,221 @@ std::string run_phase18d_single_photo_tile(const std::string& model_root,
     return status_text;
 }
 
-std::string run_phase18c_minimal_video_demo(const std::string& model_root,
-                                             const std::string& input_root,
-                                             const std::string& output_root,
-                                             const std::string& config_json)
+namespace seededge::phase18d {
+
+std::string run_phase18d_full_photo_with_hooks(
+    const std::string& model_root,
+    const std::string& task_root,
+    const uint8_t* normalized_rgb,
+    size_t byte_count,
+    int width,
+    int height,
+    const std::string& request_json,
+    const Phase18dFullPhotoHooks& hooks)
+{
+    // Keep request parsing and input validation ahead of any model access so a
+    // caller cannot accidentally turn a malformed request into a legacy run.
+    if (!looks_like_json_object(request_json))
+        return full_photo_error("INVALID_REQUEST_JSON", "request_json must be a JSON object");
+    if (width <= 0 || height <= 0 || !normalized_rgb)
+        return full_photo_error("INVALID_RGB_INPUT", "RGB pointer and positive dimensions are required");
+    const size_t expected_bytes = static_cast<size_t>(width) * static_cast<size_t>(height) * 3u;
+    if (byte_count != expected_bytes)
+        return full_photo_error("RGB_BUFFER_SIZE_MISMATCH", "normalized RGB byte count does not match width*height*3");
+
+    std::smatch match;
+    std::string task_id;
+    if (std::regex_search(request_json, match, std::regex(R"json("task_id"\s*:\s*"([A-Za-z0-9_-]+)")json")))
+        task_id = match[1];
+    if (task_id.empty())
+        return full_photo_error("TASK_ID_REQUIRED", "task_id is required for task-local state isolation");
+    std::string model_version;
+    if (std::regex_search(request_json, match, std::regex(R"json("model_version"\s*:\s*"([^"]+)")json")))
+        model_version = match[1];
+    if (model_version.empty())
+        return full_photo_error("MODEL_VERSION_REQUIRED", "model_version is required for checkpoint identity");
+    const fs::path task_path(task_root);
+    if (task_path.filename() != task_id || task_path.parent_path().filename() != "tasks")
+        return full_photo_error("TASK_ROOT_MISMATCH", "task_root must be files/tasks/<task_id>");
+    if (!hooks.validate_manifest || !hooks.execute_tile)
+        return full_photo_error("HOOKS_REQUIRED", "manifest validator and tile executor hooks are required");
+
+    const std::string normalized_sha = sha256_hex(normalized_rgb, byte_count);
+    std::string manifest_sha;
+    std::string manifest_error;
+    if (!hooks.validate_manifest(hooks.context, model_root, &manifest_sha, &manifest_error))
+    {
+        const std::string status = full_photo_task_status(
+            task_id, model_version, manifest_sha, normalized_sha, 0, 0, "failed", "",
+            "MODEL_MANIFEST_FAILED", manifest_error);
+        return persist_task_status(task_path, status);
+    }
+
+    TilePlan plan;
+    std::string core_error;
+    if (!plan_tiles(width, height, {}, &plan, &core_error) || plan.tiles.empty())
+    {
+        const std::string status = full_photo_task_status(
+            task_id, model_version, manifest_sha, normalized_sha, 0, 0, "failed", "",
+            "TILE_PLAN_FAILED", core_error);
+        return persist_task_status(task_path, status);
+    }
+
+    std::vector<std::vector<uint8_t>> tile_outputs(plan.tiles.size());
+    int completed_tiles = 0;
+    std::string task_state = "completed";
+    std::string task_error_code;
+    std::string task_error_message;
+    std::string output_full_sha;
+
+    for (size_t tile_position = 0; tile_position < plan.tiles.size(); ++tile_position)
+    {
+        if (hooks.is_cancelled && hooks.is_cancelled(hooks.context))
+        {
+            task_state = "cancelled";
+            break;
+        }
+        const TileSpec& tile = plan.tiles[tile_position];
+        const fs::path tile_root = task_path / "tiles" / tile_dir_name(tile.tile_index);
+        std::error_code ec;
+        fs::create_directories(tile_root, ec);
+        if (ec)
+        {
+            task_state = "failed";
+            task_error_code = "TASK_DIRECTORY_CREATE_FAILED";
+            task_error_message = ec.message();
+            break;
+        }
+        PaddedTile padded;
+        if (!extract_and_pad_rgb8(normalized_rgb, byte_count, width, height,
+                                  tile, &padded, &core_error))
+        {
+            task_state = "failed";
+            task_error_code = "TILE_PADDING_FAILED";
+            task_error_message = core_error;
+            break;
+        }
+        const std::string tile_sha = sha256_hex(padded.rgb.data(), padded.rgb.size());
+        if (!write_bytes(tile_root / "tile_input.rgb", padded.rgb.data(), padded.rgb.size()))
+        {
+            task_state = "failed";
+            task_error_code = "TILE_INPUT_WRITE_FAILED";
+            task_error_message = "could not persist padded RGB tile";
+            break;
+        }
+        const std::vector<float> model_input = make_five_frame_model_input(padded);
+        if (!write_bytes(tile_root / "input_norm.f32", model_input.data(), model_input.size() * sizeof(float)))
+        {
+            task_state = "failed";
+            task_error_code = "MODEL_INPUT_WRITE_FAILED";
+            task_error_message = "could not persist normalized model input";
+            break;
+        }
+
+        Phase18dTileExecutionResult result;
+        std::string tile_error;
+        if (!hooks.execute_tile(hooks.context, model_root, tile_root.string(), tile, padded,
+                                &result, &tile_error))
+        {
+            const std::string status = full_photo_tile_status(
+                task_id, model_version, manifest_sha, normalized_sha, tile_sha, tile,
+                "failed", result, "", "TILE_EXECUTION_FAILED", tile_error);
+            write_bytes(tile_root / "status.json", status.data(), status.size());
+            task_state = "failed";
+            task_error_code = "TILE_EXECUTION_FAILED";
+            task_error_message = tile_error;
+            break;
+        }
+        const size_t valid_bytes = static_cast<size_t>(tile.valid_width) * tile.valid_height * 3u;
+        if (result.output_valid_rgb.size() != valid_bytes)
+        {
+            const std::string status = full_photo_tile_status(
+                task_id, model_version, manifest_sha, normalized_sha, tile_sha, tile,
+                "failed", result, "", "TILE_OUTPUT_SIZE_MISMATCH",
+                "tile executor output byte count does not match valid_width*valid_height*3");
+            write_bytes(tile_root / "status.json", status.data(), status.size());
+            task_state = "failed";
+            task_error_code = "TILE_OUTPUT_SIZE_MISMATCH";
+            task_error_message = "tile executor output byte count does not match valid_width*valid_height*3";
+            break;
+        }
+        if (reached_tile_state(result) != "writing_output")
+        {
+            const std::string status = full_photo_tile_status(
+                task_id, model_version, manifest_sha, normalized_sha, tile_sha, tile,
+                "failed", result, "", "INCOMPLETE_TILE_RESULT",
+                "tile executor did not report the full encoder/dit/scheduler/decoder chain");
+            write_bytes(tile_root / "status.json", status.data(), status.size());
+            task_state = "failed";
+            task_error_code = "INCOMPLETE_TILE_RESULT";
+            task_error_message = "tile executor did not report the full encoder/dit/scheduler/decoder chain";
+            break;
+        }
+        const std::string output_sha = sha256_hex(result.output_valid_rgb.data(), result.output_valid_rgb.size());
+        if (!write_bytes(tile_root / "output_valid.rgb",
+                         result.output_valid_rgb.data(), result.output_valid_rgb.size()))
+        {
+            task_state = "failed";
+            task_error_code = "TILE_OUTPUT_WRITE_FAILED";
+            task_error_message = "could not persist tile output_valid.rgb";
+            break;
+        }
+        const std::string status = full_photo_tile_status(
+            task_id, model_version, manifest_sha, normalized_sha, tile_sha, tile,
+            "completed", result, output_sha, "", "");
+        if (!write_bytes(tile_root / "status.json", status.data(), status.size()))
+        {
+            task_state = "failed";
+            task_error_code = "STATUS_WRITE_FAILED";
+            task_error_message = "could not persist tile-local status";
+            break;
+        }
+        tile_outputs[tile_position] = result.output_valid_rgb;
+        ++completed_tiles;
+    }
+
+    if (task_state == "completed")
+    {
+        FusionResult fusion;
+        if (!weighted_fuse_rgb8(plan, tile_outputs, &fusion, &core_error))
+        {
+            task_state = "failed";
+            task_error_code = "FUSION_FAILED";
+            task_error_message = core_error;
+        }
+        else
+        {
+            std::vector<uint8_t> output_rgb(static_cast<size_t>(width) * height * 3u);
+            for (size_t pixel = 0; pixel < output_rgb.size(); ++pixel)
+                output_rgb[pixel] = static_cast<uint8_t>(
+                    std::clamp(std::lround(fusion.rgb[pixel]), 0L, 255L));
+            if (!write_bytes(task_path / "output_full.rgb", output_rgb.data(), output_rgb.size()))
+            {
+                task_state = "failed";
+                task_error_code = "FULL_OUTPUT_WRITE_FAILED";
+                task_error_message = "could not persist full-resolution RGB output";
+            }
+            else
+            {
+                output_full_sha = sha256_hex(output_rgb.data(), output_rgb.size());
+            }
+        }
+    }
+
+    const std::string status = full_photo_task_status(
+        task_id, model_version, manifest_sha, normalized_sha,
+        static_cast<int>(plan.tiles.size()), completed_tiles, task_state,
+        output_full_sha, task_error_code, task_error_message);
+    return persist_task_status(task_path, status);
+}
+
+}  // namespace seededge::phase18d
+std::string run_phase18c_minimal_video_demo_after_validation(
+    const std::string& model_root,
+    const std::string& input_root,
+    const std::string& output_root,
+    const std::string& config_json,
+    const std::string& manifest)
 {
     seededge_progress::reset("full_demo", output_root);
     int requested_blocks = 32;
@@ -501,7 +834,6 @@ std::string run_phase18c_minimal_video_demo(const std::string& model_root,
     const fs::path models(model_root), inputs(input_root), outputs(output_root);
     fs::create_directories(outputs);
 
-    const std::string manifest = validate_model_manifest(model_root);
     seededge_progress::update("verifying_manifest", "manifest", "manifest verification complete");
     verified = manifest.find("\"valid\":true") != std::string::npos;
     if (!verified) { error_stage="model_manifest"; error=manifest; goto done; }
@@ -629,6 +961,113 @@ done:
         std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now()-started).count(),
         error_stage,error);
 }
+std::string run_phase18c_minimal_video_demo(const std::string& model_root,
+                                             const std::string& input_root,
+                                             const std::string& output_root,
+                                             const std::string& config_json)
+{
+    const std::string manifest = validate_model_manifest(model_root);
+    return run_phase18c_minimal_video_demo_after_validation(
+        model_root, input_root, output_root, config_json, manifest);
+}
+
+namespace seededge::phase18d {
+
+struct Phase18dRealContext
+{
+    std::string manifest;
+};
+
+bool phase18d_real_validate_manifest(void* opaque, const std::string& model_root,
+                                     std::string* manifest_sha256, std::string* error)
+{
+    auto* context = static_cast<Phase18dRealContext*>(opaque);
+    const std::string manifest = validate_model_manifest(model_root);
+    if (manifest.find("\"valid\":true") == std::string::npos)
+    {
+        if (error) *error = manifest;
+        return false;
+    }
+    context->manifest = manifest;
+    if (manifest_sha256)
+    {
+        std::vector<unsigned char> bytes;
+        if (read_bytes(fs::path(model_root) / "manifest.json", bytes))
+            *manifest_sha256 = sha256_hex(bytes.data(), bytes.size());
+        else
+            *manifest_sha256 = "";
+    }
+    if (error) error->clear();
+    return true;
+}
+
+bool phase18d_real_execute_tile(void* opaque, const std::string& model_root,
+                                const std::string& tile_root, const TileSpec& tile,
+                                const PaddedTile& padded, Phase18dTileExecutionResult* result,
+                                std::string* error)
+{
+    auto* context = static_cast<Phase18dRealContext*>(opaque);
+    if (result == nullptr)
+    {
+        if (error) *error = "tile result output is null";
+        return false;
+    }
+    *result = Phase18dTileExecutionResult{};
+    const std::string pipeline_result = run_phase18c_minimal_video_demo_after_validation(
+        model_root, tile_root, tile_root, "{\"max_blocks\":32}", context->manifest);
+    result->encoder_completed = json_true(pipeline_result, "vae_encoder_executed");
+    const bool dit_completed = json_int_equals(pipeline_result, "dit_blocks_executed", 32);
+    result->dit_block_completed = dit_completed ? 32 : 0;
+    result->scheduler_completed = dit_completed && pipeline_result.find("\"error_stage\":null") != std::string::npos;
+    result->decoder_completed = json_true(pipeline_result, "vae_decoder_executed");
+    result->finite = json_true(pipeline_result, "finite");
+    result->nan_count = 0u;
+    result->inf_count = 0u;
+    result->pipeline_result_json = pipeline_result;
+    std::vector<unsigned char> decoded_frame;
+    if (result->decoder_completed && result->finite &&
+        read_bytes(fs::path(tile_root) / "frame_000.rgb", decoded_frame) &&
+        decoded_frame.size() == 128u * 128u * 3u)
+    {
+        const size_t valid_bytes = static_cast<size_t>(tile.valid_width) * tile.valid_height * 3u;
+        result->output_valid_rgb.resize(valid_bytes);
+        for (int y = 0; y < tile.valid_height; ++y)
+            for (int x = 0; x < tile.valid_width; ++x)
+            {
+                const size_t source = (static_cast<size_t>(y + tile.padding_top) * 128u +
+                                       static_cast<size_t>(x + tile.padding_left)) * 3u;
+                const size_t target = (static_cast<size_t>(y) * tile.valid_width + x) * 3u;
+                std::copy_n(decoded_frame.data() + source, 3, result->output_valid_rgb.data() + target);
+            }
+    }
+    if (error) error->clear();
+    return true;
+}
+
+bool phase18d_real_is_cancelled(void*)
+{
+    return seededge_progress::cancelled();
+}
+
+std::string run_phase18d_full_photo(const std::string& model_root,
+                                    const std::string& task_root,
+                                    const uint8_t* normalized_rgb,
+                                    size_t byte_count,
+                                    int width,
+                                    int height,
+                                    const std::string& request_json)
+{
+    Phase18dRealContext context;
+    Phase18dFullPhotoHooks hooks;
+    hooks.context = &context;
+    hooks.validate_manifest = &phase18d_real_validate_manifest;
+    hooks.execute_tile = &phase18d_real_execute_tile;
+    hooks.is_cancelled = &phase18d_real_is_cancelled;
+    return run_phase18d_full_photo_with_hooks(model_root, task_root, normalized_rgb, byte_count,
+                                              width, height, request_json, hooks);
+}
+
+}  // namespace seededge::phase18d
 
 bool write_decoder_checkpoint(const fs::path& root, const Stage& stage,
                               const std::vector<float>& values,
