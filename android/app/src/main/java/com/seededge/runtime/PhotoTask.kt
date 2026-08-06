@@ -7,6 +7,7 @@ import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.security.MessageDigest
 import java.util.UUID
+import org.json.JSONObject
 
 /**
  * Task-local helpers for the Phase 18D single-photo-tile flow.
@@ -120,6 +121,139 @@ object PhotoTask {
         outFile.outputStream().use { stream ->
             return canvasBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
         }
+    }
+
+    /** Full-photo task result validated from native JSON plus task-local status. */
+    data class FullPhotoResult(
+        val success: Boolean,
+        val state: String,
+        val errorCode: String?,
+        val errorMessage: String?,
+        val taskId: String,
+        val taskRoot: File,
+        val correctedWidth: Int,
+        val correctedHeight: Int,
+        val tileCount: Int,
+        val completedTiles: Int,
+        val silentFallback: Boolean,
+        val artifactsWritten: Boolean,
+        val inputPng: File,
+        val outputPng: File,
+        val sideBySidePng: File,
+        val statusJson: File
+    )
+
+    /** Reads width/height from the PNG IHDR chunk without decoding the image. */
+    fun pngDimensions(file: File): Pair<Int, Int>? {
+        if (!file.isFile) return null
+        val header = ByteArray(24)
+        file.inputStream().use { input ->
+            var offset = 0
+            while (offset < header.size) {
+                val read = input.read(header, offset, header.size - offset)
+                if (read < 0) break
+                offset += read
+            }
+            if (offset < header.size) return null
+        }
+        val signature = byteArrayOf(0x89.toByte(), 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A)
+        if (!header.copyOfRange(0, 8).contentEquals(signature)) return null
+        if (header[12] != 0x49.toByte() || header[13] != 0x48.toByte() ||
+            header[14] != 0x44.toByte() || header[15] != 0x52.toByte()) return null
+        fun bigEndian(offset: Int): Int =
+            ((header[offset].toInt() and 0xFF) shl 24) or
+                ((header[offset + 1].toInt() and 0xFF) shl 16) or
+                ((header[offset + 2].toInt() and 0xFF) shl 8) or
+                (header[offset + 3].toInt() and 0xFF)
+        return bigEndian(16) to bigEndian(20)
+    }
+
+    /**
+     * Validates the native full-photo result JSON and the task-local status.json.
+     * success is true only when the native bundle and task status both report a
+     * completed, artifact-complete run with a correctly sized output.png.
+     */
+    fun validateFullPhotoResult(nativeResultText: String, taskRoot: File, width: Int, height: Int): FullPhotoResult {
+        val inputPng = File(taskRoot, "input.png")
+        val outputPng = File(taskRoot, "output.png")
+        val sideBySidePng = File(taskRoot, "side_by_side.png")
+        val statusJson = File(taskRoot, "status.json")
+        var state = "failed"
+        var artifactsWritten = false
+        var silentFallback = false
+        var errorCode: String? = "NATIVE_RESULT_INVALID"
+        var errorMessage: String? = "native result JSON could not be parsed"
+        try {
+            val native = JSONObject(nativeResultText)
+            state = native.optString("state", "failed")
+            artifactsWritten = native.optBoolean("artifacts_written", false)
+            silentFallback = native.optBoolean("silent_fallback", false)
+            errorCode = native.optString("error_code", "").ifEmpty { null }
+            errorMessage = native.optString("error_message", "").ifEmpty { null }
+        } catch (_: Exception) {
+            return FullPhotoResult(false, state, errorCode, errorMessage, "", taskRoot, width, height,
+                0, 0, silentFallback, artifactsWritten, inputPng, outputPng, sideBySidePng, statusJson)
+        }
+        if (state != "completed" || !artifactsWritten || silentFallback) {
+            return FullPhotoResult(false, state, errorCode, errorMessage, "", taskRoot, width, height,
+                0, 0, silentFallback, artifactsWritten, inputPng, outputPng, sideBySidePng, statusJson)
+        }
+        if (!statusJson.isFile) {
+            return FullPhotoResult(false, state, "STATUS_JSON_MISSING", "task status.json is missing",
+                "", taskRoot, width, height, 0, 0, silentFallback, artifactsWritten,
+                inputPng, outputPng, sideBySidePng, statusJson)
+        }
+        var taskId = taskRoot.name
+        var tileCount = 0
+        var completedTiles = 0
+        var taskState = "unknown"
+        var taskSilentFallback = false
+        try {
+            val status = JSONObject(statusJson.readText())
+            taskId = status.optString("task_id", taskRoot.name)
+            taskState = status.optString("state", "unknown")
+            tileCount = status.optInt("tile_count", 0)
+            completedTiles = status.optInt("completed_tiles", 0)
+            taskSilentFallback = status.optBoolean("silent_fallback", false)
+        } catch (_: Exception) {
+            return FullPhotoResult(false, state, "STATUS_JSON_INVALID", "task status.json could not be parsed",
+                taskId, taskRoot, width, height, 0, 0, silentFallback, artifactsWritten,
+                inputPng, outputPng, sideBySidePng, statusJson)
+        }
+        val mergedSilentFallback = silentFallback || taskSilentFallback
+        if (taskState != "completed" || mergedSilentFallback || tileCount <= 0 || completedTiles != tileCount) {
+            return FullPhotoResult(false, state, "TASK_NOT_COMPLETED",
+                "task status does not report a completed full-photo run", taskId, taskRoot, width, height,
+                tileCount, completedTiles, mergedSilentFallback, artifactsWritten,
+                inputPng, outputPng, sideBySidePng, statusJson)
+        }
+        val outputDims = pngDimensions(outputPng)
+        val ok = inputPng.isFile && outputPng.isFile && sideBySidePng.isFile &&
+            outputDims == (width to height)
+        val code = when {
+            !ok && !outputPng.isFile -> "OUTPUT_PNG_MISSING"
+            !ok -> "OUTPUT_PNG_SIZE_MISMATCH"
+            else -> null
+        }
+        return FullPhotoResult(ok, state, code,
+            if (ok) null else "full-photo PNG artifacts are incomplete or wrong size",
+            taskId, taskRoot, width, height, tileCount, completedTiles, mergedSilentFallback,
+            artifactsWritten, inputPng, outputPng, sideBySidePng, statusJson)
+    }
+
+    /** MediaStore gate: only a completed, artifact-complete, non-cancelled task may be saved. */
+    fun shouldSaveToGallery(result: FullPhotoResult, userCancelled: Boolean): Boolean =
+        !userCancelled && result.success && !result.silentFallback &&
+            result.tileCount > 0 && result.completedTiles == result.tileCount &&
+            result.outputPng.isFile &&
+            pngDimensions(result.outputPng) == (result.correctedWidth to result.correctedHeight)
+
+    /** Runs the native full-photo pipeline and validates its task-local artifacts. */
+    fun runFullPhoto(modelRoot: File, taskRoot: File, normalizedRgb: ByteArray,
+                     width: Int, height: Int, requestJson: String): FullPhotoResult {
+        val nativeText = NativeRuntime.nativeRunFullPhoto(
+            modelRoot.path, taskRoot.path, normalizedRgb, width, height, requestJson)
+        return validateFullPhotoResult(nativeText, taskRoot, width, height)
     }
 
 }

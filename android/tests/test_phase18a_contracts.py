@@ -94,5 +94,24 @@ class Phase18dFullPhotoJniContractTests(unittest.TestCase):
         self.assertIn("native/third_party/stb/stb_impl.cpp", cmake)
         self.assertIn("native/third_party/stb", cmake)
 
+class Phase18dPhotoTaskFullPhotoContractTests(unittest.TestCase):
+    def test_photo_task_routes_full_photo_through_native_run_full_photo(self):
+        source = (ROOT / "app/src/main/java/com/seededge/runtime/PhotoTask.kt").read_text(encoding="utf-8")
+        self.assertIn("nativeRunFullPhoto", source)
+        self.assertIn("validateFullPhotoResult", source)
+        self.assertIn("output.png", source)
+        self.assertIn("side_by_side.png", source)
+        self.assertIn("status.json", source)
+
+    def test_main_activity_does_not_use_output_valid_rgb_as_final_image(self):
+        source = (ROOT / "app/src/main/java/com/seededge/runtime/MainActivity.kt").read_text(encoding="utf-8")
+        self.assertNotIn("output_valid.rgb", source)
+
+    def test_single_tile_entry_is_retained_for_regression(self):
+        kotlin = (ROOT / "app/src/main/java/com/seededge/runtime/NativeRuntime.kt").read_text(encoding="utf-8")
+        cpp = (ROOT / "native/src/jni_runtime.cpp").read_text(encoding="utf-8")
+        self.assertIn("external fun nativeRunSinglePhotoTile", kotlin)
+        self.assertIn("Java_com_seededge_runtime_NativeRuntime_nativeRunSinglePhotoTile", cpp)
+
 if __name__ == "__main__":
     unittest.main()

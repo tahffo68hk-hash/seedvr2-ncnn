@@ -28,9 +28,9 @@ import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
- * Real Phase 18D single-photo-tile flow: Photo Picker -> task-local RGB8 ->
- * nativeRunSinglePhotoTile (VAE encoder + 32 DiT blocks + scheduler + decoder)
- * -> output_valid.rgb -> PNG -> in-app input/output/side-by-side + MediaStore.
+ * Real Phase 18D full-photo flow: Photo Picker -> task-local RGB8 ->
+ * nativeRunFullPhoto (multi-tile VAE encoder + 32 DiT blocks + scheduler +
+ * decoder + weighted fusion) -> task-level PNGs -> in-app preview + MediaStore.
  * The UI never labels a non-model result as an enhancement.
  */
 class MainActivity : Activity() {
@@ -96,7 +96,7 @@ class MainActivity : Activity() {
     private fun showHome() {
         stopPoller(); running.set(false); base()
         text("SeedEdge", true)
-        text("本地 AI 图片增强（Phase 18D 单 tile）")
+        text("本地 AI 图片增强（Phase 18D full-photo）")
         text("照片仅在设备本地处理；运行真实 SeedVR2 单图链路：VAE Encoder → 32 DiT Block → Scheduler → VAE Decoder")
         button("选择照片") { choosePhoto() }
         button("检查模型（完整 SHA-256）") { checkModel() }
@@ -210,7 +210,7 @@ class MainActivity : Activity() {
             if (sourceBytes >= 0) append("源文件：$sourceBytes bytes\n")
             append("source_sha256=$sourceSha\nnormalized_image_sha256=$currentNormalizedSha")
         })
-        text("运行真实 SeedVR2 单 tile（tile_0000，128×128 含 padding）。\n引擎：ncnn CPU FP32 / OpenMP 多线程（Pad 已验证 5–8 线程位一致）；不会静默回退。\n预计耗时随设备而定：Encoder + 32 DiT Block + Decoder 全链路。")
+        text("运行真实 SeedVR2 全图增强：按计划拆成多个 tile（每个 128×128 含 padding），逐 tile 完整推理后加权融合回原尺寸。\n引擎：ncnn CPU FP32 / OpenMP 多线程；不会静默回退。\n预计耗时随设备与图片尺寸而定：Encoder + 32 DiT Block + Decoder 全链路。")
         button("开始增强") { startEnhancement() }
         button("返回") { showHome() }
     }
@@ -235,25 +235,46 @@ class MainActivity : Activity() {
             if (File(modelRoot, "manifest.json").isFile) PhotoTask.sha256Hex(File(modelRoot, "manifest.json")) else "")
         worker.execute {
             try {
-                val resultText = NativeRuntime.nativeRunSinglePhotoTile(
-                    modelRoot.path, taskRoot.path, rgb, currentWidth, currentHeight, requestJson)
-                handler.post { showResult(taskId, resultText) }
+                val result = PhotoTask.runFullPhoto(
+                    modelRoot, taskRoot, rgb, currentWidth, currentHeight, requestJson)
+                handler.post { showResult(taskId, result) }
             } catch (t: Throwable) {
                 handler.post { showError("运行失败", t.message ?: "native 调用异常") }
             }
         }
-        startPoller(taskId, state, meter, details)
+        startPoller(taskId, taskRoot, state, meter, details)
     }
 
-    private fun startPoller(taskId: String, state: TextView, meter: ProgressBar, details: TextView) {
+    private fun startPoller(taskId: String, taskRoot: File, state: TextView, meter: ProgressBar, details: TextView) {
         stopPoller()
-        val tileRoot = PhotoTask.tileRoot(filesDir, taskId)
-        val progressFile = File(tileRoot, "runtime_progress.json")
         poller = object : Runnable {
             override fun run() {
                 if (!running.get()) return
                 try {
-                    if (progressFile.isFile) {
+                    val taskStatus = File(taskRoot, "status.json")
+                    if (taskStatus.isFile) {
+                        val s = JSONObject(taskStatus.readText())
+                        val sState = s.optString("state", "running")
+                        val tileCount = s.optInt("tile_count", 0)
+                        val completed = s.optInt("completed_tiles", 0)
+                        state.text = when (sState) {
+                            "completed" -> "全图增强完成（$completed/$tileCount tile）"
+                            "cancelled" -> "已取消"
+                            "failed" -> "增强失败：${s.optString("error_message", "")}"
+                            else -> "增强中（$completed/$tileCount tile 完成）…"
+                        }
+                        if (sState == "completed" || sState == "cancelled" || sState == "failed") {
+                            running.set(false)
+                            return
+                        }
+                    }
+                    val tilesDir = File(taskRoot, "tiles")
+                    val tileDirs = tilesDir.listFiles()
+                        ?.filter { it.isDirectory && it.name.startsWith("tile_") }
+                        ?.sortedBy { it.name }
+                        ?: emptyList()
+                    val progressFile = tileDirs.lastOrNull()?.let { File(it, "runtime_progress.json") }
+                    if (progressFile != null && progressFile.isFile) {
                         val p = JSONObject(progressFile.readText())
                         val phase = p.optString("phase", "checking_model")
                         val block = p.optInt("dit_block_index", 0)
@@ -269,7 +290,7 @@ class MainActivity : Activity() {
                             "writing_frames" -> "写入帧 ${frame + 1} / 4"
                             else -> phase
                         }
-                        state.text = if (stateValue == "running") "当前阶段：$label" else "状态：$stateValue（$label）"
+                        if (stateValue == "running") state.text = "当前阶段：$label"
                         meter.progress = when (phase) {
                             "checking_model" -> 1
                             "verifying_manifest" -> 2
@@ -282,10 +303,6 @@ class MainActivity : Activity() {
                         details.text = "elapsed=${p.optLong("elapsed_ms", 0) / 1000}s\n" +
                             "backend=${p.optString("backend", "cpu_fp32")}\n" +
                             "message=${p.optString("message", "")}"
-                        if (stateValue == "completed" || stateValue == "failed" || stateValue == "cancelled") {
-                            running.set(false)
-                            return
-                        }
                     }
                 } catch (_: Throwable) {}
                 handler.postDelayed(this, 400)
@@ -299,67 +316,35 @@ class MainActivity : Activity() {
         poller = null
     }
 
-    private fun showResult(taskId: String, nativeResultText: String) {
+    private fun showResult(taskId: String, result: PhotoTask.FullPhotoResult) {
         running.set(false); stopPoller()
-        val tileRoot = PhotoTask.tileRoot(filesDir, taskId)
-        val statusFile = File(tileRoot, "status.json")
-        if (!statusFile.isFile) return showError("结果缺失", "status.json 未生成\n$nativeResultText")
-        val status = JSONObject(statusFile.readText())
-        val pipeline = status.optJSONObject("pipeline_result")
-        val silentFallback = pipeline?.optBoolean("silent_cpu_fallback", false) ?: false
-        val encoder = status.optBoolean("encoder_completed", false)
-        val blocks = status.optInt("dit_block_completed", 0)
-        val scheduler = status.optBoolean("scheduler_completed", false)
-        val decoder = status.optBoolean("decoder_completed", false)
-        val finite = status.optBoolean("finite", false)
-        val bounds = status.optJSONObject("tile_bounds")
-        val validW = bounds?.optInt("right", 0)?.minus(bounds.optInt("left", 0)) ?: 0
-        val validH = bounds?.optInt("bottom", 0)?.minus(bounds.optInt("top", 0)) ?: 0
-        val outputValidSha = status.optString("output_valid_sha256", "")
-        val inputSha = status.optString("tile_input_sha256", "")
-        val normalizedInStatus = status.optString("normalized_image_sha256", "")
-        val manifestInStatus = status.optString("model_manifest_sha256", "")
-        val durationMs = pipeline?.optLong("duration_ms", 0) ?: 0
-        val errorLine = ResultSummary.errorLine(pipeline)
-
-        val inputPng = File(tileRoot, "input.png")
-        val outputPng = File(tileRoot, "output.png")
-        val sideBySide = File(tileRoot, "side_by_side.png")
-        val inputOk = PhotoTask.writeRgbPng(File(tileRoot, "tile_input.rgb"), inputPng, 128, 128)
-        val outputOk = PhotoTask.writeRgbPng(File(tileRoot, "output_valid.rgb"), outputPng, validW, validH)
-        val sideOk = outputOk && PhotoTask.writeSideBySide(inputPng, outputPng, sideBySide)
-
+        val status = try { JSONObject(result.statusJson.readText()) } catch (_: Throwable) { null }
         base(); text("增强结果", true)
-        if (silentFallback) text("错误：检测到 silent_cpu_fallback=true（禁止静默回退）", large = false)
-        if (errorLine.isNotEmpty()) text("错误：$errorLine")
+        if (result.silentFallback) text("错误：检测到 silent_cpu_fallback=true（禁止静默回退）", large = false)
         text(buildString {
-            append("encoder=$encoder  dit=$blocks/32  scheduler=$scheduler  decoder=$decoder\n")
-            append("finite=$finite  nan=${status.optInt("nan_count", -1)}  inf=${status.optInt("inf_count", -1)}\n")
-            append("valid=${validW}×${validH}  duration=${durationMs}ms\n")
-            append("silent_cpu_fallback=$silentFallback\n")
-            append("output_different_from_input=${outputValidSha.isNotEmpty() && outputValidSha != inputSha}\n")
-            append("normalized_sha_match=${normalizedInStatus == currentNormalizedSha}\n")
-            append("manifest_sha_match=${manifestInStatus.isNotEmpty()}\n")
-            append("output_valid_sha256=${outputValidSha.ifEmpty { "-" }}\n")
-            append("status.json=${statusFile.path}\n")
-            append("input.png=${inputPng.path}\noutput.png=${outputPng.path}\nside_by_side.png=${sideBySide.path}")
+            append("state=${result.state}\n")
+            append("task_id=${result.taskId}\n")
+            append("tiles=${result.completedTiles}/${result.tileCount}\n")
+            append("尺寸=${result.correctedWidth}×${result.correctedHeight}\n")
+            append("silent_fallback=${result.silentFallback}\n")
+            append("output_full_sha256=${status?.optString("output_full_sha256", "-") ?: "-"}\n")
+            append("status.json=${result.statusJson.path}\n")
+            append("input.png=${result.inputPng.path}\noutput.png=${result.outputPng.path}\nside_by_side.png=${result.sideBySidePng.path}")
         })
-        if (inputOk && outputOk) {
+        if (result.success) {
             val row = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
-            row.addView(ImageView(this).apply { setImageBitmap(BitmapFactory.decodeFile(inputPng.path)); adjustViewBounds = true },
+            row.addView(ImageView(this).apply { setImageBitmap(BitmapFactory.decodeFile(result.inputPng.path)); adjustViewBounds = true },
                 LinearLayout.LayoutParams(0, 320, 1f))
-            row.addView(ImageView(this).apply { setImageBitmap(BitmapFactory.decodeFile(outputPng.path)); adjustViewBounds = true },
+            row.addView(ImageView(this).apply { setImageBitmap(BitmapFactory.decodeFile(result.outputPng.path)); adjustViewBounds = true },
                 LinearLayout.LayoutParams(0, 320, 1f))
             page.addView(row)
-            text("原图(tile)                                  增强输出")
-            if (sideOk) image(BitmapFactory.decodeFile(sideBySide.path))
+            text("原图                                  增强输出")
+            if (result.sideBySidePng.isFile) image(BitmapFactory.decodeFile(result.sideBySidePng.path))
+            text("Phase 18D full-photo 完成（需真机相册照片复核后定级）")
+            button("保存输出到相册") { saveToGallery(result.outputPng) }
         } else {
-            text("PNG 编码失败：inputOk=$inputOk outputOk=$outputOk")
+            text("未完成：${result.errorCode ?: "UNKNOWN"} ${result.errorMessage ?: ""}")
         }
-        val complete = encoder && blocks == 32 && scheduler && decoder && finite && !silentFallback && outputOk
-        text(if (complete) "Phase 18D 单 tile 完成（需真机相册照片复核后定级）" else "未完成：真实链路未全部通过")
-        button("保存输出到相册") { saveToGallery(outputPng) }
-        button("重新处理") { showEnhance(taskId, currentBitmap ?: Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888), -1, currentSourceSha) }
         button("选择其他照片") { choosePhoto() }
         button("返回首页") { showHome() }
     }
