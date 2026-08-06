@@ -71,6 +71,28 @@ class ScaffoldContractTests(unittest.TestCase):
         self.assertIn("isSaveEnabled = false", source)
         self.assertIn("R.id.runtime_log", source)
 
+class Phase18dFullPhotoJniContractTests(unittest.TestCase):
+    def test_full_photo_jni_entry_declared_in_kotlin_and_cpp(self):
+        kotlin = (ROOT / "app/src/main/java/com/seededge/runtime/NativeRuntime.kt").read_text(encoding="utf-8")
+        cpp = (ROOT / "native/src/jni_runtime.cpp").read_text(encoding="utf-8")
+        self.assertIn(
+            "external fun nativeRunFullPhoto(modelRoot: String, taskRoot: String, normalizedRgb: ByteArray,",
+            kotlin,
+        )
+        self.assertIn("Java_com_seededge_runtime_NativeRuntime_nativeRunFullPhoto", cpp)
+        self.assertIn("run_phase18d_full_photo_artifacts", cpp)
+
+    def test_full_photo_jni_wrapper_keeps_stable_validation_codes(self):
+        cpp = (ROOT / "native/src/jni_runtime.cpp").read_text(encoding="utf-8")
+        self.assertIn("JNI_NULL_ARGUMENT", cpp)
+        self.assertIn("JNI_STRING_ACQUIRE_FAILED", cpp)
+
+    def test_full_photo_artifact_sources_are_part_of_android_library(self):
+        cmake = (ROOT / "CMakeLists.txt").read_text(encoding="utf-8")
+        self.assertIn("native/src/phase18d_image_artifacts.cpp", cmake)
+        self.assertIn("native/src/phase18d_full_photo_artifacts.cpp", cmake)
+        self.assertIn("native/third_party/stb/stb_impl.cpp", cmake)
+        self.assertIn("native/third_party/stb", cmake)
 
 if __name__ == "__main__":
     unittest.main()

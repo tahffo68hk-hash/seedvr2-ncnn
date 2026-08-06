@@ -10,6 +10,8 @@ object NativeRuntime {
     external fun nativeRunMinimalVideoDemo(modelRoot: String, inputFramesRoot: String, outputRoot: String, configJson: String): String
     external fun nativeRunSinglePhotoTile(modelRoot: String, taskRoot: String, normalizedRgb: ByteArray,
                                           width: Int, height: Int, requestJson: String): String
+    external fun nativeRunFullPhoto(modelRoot: String, taskRoot: String, normalizedRgb: ByteArray,
+                                    width: Int, height: Int, requestJson: String): String
     external fun nativeGetProgressJson(): String
     external fun nativeRequestCancel(): String
     external fun nativeInspectModel(modelRoot: String): String

@@ -1,5 +1,6 @@
 #include "runtime_info.h"
 #include "minimal_video_pipeline.h"
+#include "phase18d_full_photo_artifacts.h"
 #include "runtime_progress.h"
 #include "model_manifest.h"
 #include "fast_convolution3d.h"
@@ -45,6 +46,29 @@ extern "C" JNIEXPORT jstring JNICALL Java_com_seededge_runtime_NativeRuntime_nat
     std::vector<jbyte> copied(static_cast<size_t>(length));
     if (length) e->GetByteArrayRegion(rgb, 0, length, copied.data());
     const std::string result = run_phase18d_single_photo_tile(
+        m, t, reinterpret_cast<const uint8_t*>(copied.data()), copied.size(), width, height, r);
+    e->ReleaseStringUTFChars(model, m);
+    e->ReleaseStringUTFChars(task, t);
+    e->ReleaseStringUTFChars(request, r);
+    return js(e, result);
+}
+extern "C" JNIEXPORT jstring JNICALL Java_com_seededge_runtime_NativeRuntime_nativeRunFullPhoto(
+    JNIEnv* e, jobject, jstring model, jstring task, jbyteArray rgb, jint width, jint height, jstring request) {
+    if (!model || !task || !rgb || !request)
+        return js(e, "{\"error_code\":\"JNI_NULL_ARGUMENT\",\"overall_pass\":false}");
+    const char* m = e->GetStringUTFChars(model, nullptr);
+    const char* t = e->GetStringUTFChars(task, nullptr);
+    const char* r = e->GetStringUTFChars(request, nullptr);
+    if (!m || !t || !r) {
+        if (m) e->ReleaseStringUTFChars(model, m);
+        if (t) e->ReleaseStringUTFChars(task, t);
+        if (r) e->ReleaseStringUTFChars(request, r);
+        return js(e, "{\"error_code\":\"JNI_STRING_ACQUIRE_FAILED\",\"overall_pass\":false}");
+    }
+    const jsize length = e->GetArrayLength(rgb);
+    std::vector<jbyte> copied(static_cast<size_t>(length));
+    if (length) e->GetByteArrayRegion(rgb, 0, length, copied.data());
+    const std::string result = seededge::phase18d::run_phase18d_full_photo_artifacts(
         m, t, reinterpret_cast<const uint8_t*>(copied.data()), copied.size(), width, height, r);
     e->ReleaseStringUTFChars(model, m);
     e->ReleaseStringUTFChars(task, t);
