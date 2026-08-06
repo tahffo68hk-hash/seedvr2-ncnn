@@ -1,5 +1,7 @@
 # SeedVR2 ncnn Adaptive Window Prototype
 
+[English](README.md) | [简体中文](README.zh-CN.md)
+
 Metadata-driven Adaptive Window Attention runtime prototype for ncnn.
 
 ## Current status
