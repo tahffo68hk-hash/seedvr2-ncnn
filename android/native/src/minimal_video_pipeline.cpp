@@ -1003,10 +1003,6 @@ std::string run_phase18c_minimal_video_demo(const std::string& model_root,
 
 namespace seededge::phase18d {
 
-struct Phase18dRealContext
-{
-    std::string manifest;
-};
 
 bool phase18d_real_validate_manifest(void* opaque, const std::string& model_root,
                                      std::string* manifest_sha256, std::string* error)
@@ -1080,7 +1076,7 @@ bool phase18d_real_is_cancelled(void*)
 }
 
 Phase18dFullPhotoHooks make_real_full_photo_hooks(
-    void* context,
+    Phase18dRealContext* context,
     Phase18dCancellationCheck is_cancelled,
     Phase18dProgressCallback on_progress)
 {

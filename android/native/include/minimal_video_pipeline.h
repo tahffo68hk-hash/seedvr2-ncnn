@@ -102,11 +102,37 @@ std::string run_phase18d_full_photo(const std::string& model_root,
                                     int height,
                                     const std::string& request_json);
 
+// Context used by the real production hooks.  The manifest validator and tile
+// executor read/write manifest; jni_bridge is an opaque caller handle that
+// the Android JNI progress/cancellation callbacks use to reach their bridge.
+// The context passed to make_real_full_photo_hooks must be this type; passing
+// a different object (for example a JNI bridge struct) corrupts the bridge.
+struct Phase18dRealContext
+{
+    std::string manifest;
+    void* jni_bridge = nullptr;
+};
+
+bool phase18d_real_validate_manifest(
+    void* opaque,
+    const std::string& model_root,
+    std::string* manifest_sha256,
+    std::string* error);
+
+bool phase18d_real_execute_tile(
+    void* opaque,
+    const std::string& model_root,
+    const std::string& tile_root,
+    const TileSpec& tile,
+    const PaddedTile& padded,
+    Phase18dTileExecutionResult* result,
+    std::string* error);
+
 // Builds the real production hooks around the supplied context and callbacks.
 // The manifest validator and tile executor are the real SeedVR2 pipeline; the
 // caller supplies the cooperative cancellation check and progress callback.
 Phase18dFullPhotoHooks make_real_full_photo_hooks(
-    void* context,
+    Phase18dRealContext* context,
     Phase18dCancellationCheck is_cancelled,
     Phase18dProgressCallback on_progress);
 

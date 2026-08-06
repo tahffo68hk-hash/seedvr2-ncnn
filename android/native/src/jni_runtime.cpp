@@ -90,7 +90,8 @@ struct FullPhotoJniBridge
 
 void jni_emit_progress(void* context, const char* stage, int completed, int total)
 {
-    FullPhotoJniBridge* bridge = static_cast<FullPhotoJniBridge*>(context);
+    auto* real = static_cast<seededge::phase18d::Phase18dRealContext*>(context);
+    FullPhotoJniBridge* bridge = static_cast<FullPhotoJniBridge*>(real->jni_bridge);
     JNIEnv* env = bridge->env;
     jstring stage_text = env->NewStringUTF(stage);
     env->CallBooleanMethod(bridge->bridge, bridge->on_progress_method,
@@ -107,7 +108,8 @@ void jni_emit_progress(void* context, const char* stage, int completed, int tota
 
 bool jni_is_cancelled(void* context)
 {
-    FullPhotoJniBridge* bridge = static_cast<FullPhotoJniBridge*>(context);
+    auto* real = static_cast<seededge::phase18d::Phase18dRealContext*>(context);
+    FullPhotoJniBridge* bridge = static_cast<FullPhotoJniBridge*>(real->jni_bridge);
     if (bridge->cancelled.load()) return true;
     JNIEnv* env = bridge->env;
     const jboolean cancelled = env->CallBooleanMethod(
@@ -154,9 +156,11 @@ extern "C" JNIEXPORT jstring JNICALL Java_com_seededge_runtime_NativeRuntime_nat
     context.bridge = bridge;
     context.on_progress_method = on_progress;
     context.is_cancelled_method = is_cancelled;
+    seededge::phase18d::Phase18dRealContext real_context;
+    real_context.jni_bridge = &context;
     seededge::phase18d::Phase18dFullPhotoHooks hooks =
         seededge::phase18d::make_real_full_photo_hooks(
-            &context, &jni_is_cancelled, &jni_emit_progress);
+            &real_context, &jni_is_cancelled, &jni_emit_progress);
     const std::string result = seededge::phase18d::run_phase18d_full_photo_artifacts_with_hooks(
         m, t, reinterpret_cast<const uint8_t*>(copied.data()), copied.size(), width, height, r, hooks);
     e->ReleaseStringUTFChars(model, m);
