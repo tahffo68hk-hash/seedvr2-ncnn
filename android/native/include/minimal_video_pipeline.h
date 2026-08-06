@@ -64,12 +64,19 @@ using Phase18dTileExecutor = bool (*)(
 
 using Phase18dCancellationCheck = bool (*)(void* context);
 
+// Optional cooperative progress callback: stage is a stable ASCII label
+// (PREPARING / CHECKING_MODEL / RUNNING_TILE / FUSING / ENCODING_PNG /
+// COMPLETED / FAILED / CANCELLED), completed/total describe tile progress.
+using Phase18dProgressCallback = void (*)(void* context, const char* stage,
+                                          int completed, int total);
+
 struct Phase18dFullPhotoHooks
 {
     void* context = nullptr;
     Phase18dManifestValidator validate_manifest = nullptr;
     Phase18dTileExecutor execute_tile = nullptr;
     Phase18dCancellationCheck is_cancelled = nullptr;
+    Phase18dProgressCallback on_progress = nullptr;
 };
 
 // Testable full-photo orchestration entry.  The model manifest is validated
@@ -94,5 +101,13 @@ std::string run_phase18d_full_photo(const std::string& model_root,
                                     int width,
                                     int height,
                                     const std::string& request_json);
+
+// Builds the real production hooks around the supplied context and callbacks.
+// The manifest validator and tile executor are the real SeedVR2 pipeline; the
+// caller supplies the cooperative cancellation check and progress callback.
+Phase18dFullPhotoHooks make_real_full_photo_hooks(
+    void* context,
+    Phase18dCancellationCheck is_cancelled,
+    Phase18dProgressCallback on_progress);
 
 }  // namespace seededge::phase18d

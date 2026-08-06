@@ -12,6 +12,9 @@ object NativeRuntime {
                                           width: Int, height: Int, requestJson: String): String
     external fun nativeRunFullPhoto(modelRoot: String, taskRoot: String, normalizedRgb: ByteArray,
                                     width: Int, height: Int, requestJson: String): String
+    external fun nativeRunFullPhotoWithProgress(modelRoot: String, taskRoot: String, normalizedRgb: ByteArray,
+                                                width: Int, height: Int, requestJson: String,
+                                                progressBridge: FullPhotoProgressBridge): String
     external fun nativeGetProgressJson(): String
     external fun nativeRequestCancel(): String
     external fun nativeInspectModel(modelRoot: String): String

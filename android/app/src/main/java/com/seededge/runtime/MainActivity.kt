@@ -226,23 +226,39 @@ class MainActivity : Activity() {
         val state = text("准备中…")
         val meter = ProgressBar(this, null, android.R.attr.progressBarStyleHorizontal).apply { max = 40; page.addView(this) }
         val details = text("")
+        val cancelled = AtomicBoolean(false)
         button("取消任务") {
-            val cancelJson = NativeRuntime.nativeRequestCancel()
-            state.text = "已请求取消（在安全边界生效）\n$cancelJson"
+            cancelled.set(true)
+            NativeRuntime.nativeRequestCancel()
+            state.text = "已请求取消（在下一个安全边界生效）"
         }
         val requestJson = PhotoTask.buildRequestJson(
             taskId, PhotoTask.MODEL_VERSION, currentSourceSha, currentNormalizedSha,
             if (File(modelRoot, "manifest.json").isFile) PhotoTask.sha256Hex(File(modelRoot, "manifest.json")) else "")
         worker.execute {
             try {
-                val result = PhotoTask.runFullPhoto(
-                    modelRoot, taskRoot, rgb, currentWidth, currentHeight, requestJson)
+                val result = PhotoTask.runFullPhotoWithProgress(
+                    modelRoot, taskRoot, rgb, currentWidth, currentHeight, requestJson, cancelled) { stage, completed, total ->
+                    handler.post {
+                        state.text = "当前阶段：${PhotoTask.fullPhotoStageLabel(stage, completed, total)}"
+                        details.text = "stage=$stage  tile=$completed/$total"
+                        meter.progress = when (stage) {
+                            PhotoTask.FullPhotoStages.PREPARING -> 1
+                            PhotoTask.FullPhotoStages.CHECKING_MODEL -> 2
+                            PhotoTask.FullPhotoStages.RUNNING_TILE ->
+                                3 + (completed * 32 / total.coerceAtLeast(1)).coerceAtMost(32)
+                            PhotoTask.FullPhotoStages.FUSING -> 38
+                            PhotoTask.FullPhotoStages.ENCODING_PNG -> 39
+                            PhotoTask.FullPhotoStages.SAVING -> 40
+                            else -> meter.progress
+                        }
+                    }
+                }
                 handler.post { showResult(taskId, result) }
             } catch (t: Throwable) {
                 handler.post { showError("运行失败", t.message ?: "native 调用异常") }
             }
         }
-        startPoller(taskId, taskRoot, state, meter, details)
     }
 
     private fun startPoller(taskId: String, taskRoot: File, state: TextView, meter: ProgressBar, details: TextView) {
@@ -341,7 +357,7 @@ class MainActivity : Activity() {
             text("原图                                  增强输出")
             if (result.sideBySidePng.isFile) image(BitmapFactory.decodeFile(result.sideBySidePng.path))
             text("Phase 18D full-photo 完成（需真机相册照片复核后定级）")
-            button("保存输出到相册") { saveToGallery(result.outputPng) }
+            button("保存输出到相册") { saveToGallery(result.outputPng, result) }
         } else {
             text("未完成：${result.errorCode ?: "UNKNOWN"} ${result.errorMessage ?: ""}")
         }
@@ -349,21 +365,30 @@ class MainActivity : Activity() {
         button("返回首页") { showHome() }
     }
 
-    private fun saveToGallery(file: File) {
+    private fun saveToGallery(file: File, result: PhotoTask.FullPhotoResult) {
         try {
             val values = ContentValues().apply {
                 put(MediaStore.Images.Media.DISPLAY_NAME, "SeedEdge_${System.currentTimeMillis()}.png")
                 put(MediaStore.Images.Media.MIME_TYPE, "image/png")
-                put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/SeedEdge")
+                put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/SeedVR2")
                 put(MediaStore.Images.Media.IS_PENDING, 1)
             }
             val uri: Uri = contentResolver.insert(
                 MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY), values)
                 ?: error("无法创建相册项目")
-            contentResolver.openOutputStream(uri)!!.use { output -> file.inputStream().use { it.copyTo(output) } }
-            values.clear(); values.put(MediaStore.Images.Media.IS_PENDING, 0)
-            contentResolver.update(uri, values, null, null)
-            Toast.makeText(this, "已保存到 Pictures/SeedEdge", Toast.LENGTH_LONG).show()
+            try {
+                contentResolver.openOutputStream(uri)!!.use { output -> file.inputStream().use { it.copyTo(output) } }
+                values.clear(); values.put(MediaStore.Images.Media.IS_PENDING, 0)
+                contentResolver.update(uri, values, null, null)
+            } catch (t: Throwable) {
+                contentResolver.delete(uri, null, null)
+                throw t
+            }
+            val record = PhotoTask.gallerySaveRecord(result, uri.toString())
+            Toast.makeText(this, "已保存到 Pictures/SeedVR2", Toast.LENGTH_LONG).show()
+            text("保存成功\nURI=${record.mediaStoreUri}\n任务=${record.taskId}\n" +
+                "尺寸=${record.correctedWidth}×${record.correctedHeight}\n" +
+                "tiles=${record.tileCount}\noutput.png=${record.outputPngPath}")
         } catch (t: Throwable) {
             showError("保存失败", t.message ?: "无法写入系统相册")
         }

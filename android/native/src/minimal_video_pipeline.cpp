@@ -642,6 +642,11 @@ std::string run_phase18d_full_photo_with_hooks(
     if (!hooks.validate_manifest || !hooks.execute_tile)
         return full_photo_error("HOOKS_REQUIRED", "manifest validator and tile executor hooks are required");
 
+    if (hooks.on_progress)
+    {
+        hooks.on_progress(hooks.context, "PREPARING", 0, 0);
+        hooks.on_progress(hooks.context, "CHECKING_MODEL", 0, 0);
+    }
     const std::string normalized_sha = sha256_hex(normalized_rgb, byte_count);
     std::string manifest_sha;
     std::string manifest_error;
@@ -714,6 +719,11 @@ std::string run_phase18d_full_photo_with_hooks(
             break;
         }
 
+        if (hooks.on_progress)
+            hooks.on_progress(hooks.context, "RUNNING_TILE",
+                              static_cast<int>(tile_position),
+                              static_cast<int>(plan.tiles.size()));
+
         Phase18dTileExecutionResult result;
         std::string tile_error;
         if (!hooks.execute_tile(hooks.context, model_root, tile_root.string(), tile, padded,
@@ -778,6 +788,19 @@ std::string run_phase18d_full_photo_with_hooks(
 
     if (task_state == "completed")
     {
+        if (hooks.is_cancelled && hooks.is_cancelled(hooks.context))
+        {
+            task_state = "cancelled";
+            task_error_code = "CANCELLED_BEFORE_FUSION";
+            task_error_message = "cancelled before weighted fusion";
+        }
+    }
+    if (task_state == "completed")
+    {
+        if (hooks.on_progress)
+            hooks.on_progress(hooks.context, "FUSING",
+                              static_cast<int>(plan.tiles.size()),
+                              static_cast<int>(plan.tiles.size()));
         FusionResult fusion;
         if (!weighted_fuse_rgb8(plan, tile_outputs, &fusion, &core_error))
         {
@@ -802,6 +825,13 @@ std::string run_phase18d_full_photo_with_hooks(
                 output_full_sha = sha256_hex(output_rgb.data(), output_rgb.size());
             }
         }
+    }
+
+    if (hooks.on_progress && task_state != "completed")
+    {
+        hooks.on_progress(hooks.context,
+                          task_state == "cancelled" ? "CANCELLED" : "FAILED",
+                          completed_tiles, static_cast<int>(plan.tiles.size()));
     }
 
     const std::string status = full_photo_task_status(
@@ -1049,6 +1079,20 @@ bool phase18d_real_is_cancelled(void*)
     return seededge_progress::cancelled();
 }
 
+Phase18dFullPhotoHooks make_real_full_photo_hooks(
+    void* context,
+    Phase18dCancellationCheck is_cancelled,
+    Phase18dProgressCallback on_progress)
+{
+    Phase18dFullPhotoHooks hooks;
+    hooks.context = context;
+    hooks.validate_manifest = &phase18d_real_validate_manifest;
+    hooks.execute_tile = &phase18d_real_execute_tile;
+    hooks.is_cancelled = is_cancelled;
+    hooks.on_progress = on_progress;
+    return hooks;
+}
+
 std::string run_phase18d_full_photo(const std::string& model_root,
                                     const std::string& task_root,
                                     const uint8_t* normalized_rgb,
@@ -1058,11 +1102,8 @@ std::string run_phase18d_full_photo(const std::string& model_root,
                                     const std::string& request_json)
 {
     Phase18dRealContext context;
-    Phase18dFullPhotoHooks hooks;
-    hooks.context = &context;
-    hooks.validate_manifest = &phase18d_real_validate_manifest;
-    hooks.execute_tile = &phase18d_real_execute_tile;
-    hooks.is_cancelled = &phase18d_real_is_cancelled;
+    Phase18dFullPhotoHooks hooks = make_real_full_photo_hooks(
+        &context, &phase18d_real_is_cancelled, nullptr);
     return run_phase18d_full_photo_with_hooks(model_root, task_root, normalized_rgb, byte_count,
                                               width, height, request_json, hooks);
 }

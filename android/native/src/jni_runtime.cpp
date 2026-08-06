@@ -12,6 +12,7 @@
 #include <thread>
 #include <chrono>
 #include <algorithm>
+#include <atomic>
 #include <vector>
 #ifdef _OPENMP
 #include <omp.h>
@@ -73,6 +74,96 @@ extern "C" JNIEXPORT jstring JNICALL Java_com_seededge_runtime_NativeRuntime_nat
     e->ReleaseStringUTFChars(model, m);
     e->ReleaseStringUTFChars(task, t);
     e->ReleaseStringUTFChars(request, r);
+    return js(e, result);
+}
+namespace
+{
+struct FullPhotoJniBridge
+{
+    JNIEnv* env = nullptr;
+    jobject bridge = nullptr;
+    jmethodID on_progress_method = nullptr;
+    jmethodID is_cancelled_method = nullptr;
+    std::atomic<bool> cancelled{false};
+    std::string callback_error;
+};
+
+void jni_emit_progress(void* context, const char* stage, int completed, int total)
+{
+    FullPhotoJniBridge* bridge = static_cast<FullPhotoJniBridge*>(context);
+    JNIEnv* env = bridge->env;
+    jstring stage_text = env->NewStringUTF(stage);
+    env->CallBooleanMethod(bridge->bridge, bridge->on_progress_method,
+                           stage_text, completed, total);
+    env->DeleteLocalRef(stage_text);
+    if (env->ExceptionCheck())
+    {
+        env->ExceptionClear();
+        bridge->cancelled.store(true);
+        bridge->callback_error = std::string("onProgress callback threw for stage ") + stage;
+        return;
+    }
+}
+
+bool jni_is_cancelled(void* context)
+{
+    FullPhotoJniBridge* bridge = static_cast<FullPhotoJniBridge*>(context);
+    if (bridge->cancelled.load()) return true;
+    JNIEnv* env = bridge->env;
+    const jboolean cancelled = env->CallBooleanMethod(
+        bridge->bridge, bridge->is_cancelled_method);
+    if (env->ExceptionCheck())
+    {
+        env->ExceptionClear();
+        bridge->cancelled.store(true);
+        return true;
+    }
+    if (cancelled) bridge->cancelled.store(true);
+    return bridge->cancelled.load();
+}
+}  // namespace
+
+extern "C" JNIEXPORT jstring JNICALL Java_com_seededge_runtime_NativeRuntime_nativeRunFullPhotoWithProgress(
+    JNIEnv* e, jobject, jstring model, jstring task, jbyteArray rgb, jint width, jint height,
+    jstring request, jobject bridge) {
+    if (!model || !task || !rgb || !request || !bridge)
+        return js(e, "{\"error_code\":\"JNI_NULL_ARGUMENT\",\"overall_pass\":false}");
+    const char* m = e->GetStringUTFChars(model, nullptr);
+    const char* t = e->GetStringUTFChars(task, nullptr);
+    const char* r = e->GetStringUTFChars(request, nullptr);
+    if (!m || !t || !r) {
+        if (m) e->ReleaseStringUTFChars(model, m);
+        if (t) e->ReleaseStringUTFChars(task, t);
+        if (r) e->ReleaseStringUTFChars(request, r);
+        return js(e, "{\"error_code\":\"JNI_STRING_ACQUIRE_FAILED\",\"overall_pass\":false}");
+    }
+    const jsize length = e->GetArrayLength(rgb);
+    std::vector<jbyte> copied(static_cast<size_t>(length));
+    if (length) e->GetByteArrayRegion(rgb, 0, length, copied.data());
+    jclass bridge_class = e->GetObjectClass(bridge);
+    jmethodID on_progress = e->GetMethodID(bridge_class, "onProgress", "(Ljava/lang/String;II)Z");
+    jmethodID is_cancelled = e->GetMethodID(bridge_class, "isCancelled", "()Z");
+    if (!on_progress || !is_cancelled) {
+        e->ReleaseStringUTFChars(model, m);
+        e->ReleaseStringUTFChars(task, t);
+        e->ReleaseStringUTFChars(request, r);
+        return js(e, "{\"state\":\"failed\",\"artifacts_written\":false,\"silent_fallback\":false,\"error_code\":\"JNI_BRIDGE_METHOD_MISSING\",\"error\":\"FullPhotoProgressBridge methods not found\"}");
+    }
+    FullPhotoJniBridge context;
+    context.env = e;
+    context.bridge = bridge;
+    context.on_progress_method = on_progress;
+    context.is_cancelled_method = is_cancelled;
+    seededge::phase18d::Phase18dFullPhotoHooks hooks =
+        seededge::phase18d::make_real_full_photo_hooks(
+            &context, &jni_is_cancelled, &jni_emit_progress);
+    const std::string result = seededge::phase18d::run_phase18d_full_photo_artifacts_with_hooks(
+        m, t, reinterpret_cast<const uint8_t*>(copied.data()), copied.size(), width, height, r, hooks);
+    e->ReleaseStringUTFChars(model, m);
+    e->ReleaseStringUTFChars(task, t);
+    e->ReleaseStringUTFChars(request, r);
+    if (!context.callback_error.empty())
+        return js(e, "{\"state\":\"failed\",\"artifacts_written\":false,\"silent_fallback\":false,\"error_code\":\"PROGRESS_CALLBACK_EXCEPTION\",\"error\":\"" + context.callback_error + "\"}");
     return js(e, result);
 }
 extern "C" JNIEXPORT jstring JNICALL Java_com_seededge_runtime_NativeRuntime_nativeGetProgressJson(JNIEnv*e,jobject){return js(e,seededge_progress::json());}

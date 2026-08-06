@@ -1133,16 +1133,42 @@ std::string run_phase18d_full_photo_artifacts_with_hooks(
             "state",
             "completed"))
     {
+        if (hooks.on_progress)
+        {
+            hooks.on_progress(
+                hooks.context,
+                json_string_equals(pipeline_result, "state", "cancelled")
+                    ? "CANCELLED"
+                    : "FAILED",
+                0,
+                0);
+        }
         return incomplete_pipeline_result(
             pipeline_result);
     }
 
-    return write_phase18d_full_photo_artifacts(
-        task_root,
-        normalized_rgb,
-        byte_count,
-        width,
-        height);
+    if (hooks.on_progress)
+        hooks.on_progress(hooks.context, "ENCODING_PNG", 0, 0);
+
+    const std::string artifact_result =
+        write_phase18d_full_photo_artifacts(
+            task_root,
+            normalized_rgb,
+            byte_count,
+            width,
+            height);
+
+    if (hooks.on_progress)
+    {
+        hooks.on_progress(
+            hooks.context,
+            json_string_equals(artifact_result, "state", "completed")
+                ? "COMPLETED"
+                : "FAILED",
+            0,
+            0);
+    }
+    return artifact_result;
 }
 
 std::string run_phase18d_full_photo_artifacts(

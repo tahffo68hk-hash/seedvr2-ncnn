@@ -7,6 +7,7 @@ import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.security.MessageDigest
 import java.util.UUID
+import java.util.concurrent.atomic.AtomicBoolean
 import org.json.JSONObject
 
 /**
@@ -256,4 +257,61 @@ object PhotoTask {
         return validateFullPhotoResult(nativeText, taskRoot, width, height)
     }
 
+    /**
+     * Runs the native full-photo pipeline with cooperative progress and
+     * cancellation. onProgress is invoked on the worker thread; returning
+     * false from the bridge cancels at the next tile/fusion boundary.
+     */
+    fun runFullPhotoWithProgress(modelRoot: File, taskRoot: File, normalizedRgb: ByteArray,
+                                 width: Int, height: Int, requestJson: String,
+                                 cancelled: AtomicBoolean,
+                                 onProgress: (stage: String, completed: Int, total: Int) -> Unit): FullPhotoResult {
+        val bridge = FullPhotoProgressBridge(cancelled, onProgress)
+        val nativeText = NativeRuntime.nativeRunFullPhotoWithProgress(
+            modelRoot.path, taskRoot.path, normalizedRgb, width, height, requestJson, bridge)
+        return validateFullPhotoResult(nativeText, taskRoot, width, height)
+    }
+
+    /** Stable full-photo UI stages shared by the progress bridge and tests. */
+    object FullPhotoStages {
+        const val PREPARING = "PREPARING"
+        const val CHECKING_MODEL = "CHECKING_MODEL"
+        const val RUNNING_TILE = "RUNNING_TILE"
+        const val FUSING = "FUSING"
+        const val ENCODING_PNG = "ENCODING_PNG"
+        const val SAVING = "SAVING"
+        const val COMPLETED = "COMPLETED"
+        const val FAILED = "FAILED"
+        const val CANCELLED = "CANCELLED"
+    }
+
+    /** Maps a native progress stage to a user-facing label. */
+    fun fullPhotoStageLabel(stage: String, completed: Int, total: Int): String = when (stage) {
+        FullPhotoStages.PREPARING -> "准备中"
+        FullPhotoStages.CHECKING_MODEL -> "检查模型（1366 文件 SHA-256，仅一次）"
+        FullPhotoStages.RUNNING_TILE ->
+            if (total > 0) "正在增强：tile ${completed.coerceIn(0, total)}/$total"
+            else "正在增强：tile"
+        FullPhotoStages.FUSING -> "加权融合"
+        FullPhotoStages.ENCODING_PNG -> "编码 PNG"
+        FullPhotoStages.SAVING -> "保存到相册"
+        FullPhotoStages.COMPLETED -> "完成"
+        FullPhotoStages.FAILED -> "失败"
+        FullPhotoStages.CANCELLED -> "已取消"
+        else -> stage
+    }
+
+    /** Result object recorded after a successful MediaStore save. */
+    data class GallerySaveRecord(
+        val mediaStoreUri: String,
+        val taskId: String,
+        val correctedWidth: Int,
+        val correctedHeight: Int,
+        val tileCount: Int,
+        val outputPngPath: String
+    )
+
+    fun gallerySaveRecord(result: FullPhotoResult, mediaStoreUri: String): GallerySaveRecord =
+        GallerySaveRecord(mediaStoreUri, result.taskId, result.correctedWidth,
+            result.correctedHeight, result.tileCount, result.outputPng.path)
 }

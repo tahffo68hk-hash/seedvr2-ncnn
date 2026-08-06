@@ -172,6 +172,36 @@ class PhotoTaskTest {
         assertFalse(PhotoTask.shouldSaveToGallery(failed, userCancelled = false))
     }
 
+    @Test
+    fun fullPhotoStageLabelShowsTileProgress() {
+        assertEquals("正在增强：tile 1/2", PhotoTask.fullPhotoStageLabel("RUNNING_TILE", 1, 2))
+        assertEquals("检查模型（1366 文件 SHA-256，仅一次）", PhotoTask.fullPhotoStageLabel("CHECKING_MODEL", 0, 0))
+        assertEquals("加权融合", PhotoTask.fullPhotoStageLabel("FUSING", 2, 2))
+        assertEquals("编码 PNG", PhotoTask.fullPhotoStageLabel("ENCODING_PNG", 2, 2))
+        assertEquals("已取消", PhotoTask.fullPhotoStageLabel("CANCELLED", 1, 2))
+    }
+
+    @Test
+    fun gallerySaveRecordCarriesTaskIdentity() {
+        val root = tmp.newFolder("task")
+        File(root, "input.png").writeBytes(pngHeader(160, 96))
+        File(root, "output.png").writeBytes(pngHeader(160, 96))
+        File(root, "side_by_side.png").writeBytes(pngHeader(320, 96))
+        File(root, "status.json").writeText(
+            """{"schema_version":1,"mode":"phase18d_full_photo","state":"completed","task_id":"t1","tile_count":2,"completed_tiles":2,"silent_fallback":false}"""
+        )
+        val native =
+            """{"schema_version":1,"mode":"phase18d_full_photo","state":"completed","artifacts_written":true,"silent_fallback":false}"""
+        val result = PhotoTask.validateFullPhotoResult(native, root, 160, 96)
+        assertTrue(result.success)
+        val record = PhotoTask.gallerySaveRecord(result, "content://media/external/images/media/42")
+        assertEquals("content://media/external/images/media/42", record.mediaStoreUri)
+        assertEquals("t1", record.taskId)
+        assertEquals(160, record.correctedWidth)
+        assertEquals(96, record.correctedHeight)
+        assertEquals(2, record.tileCount)
+        assertEquals(File(root, "output.png").path, record.outputPngPath)
+    }
     private fun pngHeader(width: Int, height: Int): ByteArray {
         val bytes = ByteArray(33)
         byteArrayOf(0x89.toByte(), 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A).copyInto(bytes, 0)

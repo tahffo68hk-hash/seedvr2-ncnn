@@ -113,5 +113,37 @@ class Phase18dPhotoTaskFullPhotoContractTests(unittest.TestCase):
         self.assertIn("external fun nativeRunSinglePhotoTile", kotlin)
         self.assertIn("Java_com_seededge_runtime_NativeRuntime_nativeRunSinglePhotoTile", cpp)
 
+class Phase18dProgressCancelGalleryContractTests(unittest.TestCase):
+    def test_native_full_photo_progress_entry_and_kotlin_bridge(self):
+        kotlin = (ROOT / "app/src/main/java/com/seededge/runtime/NativeRuntime.kt").read_text(encoding="utf-8")
+        cpp = (ROOT / "native/src/jni_runtime.cpp").read_text(encoding="utf-8")
+        self.assertIn("nativeRunFullPhotoWithProgress", kotlin)
+        self.assertIn("Java_com_seededge_runtime_NativeRuntime_nativeRunFullPhotoWithProgress", cpp)
+        bridge = (ROOT / "app/src/main/java/com/seededge/runtime/FullPhotoProgressBridge.kt").read_text(encoding="utf-8")
+        self.assertIn("fun onProgress(stage: String, completed: Int, total: Int): Boolean", bridge)
+        self.assertIn("AtomicBoolean", bridge)
+
+    def test_ui_stage_labels_and_tile_progress(self):
+        main = (ROOT / "app/src/main/java/com/seededge/runtime/MainActivity.kt").read_text(encoding="utf-8")
+        photo = (ROOT / "app/src/main/java/com/seededge/runtime/PhotoTask.kt").read_text(encoding="utf-8")
+        source = main + photo
+        for stage in ("PREPARING", "CHECKING_MODEL", "RUNNING_TILE", "FUSING",
+                      "ENCODING_PNG", "SAVING", "COMPLETED", "FAILED", "CANCELLED"):
+            self.assertIn(stage, source)
+        self.assertIn("正在增强：tile", source)
+        self.assertIn("取消", main)
+
+    def test_media_store_uses_seedvr2_path_and_pending_protocol(self):
+        main = (ROOT / "app/src/main/java/com/seededge/runtime/MainActivity.kt").read_text(encoding="utf-8")
+        self.assertIn("Pictures/SeedVR2", main)
+        self.assertIn("image/png", main)
+        self.assertIn("IS_PENDING", main)
+
+    def test_cancel_and_thread_safety_contracts(self):
+        main = (ROOT / "app/src/main/java/com/seededge/runtime/MainActivity.kt").read_text(encoding="utf-8")
+        self.assertIn("newSingleThreadExecutor", main)
+        self.assertIn("handler.post", main)
+        self.assertIn("cancelled.set(true)", main)
+        self.assertIn("runFullPhotoWithProgress", main)
 if __name__ == "__main__":
     unittest.main()
