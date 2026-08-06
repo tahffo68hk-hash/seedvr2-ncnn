@@ -11,6 +11,7 @@
 #include <thread>
 #include <chrono>
 #include <algorithm>
+#include <vector>
 #ifdef _OPENMP
 #include <omp.h>
 #endif
@@ -26,6 +27,29 @@ extern "C" JNIEXPORT jstring JNICALL Java_com_seededge_runtime_NativeRuntime_nat
     const std::string result=run_phase18c_minimal_video_demo(m,i,o,c);
     e->ReleaseStringUTFChars(model,m);e->ReleaseStringUTFChars(input,i);e->ReleaseStringUTFChars(output,o);e->ReleaseStringUTFChars(config,c);
     return js(e,result);
+}
+extern "C" JNIEXPORT jstring JNICALL Java_com_seededge_runtime_NativeRuntime_nativeRunSinglePhotoTile(
+    JNIEnv* e, jobject, jstring model, jstring task, jbyteArray rgb, jint width, jint height, jstring request) {
+    if (!model || !task || !rgb || !request)
+        return js(e, "{\"error_code\":\"JNI_NULL_ARGUMENT\",\"overall_pass\":false}");
+    const char* m = e->GetStringUTFChars(model, nullptr);
+    const char* t = e->GetStringUTFChars(task, nullptr);
+    const char* r = e->GetStringUTFChars(request, nullptr);
+    if (!m || !t || !r) {
+        if (m) e->ReleaseStringUTFChars(model, m);
+        if (t) e->ReleaseStringUTFChars(task, t);
+        if (r) e->ReleaseStringUTFChars(request, r);
+        return js(e, "{\"error_code\":\"JNI_STRING_ACQUIRE_FAILED\",\"overall_pass\":false}");
+    }
+    const jsize length = e->GetArrayLength(rgb);
+    std::vector<jbyte> copied(static_cast<size_t>(length));
+    if (length) e->GetByteArrayRegion(rgb, 0, length, copied.data());
+    const std::string result = run_phase18d_single_photo_tile(
+        m, t, reinterpret_cast<const uint8_t*>(copied.data()), copied.size(), width, height, r);
+    e->ReleaseStringUTFChars(model, m);
+    e->ReleaseStringUTFChars(task, t);
+    e->ReleaseStringUTFChars(request, r);
+    return js(e, result);
 }
 extern "C" JNIEXPORT jstring JNICALL Java_com_seededge_runtime_NativeRuntime_nativeGetProgressJson(JNIEnv*e,jobject){return js(e,seededge_progress::json());}
 extern "C" JNIEXPORT jstring JNICALL Java_com_seededge_runtime_NativeRuntime_nativeRequestCancel(JNIEnv*e,jobject){seededge_progress::cancel();return js(e,seededge_progress::json());}
@@ -50,3 +74,11 @@ observed=0;
  return js(e,"{\"requested_threads\":"+std::to_string(threads)+",\"observed_worker_threads\":"+std::to_string(observed)+",\"checksum\":"+std::to_string(checksum)+",\"openmp_compiled\":"+(compiled?"true":"false")+",\"overall_pass\":"+((observed>1||threads==1)?std::string("true"):std::string("false"))+"}");}
 extern "C" JNIEXPORT jstring JNICALL Java_com_seededge_runtime_NativeRuntime_nativeRunDecoderStageBenchmark(JNIEnv*e,jobject,jstring model,jstring output){const char*m=e->GetStringUTFChars(model,nullptr),*o=e->GetStringUTFChars(output,nullptr);auto r=run_phase18c_decoder_stage_benchmark(m,o);e->ReleaseStringUTFChars(model,m);e->ReleaseStringUTFChars(output,o);return js(e,r);}
 extern "C" JNIEXPORT jstring JNICALL Java_com_seededge_runtime_NativeRuntime_nativeTestFastConvolution3D(JNIEnv*e,jobject){return js(e,seededge::fast_convolution3d_test_json());}
+
+extern "C" JNIEXPORT jstring JNICALL Java_com_seededge_runtime_NativeRuntime_nativeValidateModelManifest(JNIEnv* e, jobject, jstring root) {
+    const char* r = e->GetStringUTFChars(root, nullptr);
+    if (!r) return js(e, "{\"valid\":false,\"error\":\"JNI_STRING_ACQUIRE_FAILED\",\"silent_fallback\":false}");
+    const std::string result = validate_model_manifest(r);
+    e->ReleaseStringUTFChars(root, r);
+    return js(e, result);
+}

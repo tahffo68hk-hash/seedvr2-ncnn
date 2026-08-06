@@ -165,7 +165,6 @@ int FastConvolution3D::forward(const ncnn::Mat& bottom_blob, ncnn::Mat& top_blob
     if (outd <= 0) return kUnsupportedContract;
 
     ncnn::Option conv_opt = opt;
-    conv_opt.use_packing_layout = true;
     ncnn::Mat first_slice(bottom_blob.w, bottom_blob.h, bottom_blob.c,
                           static_cast<size_t>(4u), 1, opt.workspace_allocator);
     if (first_slice.empty()) return -100;

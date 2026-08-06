@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "phase": "18D",
+  "scope": "task-local RGB8 tile_0000 runtime",
+  "date": "2026-08-06",
+  "implementation": {
+    "entry": "run_phase18d_single_photo_tile",
+    "input": "normalized contiguous RGB8",
+    "task_root_contract": "files/tasks/<task_id>/tiles/tile_0000",
+    "legacy_phase18c4_checkpoints_accepted": false,
+    "pipeline": ["tile planner", "C++ padding", "FP32 [-1,1]", "five-frame repeat", "VAE encoder", "32-block DiT", "scheduler", "VAE decoder", "frame 0 crop"],
+    "task_local_artifacts": ["tile_input.rgb", "input_norm.f32", "output_valid.rgb", "status.json"]
+  },
+  "verified": {
+    "host_tile_core_test": "PASS: phase18d_tile_core_test failed=0",
+    "host_single_tile_contract_test": "PASS: phase18d_single_tile_contract_test failed=0",
+    "android_arm64_debug_build": "PASS: :app:assembleDebug",
+    "host_model_manifest_gate": "PASS: native validator verified 1366/1366 linked real files with SHA-256 and silent_fallback=false",
+    "host_full_real_model_run": "PASS: task host-forest-001 used a deterministic public forest photograph and completed RGB8 -> VAE encoder -> 32 DiT blocks -> scheduler -> VAE decoder -> frame 0 crop in 72622 ms",
+    "host_output": "PASS: output_valid.rgb SHA-256 e0f95d8316e9b68a5a978b6c1eccb2ade1d4056008f465150ea2173b82206673; finite=true, nan_count=0, inf_count=0",
+    "android_jni_runtime": "READY_FOR_DEVICE: ABI compiled, not executed on a device",
+    "pad_gallery_real_photo_tile": "NOT_RUN"
+  },
+  "status": {
+    "phase18d_shared_tile_core": "PASS",
+    "phase18d_host_tile_infrastructure": "PASS",
+    "phase18d_host_task_local_full_single_tile_runtime": "PASS",
+    "phase18d_android_jni_single_tile_runtime": "READY_FOR_DEVICE",
+    "phase18d_real_photo_tile": "NOT_READY",
+    "phase18d_full_resolution_enhancement": "NOT_READY"
+  },
+  "next_gate": "Install the rebuilt APK on Pad 7 Pro and invoke nativeRunSinglePhotoTile from a task root under files/tasks/<task_id> using a Photo Picker image. That is the first valid gate for Phase 18D Real Photo Tile."
+  ,"android_gallery_flow":{"kotlin_photo_picker_to_rgb8":"IMPLEMENTED","task_local_rgb_sha256":"IMPLEMENTED","output_valid_rgb_to_png":"IMPLEMENTED","in_app_input_output_side_by_side":"IMPLEMENTED","save_to_gallery_mediastore":"IMPLEMENTED","cancel_button":"IMPLEMENTED","stage_progress_ui":"IMPLEMENTED","model_check_ui":"IMPLEMENTED","unit_tests":"PASS: PhotoTaskTest 5/5, SafeResultTextTest 9/9, Yuv420Test 2/2","assemble_debug":"PASS: app-debug.apk built","device_gallery_run":"NOT_RUN"}}

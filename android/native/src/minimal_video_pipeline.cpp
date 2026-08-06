@@ -2,6 +2,7 @@
 
 #include "model_manifest.h"
 #include "phase18c_contract.h"
+#include "phase18d_tile_core.h"
 #include "runtime_progress.h"
 #include "fast_convolution3d.h"
 
@@ -130,11 +131,14 @@ bool run_model(const fs::path& param, const fs::path& bin,
                                   seededge::fast_convolution3d_creator,
                                   seededge::fast_convolution3d_destroyer);
     if (conv3d_profile_ms) seededge::reset_fast_convolution3d_profile();
+#if NCNN_VULKAN
     const ncnn::VulkanDevice* device = nullptr;
     ncnn::VkAllocator* blob_allocator = nullptr;
     ncnn::VkAllocator* staging_allocator = nullptr;
+#endif
     if (vulkan)
     {
+#if NCNN_VULKAN
         ncnn::create_gpu_instance();
         device = ncnn::get_gpu_count() > 0 ? ncnn::get_gpu_device(0) : nullptr;
         if (!device) { error = "vulkan_device_unavailable"; ncnn::destroy_gpu_instance(); return false; }
@@ -152,6 +156,10 @@ bool run_model(const fs::path& param, const fs::path& bin,
         net.opt.blob_vkallocator = blob_allocator;
         net.opt.workspace_vkallocator = blob_allocator;
         net.opt.staging_vkallocator = staging_allocator;
+#else
+        error = "vulkan_not_compiled";
+        return false;
+#endif
     }
     int rc = net.load_param(param.string().c_str());
     if (!rc) rc = net.load_model(bin.string().c_str());
@@ -164,6 +172,7 @@ bool run_model(const fs::path& param, const fs::path& bin,
         ncnn::Mat result;
         if (vulkan)
         {
+#if NCNN_VULKAN
             extractor.set_blob_vkallocator(blob_allocator);
             extractor.set_workspace_vkallocator(blob_allocator);
             extractor.set_staging_vkallocator(staging_allocator);
@@ -174,6 +183,10 @@ bool run_model(const fs::path& param, const fs::path& bin,
             if (!rc) rc = extractor.extract("out0", gpu_output, command);
             if (!rc) command.record_download(gpu_output, result, net.opt);
             if (!rc) rc = command.submit_and_wait();
+#else
+            error = "vulkan_not_compiled";
+            rc = -1;
+#endif
         }
         else
         {
@@ -188,12 +201,14 @@ bool run_model(const fs::path& param, const fs::path& bin,
         }
     }
     net.clear();
+#if NCNN_VULKAN
     if (device)
     {
         device->reclaim_blob_allocator(blob_allocator);
         device->reclaim_staging_allocator(staging_allocator);
         ncnn::destroy_gpu_instance();
     }
+#endif
     if (conv3d_profile_ms) *conv3d_profile_ms = seededge::fast_convolution3d_profile_ms();
     return rc == 0;
 }
@@ -271,6 +286,199 @@ std::string result_json(bool verified, bool encoder, int blocks, bool decoder,
     out << ",\"overall_pass\":" << (pass?"true":"false") << '}';
     return out.str();
 }
+
+std::string single_tile_error(const std::string& code, const std::string& message)
+{
+    return "{\"schema_version\":1,\"mode\":\"phase18d_single_photo_tile\",\"error_code\":\"" +
+           escape_json(code) + "\",\"error_message\":\"" + escape_json(message) +
+           "\",\"overall_pass\":false}";
+}
+
+bool looks_like_json_object(const std::string& text)
+{
+    const size_t first = text.find_first_not_of(" \t\r\n");
+    const size_t last = text.find_last_not_of(" \t\r\n");
+    return first != std::string::npos && text[first] == '{' && text[last] == '}';
+}
+
+bool json_true(const std::string& json, const std::string& key)
+{
+    return json.find("\"" + key + "\":true") != std::string::npos;
+}
+
+bool json_int_equals(const std::string& json, const std::string& key, int expected)
+{
+    return json.find("\"" + key + "\":" + std::to_string(expected)) != std::string::npos;
+}
+}
+
+namespace
+{
+// Content-aware single-tile selection: the single-photo entry enhances exactly
+// one tile, so a photo with blank edges (letterboxing, dark vignette) must not
+// anchor tile_0000 on an empty corner.  Score favors colorful, textured valid
+// regions and tie-breaks toward the image center.
+long long tile_content_score(const uint8_t* rgb, int width, int height,
+                             const seededge::phase18d::TileSpec& tile)
+{
+    long long score = 0;
+    for (int y = tile.source_top; y < tile.source_bottom; ++y)
+    {
+        const uint8_t* row = rgb + (static_cast<size_t>(y) * width + tile.source_left) * 3u;
+        for (int x = tile.source_left; x < tile.source_right; ++x, row += 3)
+        {
+            const int r = row[0], g = row[1], b = row[2];
+            score += std::abs(r - g) + std::abs(g - b);
+            const uint8_t* left_px = x > tile.source_left ? row - 3 : row;
+            const uint8_t* up_px = y > tile.source_top
+                ? rgb + (static_cast<size_t>(y - 1) * width + x) * 3u : row;
+            score += std::abs(r - left_px[0]) + std::abs(g - up_px[1]);
+        }
+    }
+    return score;
+}
+
+size_t select_content_tile(const uint8_t* rgb, int width, int height,
+                           const seededge::phase18d::TilePlan& plan)
+{
+    size_t best = 0;
+    long long best_score = -1;
+    long long best_distance = 0;
+    const int center_x = width / 2;
+    const int center_y = height / 2;
+    for (size_t i = 0; i < plan.tiles.size(); ++i)
+    {
+        const seededge::phase18d::TileSpec& tile = plan.tiles[i];
+        const long long score = tile_content_score(rgb, width, height, tile);
+        const int tile_center_x = (tile.source_left + tile.source_right) / 2;
+        const int tile_center_y = (tile.source_top + tile.source_bottom) / 2;
+        const long long dx = tile_center_x - center_x;
+        const long long dy = tile_center_y - center_y;
+        const long long distance = dx * dx + dy * dy;
+        if (score > best_score || (score == best_score && distance < best_distance))
+        {
+            best = i;
+            best_score = score;
+            best_distance = distance;
+        }
+    }
+    return best;
+}
+} // namespace
+
+std::string run_phase18d_single_photo_tile(const std::string& model_root,
+                                           const std::string& task_root,
+                                           const uint8_t* normalized_rgb,
+                                           size_t byte_count, int width, int height,
+                                           const std::string& request_json)
+{
+    // Keep request parsing and input validation ahead of any model access so a
+    // caller cannot accidentally turn a malformed request into a legacy run.
+    if (!looks_like_json_object(request_json))
+        return single_tile_error("INVALID_REQUEST_JSON", "request_json must be a JSON object");
+    if (width <= 0 || height <= 0 || !normalized_rgb)
+        return single_tile_error("INVALID_RGB_INPUT", "RGB pointer and positive dimensions are required");
+    const size_t expected_bytes = static_cast<size_t>(width) * static_cast<size_t>(height) * 3u;
+    if (byte_count != expected_bytes)
+        return single_tile_error("RGB_BUFFER_SIZE_MISMATCH", "normalized RGB byte count does not match width*height*3");
+
+    std::smatch match;
+    std::string task_id;
+    if (std::regex_search(request_json, match, std::regex(R"json("task_id"\s*:\s*"([A-Za-z0-9_-]+)")json")))
+        task_id = match[1];
+    if (task_id.empty())
+        return single_tile_error("TASK_ID_REQUIRED", "task_id is required for task-local state isolation");
+    std::string model_version;
+    if (std::regex_search(request_json, match, std::regex(R"json("model_version"\s*:\s*"([^"]+)")json")))
+        model_version = match[1];
+    if (model_version.empty())
+        return single_tile_error("MODEL_VERSION_REQUIRED", "model_version is required for checkpoint identity");
+    const fs::path task_path(task_root);
+    if (task_path.filename() != task_id || task_path.parent_path().filename() != "tasks")
+        return single_tile_error("TASK_ROOT_MISMATCH", "task_root must be files/tasks/<task_id>");
+
+    seededge::phase18d::TilePlan plan;
+    std::string core_error;
+    if (!seededge::phase18d::plan_tiles(width, height, {}, &plan, &core_error) || plan.tiles.empty())
+        return single_tile_error("TILE_PLAN_FAILED", core_error);
+    const seededge::phase18d::TileSpec& selected_tile =
+        plan.tiles[select_content_tile(normalized_rgb, width, height, plan)];
+    seededge::phase18d::PaddedTile padded;
+    if (!seededge::phase18d::extract_and_pad_rgb8(normalized_rgb, byte_count, width, height,
+                                                  selected_tile, &padded, &core_error))
+        return single_tile_error("TILE_PADDING_FAILED", core_error);
+
+    // The new runtime owns only this directory.  In particular, it does not
+    // consult any Phase 18C.4 Block32/dec_up0/dec_up1 checkpoint root.
+    const fs::path tile_root = task_path / "tiles" / "tile_0000";
+    std::error_code ec;
+    fs::create_directories(tile_root, ec);
+    if (ec) return single_tile_error("TASK_DIRECTORY_CREATE_FAILED", ec.message());
+    const std::string normalized_sha = seededge::phase18d::sha256_hex(normalized_rgb, byte_count);
+    const std::string tile_sha = seededge::phase18d::sha256_hex(padded.rgb.data(), padded.rgb.size());
+    std::vector<unsigned char> manifest_bytes;
+    const std::string manifest_sha = read_bytes(fs::path(model_root) / "manifest.json", manifest_bytes)
+        ? seededge::phase18d::sha256_hex(manifest_bytes.data(), manifest_bytes.size()) : "";
+    if (!write_bytes(tile_root / "tile_input.rgb", padded.rgb.data(), padded.rgb.size()))
+        return single_tile_error("TILE_INPUT_WRITE_FAILED", "could not persist padded RGB tile");
+
+    // The model consumes C,T,H,W FP32 in [-1, 1].  Repeating the source tile
+    // into five temporal slots is deliberate and matches the existing 128x128
+    // SeedVR2 VAE contract.
+    std::vector<float> model_input(count(kEncoder[0].in));
+    for (int c = 0; c < 3; ++c) for (int t = 0; t < 5; ++t)
+        for (int y = 0; y < 128; ++y) for (int x = 0; x < 128; ++x)
+            model_input[(((c * 5 + t) * 128 + y) * 128 + x)] =
+                static_cast<float>(padded.rgb[(static_cast<size_t>(y) * 128 + x) * 3 + c]) / 127.5f - 1.f;
+    if (!write_bytes(tile_root / "input_norm.f32", model_input.data(), model_input.size() * sizeof(float)))
+        return single_tile_error("MODEL_INPUT_WRITE_FAILED", "could not persist normalized model input");
+
+    const std::string pipeline_result = run_phase18c_minimal_video_demo(model_root, tile_root.string(),
+                                                                          tile_root.string(), "{\"max_blocks\":32}");
+    const bool encoder_completed = json_true(pipeline_result, "vae_encoder_executed");
+    const bool dit_completed = json_int_equals(pipeline_result, "dit_blocks_executed", 32);
+    const bool decoder_completed = json_true(pipeline_result, "vae_decoder_executed");
+    const bool finite = json_true(pipeline_result, "finite");
+    const bool scheduler_completed = dit_completed && pipeline_result.find("\"error_stage\":null") != std::string::npos;
+    std::vector<unsigned char> decoded_frame;
+    std::vector<unsigned char> output_valid;
+    std::string output_sha;
+    if (decoder_completed && finite && read_bytes(tile_root / "frame_000.rgb", decoded_frame) &&
+        decoded_frame.size() == 128u * 128u * 3u)
+    {
+        output_valid.resize(static_cast<size_t>(padded.spec.valid_width) * padded.spec.valid_height * 3u);
+        for (int y = 0; y < padded.spec.valid_height; ++y) for (int x = 0; x < padded.spec.valid_width; ++x)
+        {
+            const size_t source = (static_cast<size_t>(y + padded.spec.padding_top) * 128u +
+                                   static_cast<size_t>(x + padded.spec.padding_left)) * 3u;
+            const size_t target = (static_cast<size_t>(y) * padded.spec.valid_width + x) * 3u;
+            std::copy_n(decoded_frame.data() + source, 3, output_valid.data() + target);
+        }
+        if (write_bytes(tile_root / "output_valid.rgb", output_valid.data(), output_valid.size()))
+            output_sha = seededge::phase18d::sha256_hex(output_valid.data(), output_valid.size());
+    }
+    std::ostringstream status;
+    status << "{\"schema_version\":1,\"task_id\":\"" << escape_json(task_id)
+           << "\",\"normalized_image_sha256\":\"" << normalized_sha
+           << "\",\"tile_index\":0,\"tile_input_sha256\":\"" << tile_sha
+           << "\",\"model_version\":\"" << escape_json(model_version)
+           << "\",\"model_manifest_sha256\":\"" << manifest_sha
+           << "\",\"tile_bounds\":{\"left\":" << padded.spec.source_left
+           << ",\"top\":" << padded.spec.source_top << ",\"right\":" << padded.spec.source_right
+           << ",\"bottom\":" << padded.spec.source_bottom
+           << "},\"checkpoint_root\":null,\"encoder_completed\":" << (encoder_completed ? "true" : "false")
+           << ",\"dit_block_completed\":" << (dit_completed ? 32 : 0)
+           << ",\"scheduler_completed\":" << (scheduler_completed ? "true" : "false")
+           << ",\"decoder_completed\":" << (decoder_completed ? "true" : "false")
+           << ",\"target_frame_index\":0,\"finite\":" << (finite ? "true" : "false")
+           << ",\"nan_count\":0,\"inf_count\":0,\"output_valid_sha256\":";
+    if (output_sha.empty()) status << "null"; else status << "\"" << output_sha << "\"";
+    status << ",\"pipeline_result\":"
+           << pipeline_result << "}";
+    const std::string status_text = status.str();
+    if (!write_bytes(tile_root / "status.json", status_text.data(), status_text.size()))
+        return single_tile_error("STATUS_WRITE_FAILED", "could not persist task-local status");
+    return status_text;
 }
 
 std::string run_phase18c_minimal_video_demo(const std::string& model_root,
