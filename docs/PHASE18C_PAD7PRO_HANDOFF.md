@@ -1,6 +1,6 @@
 # Phase 18C Pad 7 Pro handoff
 
-Branch: `codex/phase18c-android-minimal-video-demo`
+Branch: `phase18c-android-minimal-video-demo`
 HEAD at start: `2437856000a3532eb49303f2c6a09e7ccf4618c6`
 
 Device: Xiaomi Pad 7 Pro candidate (`product:muyu`, model `24091RPADC`, Android 16/API 36, arm64-v8a, Adreno 735). Find X8 PKB110 evidence is separate and remains only the earlier block-9 partial result.

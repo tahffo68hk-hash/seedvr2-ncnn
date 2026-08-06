@@ -1,10 +1,10 @@
 # Synthetic SeedVR2 DiT Block staged ncnn fidelity (Phase 12)
 
-Status: **READY** (scaled synthetic fixture). Branch `codex/phase12-synthetic-dit-block-ncnn`, base `5f44137` (Phase 11.1 READY). No push, no tag, no PR; Phase 13 not started.
+Status: **READY** (scaled synthetic fixture). Branch `phase12-synthetic-dit-block-ncnn`, base `5f44137` (Phase 11.1 READY). No push, no tag, no PR; Phase 13 not started.
 
 ## 1. Branch and baseline
 
-- Branch: `codex/phase12-synthetic-dit-block-ncnn` created from clean HEAD `5f44137` (`test: execute real SeedVR2 DiT block forward contract`, Phase 11.1 READY). History contains `5f44137` (Phase 11.1), `062f537` (Phase 11 contract PARTIAL), `e9e5985` (Phase 10 READY). No existing tag was moved; no tag created by this task.
+- Branch: `phase12-synthetic-dit-block-ncnn` created from clean HEAD `5f44137` (`test: execute real SeedVR2 DiT block forward contract`, Phase 11.1 READY). History contains `5f44137` (Phase 11.1), `062f537` (Phase 11 contract PARTIAL), `e9e5985` (Phase 10 READY). No existing tag was moved; no tag created by this task.
 - Worktree before the task: clean; during the task only `tests/seedvr2_dit_block_ncnn/` (new) and `tests/attention_dispatcher/artifact_registry.{cpp,h}` (registry `read_dit_block` extension) changed.
 
 ## 2. SeedVR2 / ncnn / pnnx provenance
@@ -166,7 +166,7 @@ Release ncnn CPU FP32, per-profile latency (median of 5 reps): A ~3.1 ms, B ~19.
 
 - `reports/synthetic_dit_block_ncnn_validation.json` (stdlib-parseable, typed booleans, no NaN/Inf; `overall_status=PASS`, `overall_pass=true`, provenance flags `real_seedvr2_weights=false`, `real_flash_attn_cuda_kernel=false`, `real_apex_cuda_kernel=false`, `full_32_block_dit=false`, `android_vulkan=false`).
 - `reports/synthetic_dit_block_last_layer_validation.json` (overall PASS).
-- This report; README, AGENTS.md, `docs/CURRENT_STATUS.md`, `docs/NEXT_TASK.md`, `docs/CODEX_HANDOFF.md`, `docs/ARCHITECTURE.md`, `docs/DECISIONS_AND_GOTCHAS.md`, `docs/TEST_MATRIX.md`, `docs/PROJECT_MEMORY_INDEX.md`, `docs/full-fidelity-ncnn-report.md` updated.
+- This report; README, AGENTS.md, `docs/CURRENT_STATUS.md`, `docs/NEXT_TASK.md`, `docs/HANDOFF.md`, `docs/ARCHITECTURE.md`, `docs/DECISIONS_AND_GOTCHAS.md`, `docs/TEST_MATRIX.md`, `docs/PROJECT_MEMORY_INDEX.md`, `docs/full-fidelity-ncnn-report.md` updated.
 
 ## 27. Phase 12 final status
 

@@ -1,6 +1,6 @@
 ﻿# Hybrid Visual Milestone Report (Phase 14)
 
-Status: **READY** (branch `codex/phase14-real-weight-visual-milestone`, base `e7e24d0`).
+Status: **READY** (branch `phase14-real-weight-visual-milestone`, base `e7e24d0`).
 Scope: run the official SeedVR2 3B video-diffusion pipeline (VAE encode -> DiT
 single step -> VAE decode) on a synthetic 4-frame 128x128 input, replace exactly one
 middle DiT block (block 16) with the ncnn `real_block_adapter` (real weights, FP32),

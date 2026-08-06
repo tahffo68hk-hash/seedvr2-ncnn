@@ -1,6 +1,6 @@
 # Multi-block SeedVR2 streaming hybrid runtime report (Phase 15)
 
-Status: **READY** (branch `codex/phase15-multiblock-streaming-hybrid`, base
+Status: **READY** (branch `phase15-multiblock-streaming-hybrid`, base
 `17ce482`). Real-weight SeedVR2 blocks are chained through ncnn in strict
 streaming mode: per block `LOAD -> EXECUTE -> UNLOAD` (runtime destroyed, model
 cache cleared to 0, resident bytes 0, file handles released and rename-probed)

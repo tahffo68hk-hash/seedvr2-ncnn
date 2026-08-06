@@ -1,6 +1,6 @@
 # Full SeedVR2 DiT streaming report (Phase 16)
 
-Status: **READY** (branch `codex/phase16-full-dit-streaming`, base `a4b9a5e`).
+Status: **READY** (branch `phase16-full-dit-streaming`, base `a4b9a5e`).
 The complete 32-block real-weight SeedVR2-3B DiT body runs through ncnn in
 strict per-block streaming mode (`LOAD -> EXECUTE -> UNLOAD`,
 `max_resident_weighted_blocks=1`) and is embedded into the official PyTorch

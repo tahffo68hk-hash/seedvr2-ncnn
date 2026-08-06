@@ -10,7 +10,7 @@
 
 ## Global Constraints
 
-- Work from Phase 17 commit `13b2d14e945ea3d07246006d6c75840184f9448c` on `codex/phase18a-android-arm64-scaffold`.
+- Work from Phase 17 commit `13b2d14e945ea3d07246006d6c75840184f9448c` on `phase18a-android-arm64-scaffold`.
 - Use only `arm64-v8a`; use SDK/NDK/JDK/CMake/Ninja/Gradle caches under `D:\Android`.
 - Build ncnn from a repository-pinned official commit with Vulkan enabled; do not commit generated libraries, APKs, caches, SDKs, models, or weights.
 - Device execution, Adreno/Vulkan inference, VAE/DiT inference, and full restoration remain false and unclaimed.
@@ -65,7 +65,7 @@
 
 ### Task 6: Reports, documentation, final verification, and commit
 
-**Files:** create the eleven `reports/phase18a_*.json` files and `docs/android-phase18a-build-and-scaffold-report.md`; update `README.md`, `AGENTS.md`, `docs/NEXT_TASK.md`, `docs/CURRENT_STATUS.md`, `docs/CODEX_HANDOFF.md`, and `docs/TEST_MATRIX.md`.
+**Files:** create the eleven `reports/phase18a_*.json` files and `docs/android-phase18a-build-and-scaffold-report.md`; update `README.md`, `AGENTS.md`, `docs/NEXT_TASK.md`, `docs/CURRENT_STATUS.md`, `docs/HANDOFF.md`, and `docs/TEST_MATRIX.md`.
 
 - [ ] Generate UTF-8 strict JSON with `overall_pass`, `device_required`, and `device_executed`, preserving all device-only results as false.
 - [ ] Update documentation to distinguish Phase 17 READY, Phase 18A device-free readiness, and Phase 18 overall NOT READY.

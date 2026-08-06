@@ -1,6 +1,6 @@
 # Phase 17: real-weight SeedVR2 VAE ncnn + full video restoration
 
-Status: **READY** (branch `codex/phase17-vae-full-video-restoration`, base `87b032c`).
+Status: **READY** (branch `phase17-vae-full-video-restoration`, base `87b032c`).
 
 ## Scope
 

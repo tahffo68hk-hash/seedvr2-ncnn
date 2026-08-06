@@ -1,6 +1,6 @@
 # Real-Width SeedVR2 Single Block Feasibility Report (Phase 13)
 
-Status: **READY** (commit on `codex/phase13-real-width-weight-map`, base `c05a5a4`
+Status: **READY** (commit on `phase13-real-width-weight-map`, base `c05a5a4`
 Phase 12 READY). Scope: extend the Phase 12 scaled staged runtime to the REAL
 SeedVR2 3B single-block width `C=2560 / H=20 / HD=128` with deterministic random
 weights, export all stage artifacts with `pnnx fp16=0`, run the minimal RW-A
@@ -11,7 +11,7 @@ Vulkan are NOT started.
 
 ## 1. Provenance
 
-- Repo branch: `codex/phase13-real-width-weight-map`; base commit `c05a5a4` (Phase 12 READY).
+- Repo branch: `phase13-real-width-weight-map`; base commit `c05a5a4` (Phase 12 READY).
 - SeedVR2: `e4de8c2` (`D:\AIProjects\third_party\SeedVR2`, clean worktree, unmodified).
 - ncnn: `a4d2ea1d` (`D:\AIProjects\third_party\ncnn`, unmodified; install `build/ncnn-cpu/install`, cmake version `20260730`).
 - pnnx: built from the same ncnn tree (`build/pnnx-cpu/src/pnnx.exe`), `fp16=0` on every export; runs against libtorch `2.7.0+cpu` (`V:\AI\LibTorch\2.7.0+cpu\lib`).

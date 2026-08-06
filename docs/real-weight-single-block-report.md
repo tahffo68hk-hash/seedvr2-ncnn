@@ -1,6 +1,6 @@
 ﻿# Real-Weight SeedVR2 Single-Block Report (Phase 14)
 
-Status: **READY** (branch `codex/phase14-real-weight-visual-milestone`, base `e7e24d0`).
+Status: **READY** (branch `phase14-real-weight-visual-milestone`, base `e7e24d0`).
 Scope: acquire and safely load the official `ByteDance-Seed/SeedVR2-3B` checkpoint,
 validate the schema against the Phase 13 mapping contract, force real affine q/k
 RMSNorm (Phase 13 0-byte reuse FORBIDDEN), select the middle DiT block, stream-export
@@ -10,7 +10,7 @@ fallback. 32-block DiT, Android and Vulkan are NOT started.
 
 ## 1. Provenance
 
-- Repo branch: `codex/phase14-real-weight-visual-milestone`; HEAD base `e7e24d0`.
+- Repo branch: `phase14-real-weight-visual-milestone`; HEAD base `e7e24d0`.
 - Checkpoint: official `ByteDance-Seed/SeedVR2-3B` (`huggingface.co`), `official_source_only=true`,
   `mirror_used=false`, `login_required=false`, `token_used=false`.
 - Main checkpoint SHA-256: `6bcc5ac59447e97b100477480aebb01be2ec724c8340bb83faae21f64848604b`
