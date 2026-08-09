@@ -2170,8 +2170,19 @@ std::string run_phase18d_stage_major_photo(const std::string& model_root,
     if(!estimate_photo_storage(width,height,plan.tiles.size(),&estimate,&error))
         return full_photo_error("STORAGE_ESTIMATE_FAILED",error);
     const fs::space_info space=fs::space(task_path,directory_error);
-    if(directory_error||!has_required_free_space(estimate.required_bytes,space.available,&error))
-        return full_photo_error("INSUFFICIENT_FREE_SPACE",error.empty()?directory_error.message():error);
+    if(directory_error)
+        return full_photo_error("INSUFFICIENT_FREE_SPACE",directory_error.message());
+    uint64_t memory_budget_bytes = 2ull * 1024ull * 1024ull * 1024ull;
+    std::smatch memory_budget_match;
+    if (std::regex_search(request_json, memory_budget_match,
+        std::regex(R"rx("memory_budget_bytes"\s*:\s*([0-9]+))rx")))
+        memory_budget_bytes = std::stoull(memory_budget_match[1].str());
+    RuntimeResourceEstimate resource_estimate;
+    RuntimeCalibration calibration;
+    if (!estimate_task_resources(width, height, runtime_request, space.available,
+            memory_budget_bytes, calibration, &resource_estimate, &error))
+        return full_photo_error(error.empty()?"RESOURCE_ESTIMATE_FAILED":error,
+                                error.empty()?"resource estimate failed":error);
     StageMajorIdentity identity;
     identity.task_id=task_id; identity.model_version=model_version; identity.source_sha256=source_sha;
     identity.normalized_image_sha256=normalized_sha; identity.tile_count=static_cast<int>(plan.tiles.size());
@@ -2319,7 +2330,12 @@ std::string run_phase18d_stage_major_photo(const std::string& model_root,
            << ",\"wall_time_ms\":" << wall_ms << ",\"peak_rss_mb\":" << context.peak_rss_mb
            << ",\"model_stage_loads\":" << stats.model_stage_loads
            << ",\"peak_resident_model_stages\":" << stats.peak_resident_model_stages
-           << ",\"estimated_required_bytes\":" << estimate.required_bytes
+           << ",\"resource_estimate_classification\":\"ESTIMATED\""
+           << ",\"resource_calibration_source\":\"" << escape_json(resource_estimate.source_label) << "\""
+           << ",\"estimated_required_bytes\":" << resource_estimate.required_free_bytes
+           << ",\"estimated_peak_task_bytes\":" << resource_estimate.estimated_peak_task_bytes
+           << ",\"estimated_final_task_bytes\":" << resource_estimate.estimated_final_task_bytes
+           << ",\"estimated_runtime_ms\":" << resource_estimate.estimated_runtime_ms
            << ",\"free_space_before_bytes\":" << space.available
            << ",\"checkpoint_bytes_on_disk\":" << checkpoint_bytes
            << ",\"checkpoint_generation\":" << checkpoint_inventory.newest_generation

@@ -26,6 +26,7 @@ struct RuntimeCalibration
     // Host CPU FP32 calibration. These fields are deliberately data, so Android
     // can replace them after device measurements instead of inheriting guesses.
     int tile_major_max_tiles = 2;
+    int stage_major_max_tiles = 25;
     int default_cohort_size = 4;
     double fixed_runtime_ms = 41799.59302326;
     double per_tile_runtime_ms = 13743.10465116;

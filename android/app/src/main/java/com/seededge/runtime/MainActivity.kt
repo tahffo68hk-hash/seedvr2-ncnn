@@ -229,7 +229,9 @@ class MainActivity : Activity() {
         if (currentWidth.toLong() * currentHeight > PhotoTask.MAX_SOURCE_PIXELS ||
             tileCount > PhotoTask.MAX_TILE_COUNT)
             return showError("图片超过安全上限", "pixels=${currentWidth.toLong() * currentHeight}, tiles=$tileCount")
-        val required = PhotoTask.estimateRequiredStorageBytes(currentWidth, currentHeight, tileCount)
+        val estimate = PhotoTask.estimateTaskResources(currentWidth, currentHeight,
+            availableDiskBytes = filesDir.usableSpace)
+        val required = estimate.requiredFreeBytes
         if (!normalizedRgb.isFile || !PhotoTask.hasStorageCapacity(filesDir.usableSpace, required))
             return showError("存储空间不足", "required=$required available=${filesDir.usableSpace}")
 
@@ -239,7 +241,6 @@ class MainActivity : Activity() {
         val meter = ProgressBar(this, null, android.R.attr.progressBarStyleHorizontal).apply {
             max = 40; page.addView(this)
         }
-        val estimate = PhotoTask.estimateTaskResources(currentWidth, currentHeight)
         val details = text("Auto → ${estimate.selectedMode}" +
             (if (estimate.cohortSize > 0) " K=${estimate.cohortSize}" else "") +
             " · $tileCount tiles · 设备阈值 READY_FOR_DEVICE")

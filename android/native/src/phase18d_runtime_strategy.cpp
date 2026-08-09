@@ -210,7 +210,9 @@ bool estimate_task_resources(int width, int height, const RuntimeRequest& reques
     if (!estimate) return fail(error, "RESOURCE_ESTIMATE_OUTPUT_NULL");
     if (width <= 0 || height <= 0)
         return fail(error, "INVALID_RESOURCE_DIMENSIONS");
-    if (calibration.tile_major_max_tiles < 1 || calibration.default_cohort_size < 1 ||
+    if (calibration.tile_major_max_tiles < 1 ||
+        calibration.stage_major_max_tiles < calibration.tile_major_max_tiles ||
+        calibration.default_cohort_size < 1 ||
         calibration.per_tile_runtime_ms < 0.0 ||
         calibration.model_reload_per_cohort_ms < 0.0)
         return fail(error, "INVALID_RESOURCE_CALIBRATION");
@@ -239,6 +241,11 @@ bool estimate_task_resources(int width, int height, const RuntimeRequest& reques
         selection.selected_mode = RuntimeMode::TileMajor;
         selection.reason = "MEASURED_SMALL_TASK_TILE_MAJOR";
     }
+    else if (tiles <= static_cast<uint64_t>(calibration.stage_major_max_tiles))
+    {
+        selection.selected_mode = RuntimeMode::StageMajor;
+        selection.reason = "MEASURED_MEDIUM_TASK_STAGE_MAJOR";
+    }
     else
     {
         selection.selected_mode = RuntimeMode::Hybrid;
@@ -246,7 +253,7 @@ bool estimate_task_resources(int width, int height, const RuntimeRequest& reques
         selection.reason = "MEASURED_LONG_TASK_BOUNDED_DISK";
     }
 
-    const uint64_t live_tiles = selection.selected_mode == RuntimeMode::StageMajor ? tiles :
+    uint64_t live_tiles = selection.selected_mode == RuntimeMode::StageMajor ? tiles :
         (selection.selected_mode == RuntimeMode::Hybrid ?
             static_cast<uint64_t>(selection.cohort_size) : 1u);
     uint64_t intermediate = 0, final_bytes = 0, peak = 0, required = 0;
@@ -255,6 +262,23 @@ bool estimate_task_resources(int width, int height, const RuntimeRequest& reques
         !checked_add(intermediate, final_bytes, &peak) ||
         !checked_add(peak, calibration.safety_margin_bytes, &required))
         return fail(error, "RESOURCE_ESTIMATE_OVERFLOW");
+
+    // StageMajor is the measured latency choice through 25 tiles, but Auto must
+    // not select it when its all-tile intermediate state cannot fit. Fall back
+    // to the measured default Hybrid cohort before considering smaller cohorts.
+    if (request.mode == RuntimeMode::Auto &&
+        selection.selected_mode == RuntimeMode::StageMajor &&
+        required > available_disk_bytes)
+    {
+        selection.selected_mode = RuntimeMode::Hybrid;
+        selection.cohort_size = std::min<uint64_t>(tiles, calibration.default_cohort_size);
+        selection.reason = "AVAILABLE_DISK_SELECTED_HYBRID";
+        live_tiles = static_cast<uint64_t>(selection.cohort_size);
+        if (!checked_mul(live_tiles, calibration.peak_intermediate_bytes_per_tile, &intermediate) ||
+            !checked_add(intermediate, final_bytes, &peak) ||
+            !checked_add(peak, calibration.safety_margin_bytes, &required))
+            return fail(error, "RESOURCE_ESTIMATE_OVERFLOW");
+    }
 
     // Auto may reduce K only from measured/default K downwards to fit the disk;
     // it never invents a larger cohort or hides an insufficient final-state budget.

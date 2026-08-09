@@ -84,6 +84,18 @@ int main()
         estimate.selection.cohort_size == 4 &&
         estimate.required_free_bytes >= estimate.estimated_peak_task_bytes,
         "Auto uses bounded-disk Hybrid for a long task");
+    expect(p18d::estimate_task_resources(512, 512, automatic,
+        std::numeric_limits<uint64_t>::max(), 2ull * 1024 * 1024 * 1024,
+        calibration, &estimate, &error) && estimate.tile_count == 25 &&
+        estimate.selection.selected_mode == p18d::RuntimeMode::StageMajor &&
+        estimate.selection.reason == "MEASURED_MEDIUM_TASK_STAGE_MAJOR",
+        "Auto keeps measured-faster StageMajor through 25 tiles");
+    expect(p18d::estimate_task_resources(512, 512, automatic,
+        2ull * 1024 * 1024 * 1024, 2ull * 1024 * 1024 * 1024,
+        calibration, &estimate, &error) &&
+        estimate.selection.selected_mode == p18d::RuntimeMode::Hybrid &&
+        estimate.selection.reason == "AVAILABLE_DISK_SELECTED_HYBRID",
+        "Auto falls back to bounded-disk Hybrid when StageMajor cannot fit");
     p18d::RuntimeRequest explicit_stage;
     explicit_stage.mode = p18d::RuntimeMode::StageMajor;
     expect(p18d::estimate_task_resources(4032, 3024, explicit_stage,

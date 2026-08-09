@@ -87,6 +87,20 @@ class PhotoTaskTest {
     }
 
     @Test
+    fun autoUsesMeasuredMediumModeAndFallsBackWhenDiskCannotFitIt() {
+        val latency = PhotoTask.estimateTaskResources(512, 512, "auto", 4)
+        assertEquals(25, latency.tileCount)
+        assertEquals("stage_major", latency.selectedMode)
+        assertEquals(0, latency.cohortSize)
+
+        val bounded = PhotoTask.estimateTaskResources(512, 512, "auto", 4,
+            availableDiskBytes = 2L * 1024 * 1024 * 1024)
+        assertEquals("hybrid", bounded.selectedMode)
+        assertEquals(4, bounded.cohortSize)
+        assertTrue(bounded.requiredFreeBytes <= 2L * 1024 * 1024 * 1024)
+    }
+
+    @Test
     fun resumedRequestCarriesExplicitResumeFlag() {
         val json = PhotoTask.buildRequestJson("task_1", PhotoTask.MODEL_VERSION,
             "src", "norm", "manifest", resume = true)

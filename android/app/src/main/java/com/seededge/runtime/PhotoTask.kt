@@ -122,21 +122,41 @@ object PhotoTask {
 
     /** Host-calibrated planning only; Pad thresholds remain READY_FOR_DEVICE. */
     fun estimateTaskResources(width: Int, height: Int, runtimeMode: String = "auto",
-                              cohortSize: Int = 4): TaskResourceEstimate {
+                              cohortSize: Int = 4,
+                              availableDiskBytes: Long = Long.MAX_VALUE): TaskResourceEstimate {
         require(width > 0 && height > 0 && cohortSize > 0)
         val columns = ((width - TILE_SIZE).coerceAtLeast(0) + 95) / 96 + 1
         val rows = ((height - TILE_SIZE).coerceAtLeast(0) + 95) / 96 + 1
         val tiles = Math.multiplyExact(columns, rows)
-        val selected = if (runtimeMode == "auto") if (tiles <= 2) "tile_major" else "hybrid" else runtimeMode
-        val selectedK = if (selected == "hybrid") minOf(cohortSize, tiles) else 0
-        val liveTiles = when (selected) { "stage_major" -> tiles; "hybrid" -> selectedK; else -> 1 }
+        var selected = if (runtimeMode == "auto") when {
+            tiles <= 2 -> "tile_major"
+            tiles <= 25 -> "stage_major"
+            else -> "hybrid"
+        } else runtimeMode
+        var selectedK = if (selected == "hybrid") minOf(cohortSize, tiles) else 0
         val finalBytes = Math.multiplyExact(tiles.toLong(), 2_114_073L)
-        val peakBytes = Math.addExact(Math.multiplyExact(liveTiles.toLong(), 84_918_726L), finalBytes)
+        fun peakAndRequired(mode: String, k: Int): Pair<Long, Long> {
+            val liveTiles = when (mode) { "stage_major" -> tiles; "hybrid" -> k; else -> 1 }
+            val peak = Math.addExact(Math.multiplyExact(liveTiles.toLong(), 84_918_726L), finalBytes)
+            return peak to Math.addExact(peak, 1_073_741_824L)
+        }
+        var storage = peakAndRequired(selected, selectedK)
+        if (runtimeMode == "auto" && selected == "stage_major" && storage.second > availableDiskBytes) {
+            selected = "hybrid"
+            selectedK = minOf(cohortSize, tiles)
+            storage = peakAndRequired(selected, selectedK)
+        }
+        while (runtimeMode == "auto" && selected == "hybrid" && selectedK > 1 &&
+            storage.second > availableDiskBytes) {
+            selectedK--
+            storage = peakAndRequired(selected, selectedK)
+        }
+        val peakBytes = storage.first
         val cohorts = if (selected == "hybrid") (tiles + selectedK - 1) / selectedK else 1
         val runtime = if (selected == "tile_major") 15_190.4 * tiles else
             41_799.59302326 + 13_743.10465116 * tiles + 8_413.613 * (cohorts - 1)
         return TaskResourceEstimate(tiles, selected, selectedK, runtime, peakBytes, finalBytes,
-            Math.addExact(peakBytes, 1_073_741_824L), 1480.41,
+            storage.second, 1480.41,
             "HOST_MEASURED_256_512_1024_2026-08-09", false)
     }
 
