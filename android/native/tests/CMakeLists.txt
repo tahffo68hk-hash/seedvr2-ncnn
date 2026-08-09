@@ -16,12 +16,24 @@ target_include_directories(phase18d_tile_core_test PRIVATE ../include)
 target_compile_features(phase18d_tile_core_test PRIVATE cxx_std_17)
 add_executable(phase18d_stage_major_test
   phase18d_stage_major_test.cpp
-  ../src/phase18d_stage_major.cpp)
+  ../src/phase18d_stage_major.cpp ../src/phase18d_checkpoint_store.cpp ../src/phase18d_tile_core.cpp)
 target_include_directories(phase18d_stage_major_test PRIVATE ../include)
 target_compile_features(phase18d_stage_major_test PRIVATE cxx_std_17)
+add_executable(phase18d_runtime_strategy_test phase18d_runtime_strategy_test.cpp
+  ../src/phase18d_runtime_strategy.cpp ../src/phase18d_stage_major.cpp
+  ../src/phase18d_checkpoint_store.cpp ../src/phase18d_tile_core.cpp)
+target_include_directories(phase18d_runtime_strategy_test PRIVATE ../include)
+target_compile_features(phase18d_runtime_strategy_test PRIVATE cxx_std_17)
+add_executable(phase18d_checkpoint_store_test phase18d_checkpoint_store_test.cpp
+  ../src/phase18d_checkpoint_store.cpp ../src/phase18d_tile_core.cpp)
+target_include_directories(phase18d_checkpoint_store_test PRIVATE ../include)
+target_compile_features(phase18d_checkpoint_store_test PRIVATE cxx_std_17)
+add_executable(phase18d_seam_metrics_test phase18d_seam_metrics_test.cpp ../src/phase18d_seam_metrics.cpp)
+target_include_directories(phase18d_seam_metrics_test PRIVATE ../include)
+target_compile_features(phase18d_seam_metrics_test PRIVATE cxx_std_17)
 add_executable(phase18d_single_tile_contract_test
   phase18d_single_tile_contract_test.cpp
-  ../src/minimal_video_pipeline.cpp ../src/phase18d_stage_major.cpp ../src/model_manifest.cpp ../src/phase18c_contract.cpp
+  ../src/minimal_video_pipeline.cpp ../src/phase18d_stage_major.cpp ../src/phase18d_runtime_strategy.cpp ../src/phase18d_checkpoint_store.cpp ../src/phase18d_seam_metrics.cpp ../src/model_manifest.cpp ../src/phase18c_contract.cpp
   ../src/runtime_progress.cpp ../src/fast_convolution3d.cpp ../src/phase18d_tile_core.cpp
   ../../../tests/attention_dispatcher/artifact_registry.cpp
   ../../../tests/attention_dispatcher/model_cache.cpp
@@ -34,6 +46,9 @@ add_executable(phase18d_full_photo_contract_test
   phase18d_full_photo_contract_test.cpp
   ../src/minimal_video_pipeline.cpp
   ../src/phase18d_stage_major.cpp
+  ../src/phase18d_runtime_strategy.cpp
+  ../src/phase18d_checkpoint_store.cpp
+  ../src/phase18d_seam_metrics.cpp
   ../src/model_manifest.cpp
   ../src/phase18c_contract.cpp
   ../src/runtime_progress.cpp
@@ -76,6 +91,9 @@ add_executable(phase18d_full_photo_artifacts_test
   phase18d_full_photo_artifacts_test.cpp
   ../src/minimal_video_pipeline.cpp
   ../src/phase18d_stage_major.cpp
+  ../src/phase18d_runtime_strategy.cpp
+  ../src/phase18d_checkpoint_store.cpp
+  ../src/phase18d_seam_metrics.cpp
   ../src/model_manifest.cpp
   ../src/phase18c_contract.cpp
   ../src/runtime_progress.cpp
@@ -110,7 +128,7 @@ target_include_directories(phase18d_model_bundle_test PRIVATE ../include)
 target_compile_features(phase18d_model_bundle_test PRIVATE cxx_std_17)
 add_executable(phase18d_single_tile_runner
   phase18d_single_tile_runner.cpp
-  ../src/minimal_video_pipeline.cpp ../src/phase18d_stage_major.cpp ../src/model_manifest.cpp ../src/phase18c_contract.cpp
+  ../src/minimal_video_pipeline.cpp ../src/phase18d_stage_major.cpp ../src/phase18d_runtime_strategy.cpp ../src/phase18d_checkpoint_store.cpp ../src/phase18d_seam_metrics.cpp ../src/model_manifest.cpp ../src/phase18c_contract.cpp
   ../src/runtime_progress.cpp ../src/fast_convolution3d.cpp ../src/phase18d_tile_core.cpp
   ../../../tests/attention_dispatcher/artifact_registry.cpp
   ../../../tests/attention_dispatcher/model_cache.cpp
@@ -122,6 +140,9 @@ add_executable(phase18d_full_photo_runner
   phase18d_full_photo_runner.cpp
   ../src/minimal_video_pipeline.cpp
   ../src/phase18d_stage_major.cpp
+  ../src/phase18d_runtime_strategy.cpp
+  ../src/phase18d_checkpoint_store.cpp
+  ../src/phase18d_seam_metrics.cpp
   ../src/model_manifest.cpp
   ../src/phase18c_contract.cpp
   ../src/runtime_progress.cpp
@@ -144,6 +165,9 @@ add_executable(phase18d_real_hooks_test
   phase18d_real_hooks_test.cpp
   ../src/minimal_video_pipeline.cpp
   ../src/phase18d_stage_major.cpp
+  ../src/phase18d_runtime_strategy.cpp
+  ../src/phase18d_checkpoint_store.cpp
+  ../src/phase18d_seam_metrics.cpp
   ../src/model_manifest.cpp
   ../src/phase18c_contract.cpp
   ../src/runtime_progress.cpp

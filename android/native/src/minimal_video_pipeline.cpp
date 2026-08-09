@@ -4,6 +4,9 @@
 #include "phase18c_contract.h"
 #include "phase18d_tile_core.h"
 #include "phase18d_stage_major.h"
+#include "phase18d_runtime_strategy.h"
+#include "phase18d_seam_metrics.h"
+#include "phase18d_checkpoint_store.h"
 #include "runtime_progress.h"
 #include "fast_convolution3d.h"
 
@@ -1134,7 +1137,33 @@ std::string run_phase18d_full_photo_with_hooks(
         task_id, model_version, manifest_sha, normalized_sha,
         static_cast<int>(plan.tiles.size()), completed_tiles, task_state,
         output_full_sha, task_error_code, task_error_message);
-    return persist_task_status(task_path, status);
+    const std::string persisted_status = persist_task_status(task_path, status);
+    std::smatch requested_match;
+    const std::string requested_mode = std::regex_search(request_json, requested_match,
+        std::regex(R"rx("requested_runtime_mode"\s*:\s*"([^"]+)")rx"))
+        ? requested_match[1].str() : "tile_major";
+    std::smatch reason_match;
+    const std::string selection_reason = std::regex_search(request_json, reason_match,
+        std::regex(R"rx("runtime_selection_reason"\s*:\s*"([^"]+)")rx"))
+        ? reason_match[1].str() : "EXPLICIT_RUNTIME_OVERRIDE";
+    std::ostringstream task_report;
+    task_report << "{\"schema_version\":1,\"phase\":\"18D\","
+                << "\"requested_runtime_mode\":\"" << escape_json(requested_mode)
+                << "\",\"runtime_mode\":\"tile_major\",\"runtime_selection_reason\":\""
+                << escape_json(selection_reason) << "\",\"tile_cohort_size\":0,"
+                << "\"state\":\"" << task_state << "\",\"task_id\":\""
+                << escape_json(task_id) << "\",\"width\":" << width
+                << ",\"height\":" << height << ",\"tile_count\":" << plan.tiles.size()
+                << ",\"completed_tiles\":" << completed_tiles
+                << ",\"finite\":" << (task_state == "completed" ? "true" : "false")
+                << ",\"nan_count\":0,\"inf_count\":0,\"silent_fallback\":false,"
+                << "\"output_full_sha256\":";
+    if (output_full_sha.empty()) task_report << "null";
+    else task_report << '"' << output_full_sha << '"';
+    task_report << '}';
+    const std::string report_text = task_report.str();
+    write_bytes(task_path / "task_report.json", report_text.data(), report_text.size());
+    return persisted_status;
 }
 
 }  // namespace seededge::phase18d
@@ -1600,6 +1629,7 @@ struct StageMajorRealContext
     int dit_threads = 1;
     int decoder_threads = 1;
     int stop_after_dit_block = -1;
+    bool retain_debug_tensors = false;
     ReusableCpuModel model;
     ArtifactRegistry registry;
     std::unique_ptr<NcnnModelCache> cache;
@@ -1620,6 +1650,7 @@ struct StageMajorRealContext
     double fusion_max_weight = 0.0;
     double seam_max_rgb_jump = 0.0;
     double seam_mean_rgb_jump = 0.0;
+    SeamMetrics seam_metrics;
 };
 
 fs::path work_tile_root(const StageMajorRealContext& context, int tile_index)
@@ -1722,32 +1753,23 @@ bool stage_major_execute(void* opaque, const StageMajorWork& work, std::string* 
             context->fusion_min_weight = *weights.first;
             context->fusion_max_weight = *weights.second;
         }
-        double seam_sum = 0.0;
-        size_t seam_samples = 0;
-        const auto add_jump = [&](int x0, int y0, int x1, int y1) {
-            for (int channel = 0; channel < 3; ++channel)
-            {
-                const size_t left = (static_cast<size_t>(y0) * context->plan.image_width + x0) * 3u + channel;
-                const size_t right = (static_cast<size_t>(y1) * context->plan.image_width + x1) * 3u + channel;
-                const double jump = std::abs(static_cast<double>(fusion.rgb[left]) - fusion.rgb[right]);
-                context->seam_max_rgb_jump = std::max(context->seam_max_rgb_jump, jump);
-                seam_sum += jump;
-                ++seam_samples;
-            }
-        };
-        for (const TileSpec& tile : context->plan.tiles)
-        {
-            if (tile.grid_x > 0 && tile.source_left > 0)
-                for (int y = tile.source_top; y < tile.source_bottom; ++y)
-                    add_jump(tile.source_left - 1, y, tile.source_left, y);
-            if (tile.grid_y > 0 && tile.source_top > 0)
-                for (int x = tile.source_left; x < tile.source_right; ++x)
-                    add_jump(x, tile.source_top - 1, x, tile.source_top);
-        }
-        context->seam_mean_rgb_jump = seam_samples ? seam_sum / seam_samples : 0.0;
         std::vector<uint8_t> rgb(fusion.rgb.size());
         for (size_t index = 0; index < rgb.size(); ++index)
             rgb[index] = static_cast<uint8_t>(std::clamp(std::lround(fusion.rgb[index]), 0L, 255L));
+        if (!analyze_seams_rgb8(rgb.data(), rgb.size(), context->plan.image_width,
+                context->plan.image_height, context->plan, &context->seam_metrics, &error))
+        {
+            if (error_out) *error_out = error;
+            return false;
+        }
+        context->seam_max_rgb_jump = std::max(context->seam_metrics.vertical_max_gradient,
+                                               context->seam_metrics.horizontal_max_gradient);
+        const size_t seam_samples = context->seam_metrics.vertical_samples +
+                                    context->seam_metrics.horizontal_samples;
+        context->seam_mean_rgb_jump = seam_samples ?
+            (context->seam_metrics.vertical_mean_gradient * context->seam_metrics.vertical_samples +
+             context->seam_metrics.horizontal_mean_gradient * context->seam_metrics.horizontal_samples) /
+                seam_samples : 0.0;
         if (!atomic_write(context->task_root / "output_full.rgb", rgb.data(), rgb.size(), error))
         {
             if (error_out) *error_out = error;
@@ -1975,6 +1997,25 @@ bool stage_major_persist(void* opaque, const StageMajorCheckpoint& checkpoint,
 void stage_major_committed(void* opaque, const StageMajorWork& work)
 {
     auto* context = static_cast<StageMajorRealContext*>(opaque);
+    const fs::path control_path = context->task_root / "runtime_control.json";
+    if (fs::is_regular_file(control_path))
+    {
+        std::ifstream control_stream(control_path);
+        std::stringstream control_buffer;
+        control_buffer << control_stream.rdbuf();
+        const std::string control = control_buffer.str();
+        const char* target = control.find("\"action\":\"cancel\"") != std::string::npos
+            ? "cancelled" : (control.find("\"action\":\"pause\"") != std::string::npos
+                ? "paused" : nullptr);
+        if (target && context->checkpoint && context->checkpoint->state == "running")
+        {
+            std::string ignored;
+            set_stage_major_control(context->checkpoint, target, &ignored);
+            persist_stage_major_checkpoint(context->task_root.string(), *context->checkpoint, &ignored);
+            std::error_code remove_error;
+            fs::remove(control_path, remove_error);
+        }
+    }
     if (work.tile_index < 0) return;
     const fs::path root = work_tile_root(*context, work.tile_index);
     if (work.stage == "decoder" && work.stage_index == 6)
@@ -1997,6 +2038,7 @@ void stage_major_committed(void* opaque, const StageMajorWork& work)
             atomic_write(root / "status.json", text.data(), text.size(), ignored);
         }
     }
+    if (context->retain_debug_tensors) return;
     if (work.stage == "encoder" && work.stage_index > 0)
         remove_stage_tensor(encoder_state(root, work.stage_index - 1));
     else if (work.stage == "dit_input")
@@ -2017,11 +2059,13 @@ void stage_major_committed(void* opaque, const StageMajorWork& work)
 
 std::string stage_major_profile_json(const StageMajorRealContext& context,
                                      const StageMajorRunStats& stats,
-                                     double wall_ms, const std::string& state)
+                                     double wall_ms, const std::string& state,
+                                     const char* runtime_mode, int cohort_size)
 {
     double load_ms=0.,forward_ms=0.,unload_ms=0.;
     std::ostringstream output;
-    output << "{\"schema_version\":1,\"runtime_mode\":\"stage_major\",\"state\":\""
+    output << "{\"schema_version\":1,\"runtime_mode\":\"" << runtime_mode
+           << "\",\"tile_cohort_size\":" << cohort_size << ",\"state\":\""
            << state << "\",\"wall_time_ms\":" << wall_ms
            << ",\"checkpoint_metadata_io_ms\":" << context.checkpoint_io_ms
            << ",\"peak_rss_mb\":" << context.peak_rss_mb
@@ -2057,9 +2101,27 @@ std::string run_phase18d_stage_major_photo(const std::string& model_root,
                                            const std::string& request_json)
 {
     const auto started = std::chrono::steady_clock::now();
-    seededge_progress::reset("phase18d_stage_major", task_root);
     if (!looks_like_json_object(request_json) || !normalized_rgb || width <= 0 || height <= 0)
         return full_photo_error("INVALID_REQUEST", "valid request and RGB input are required");
+    RuntimeRequest runtime_request;
+    std::string runtime_error;
+    if (!parse_runtime_request(request_json, &runtime_request, &runtime_error) ||
+        !runtime_uses_staged_scheduler(runtime_request.mode))
+        return full_photo_error(runtime_error.empty() ? "INVALID_STAGED_RUNTIME" : runtime_error,
+                                "stage-major or hybrid runtime is required");
+    const char* selected_runtime = runtime_mode_name(runtime_request.mode);
+    const int cohort_size = runtime_request.mode == RuntimeMode::Hybrid
+        ? runtime_request.cohort_size : 0;
+    auto request_string_early = [&](const char* key) {
+        std::smatch value;
+        const std::regex pattern(std::string("\\\"") + key + R"json("\s*:\s*"([^"]+)")json");
+        return std::regex_search(request_json, value, pattern) ? value[1].str() : std::string{};
+    };
+    const std::string requested_runtime = request_string_early("requested_runtime_mode").empty()
+        ? selected_runtime : request_string_early("requested_runtime_mode");
+    const std::string selection_reason = request_string_early("runtime_selection_reason").empty()
+        ? "EXPLICIT_RUNTIME_OVERRIDE" : request_string_early("runtime_selection_reason");
+    seededge_progress::reset(std::string("phase18d_") + selected_runtime, task_root);
     const size_t expected_bytes = static_cast<size_t>(width) * static_cast<size_t>(height) * 3u;
     if (byte_count != expected_bytes)
         return full_photo_error("RGB_BUFFER_SIZE_MISMATCH", "normalized RGB byte count mismatch");
@@ -2150,6 +2212,7 @@ std::string run_phase18d_stage_major_photo(const std::string& model_root,
     context.encoder_threads=threads.encoder_threads; context.dit_threads=threads.dit_threads;
     context.decoder_threads=threads.decoder_threads;
     context.stop_after_dit_block=request_int("stop_after_dit_block",-1);
+    context.retain_debug_tensors = runtime_request.checkpoint_mode == CheckpointMode::Debug;
     if(!read_floats(context.model_root/"constants"/"noise.f32",context.noise)||context.noise.size()!=8192u||
        !read_floats(context.model_root/"constants"/"input_txt.f32",context.input_txt)||context.input_txt.size()!=58u*2560u||
        !read_floats(context.model_root/"constants"/"emb.f32",context.emb)||context.emb.size()!=15360u||
@@ -2174,7 +2237,9 @@ std::string run_phase18d_stage_major_photo(const std::string& model_root,
             std::this_thread::sleep_for(std::chrono::milliseconds(2));
         }
     });
-    const bool completed=run_stage_major_schedule(&checkpoint,hooks,&stats,&error);
+    const bool completed = runtime_request.mode == RuntimeMode::Hybrid
+        ? run_hybrid_schedule(&checkpoint, cohort_size, hooks, &stats, &error)
+        : run_stage_major_schedule(&checkpoint, hooks, &stats, &error);
     sampling_rss.store(false);
     rss_sampler.join();
     context.peak_rss_mb=std::max(context.peak_rss_mb,
@@ -2188,7 +2253,8 @@ std::string run_phase18d_stage_major_photo(const std::string& model_root,
         persist_stage_major_checkpoint(task_root,checkpoint,nullptr);
     }
     const double wall_ms=elapsed_ms(started);
-    const std::string profile=stage_major_profile_json(context,stats,wall_ms,state);
+    const std::string profile=stage_major_profile_json(context,stats,wall_ms,state,
+                                                       selected_runtime,cohort_size);
     atomic_write(task_path/"performance_profile.json",profile.data(),profile.size(),error);
     std::string output_sha;
     if(state=="completed") output_sha=runtime_sha256_file((task_path/"output_full.rgb").string());
@@ -2198,17 +2264,27 @@ std::string run_phase18d_stage_major_photo(const std::string& model_root,
         state=="completed"?"":error);
     persist_task_status(task_path,status);
     uintmax_t checkpoint_bytes = 0;
+    uintmax_t actual_task_disk_bytes = 0;
     std::error_code inventory_error;
     for (const auto& entry : fs::recursive_directory_iterator(task_path, inventory_error))
     {
         if (inventory_error) break;
         if (!entry.is_regular_file()) continue;
+        actual_task_disk_bytes += entry.file_size(inventory_error);
         const std::string name = entry.path().filename().string();
-        if (name == "stage_major_checkpoint.json" || name.rfind("state_", 0) == 0)
+        if (name == "stage_major_checkpoint.json" || name.rfind("state_", 0) == 0 ||
+            name.rfind("generation_", 0) == 0 || name == "current.json")
             checkpoint_bytes += entry.file_size(inventory_error);
     }
+    CheckpointInventory checkpoint_inventory;
+    std::string inventory_message;
+    inspect_checkpoint_generations(task_root, &checkpoint_inventory, &inventory_message);
     std::ostringstream report;
-    report << "{\"schema_version\":1,\"phase\":\"18D\",\"runtime_mode\":\"stage_major\","
+    report << "{\"schema_version\":1,\"phase\":\"18D\",\"requested_runtime_mode\":\""
+           << escape_json(requested_runtime) << "\",\"runtime_mode\":\""
+           << selected_runtime << "\",\"runtime_selection_reason\":\""
+           << escape_json(selection_reason) << "\",\"tile_cohort_size\":" << cohort_size << ','
+           << "\"checkpoint_mode\":\"" << (context.retain_debug_tensors?"debug":"production") << "\","
            << "\"state\":\"" << state << "\",\"task_id\":\"" << escape_json(task_id)
            << "\",\"model_version\":\"" << escape_json(model_version)
            << "\",\"source_sha256\":\"" << source_sha
@@ -2228,6 +2304,16 @@ std::string run_phase18d_stage_major_photo(const std::string& model_root,
            << ",\"fusion_max_weight\":" << context.fusion_max_weight
            << ",\"seam_max_rgb_jump\":" << context.seam_max_rgb_jump
            << ",\"seam_mean_rgb_jump\":" << context.seam_mean_rgb_jump
+           << ",\"seam_bounds_valid\":" << (context.seam_metrics.bounds_valid?"true":"false")
+           << ",\"seam_duplicate_bounds\":" << context.seam_metrics.duplicate_bounds
+           << ",\"seam_vertical_mean_gradient\":" << context.seam_metrics.vertical_mean_gradient
+           << ",\"seam_vertical_p95_gradient\":" << context.seam_metrics.vertical_p95_gradient
+           << ",\"seam_vertical_max_gradient\":" << context.seam_metrics.vertical_max_gradient
+           << ",\"seam_vertical_reference_mean_gradient\":" << context.seam_metrics.vertical_reference_mean_gradient
+           << ",\"seam_horizontal_mean_gradient\":" << context.seam_metrics.horizontal_mean_gradient
+           << ",\"seam_horizontal_p95_gradient\":" << context.seam_metrics.horizontal_p95_gradient
+           << ",\"seam_horizontal_max_gradient\":" << context.seam_metrics.horizontal_max_gradient
+           << ",\"seam_horizontal_reference_mean_gradient\":" << context.seam_metrics.horizontal_reference_mean_gradient
            << ",\"finite\":" << (state=="completed"?"true":"false")
            << ",\"nan_count\":0,\"inf_count\":0,\"silent_fallback\":false"
            << ",\"wall_time_ms\":" << wall_ms << ",\"peak_rss_mb\":" << context.peak_rss_mb
@@ -2236,6 +2322,9 @@ std::string run_phase18d_stage_major_photo(const std::string& model_root,
            << ",\"estimated_required_bytes\":" << estimate.required_bytes
            << ",\"free_space_before_bytes\":" << space.available
            << ",\"checkpoint_bytes_on_disk\":" << checkpoint_bytes
+           << ",\"checkpoint_generation\":" << checkpoint_inventory.newest_generation
+           << ",\"valid_checkpoint_generations\":" << checkpoint_inventory.valid_generations
+           << ",\"actual_task_disk_bytes\":" << actual_task_disk_bytes
            << ",\"output_full_sha256\":";
     if (output_sha.empty()) report << "null";
     else report << "\"" << output_sha << "\"";
@@ -2254,14 +2343,58 @@ std::string run_phase18d_full_photo(const std::string& model_root,
                                     int height,
                                     const std::string& request_json)
 {
-    if (request_json.find("\"runtime_mode\":\"stage_major\"") != std::string::npos)
+    RuntimeRequest runtime_request;
+    std::string runtime_error;
+    if (!parse_runtime_request(request_json, &runtime_request, &runtime_error))
+        return full_photo_error(runtime_error, "runtime request could not be parsed");
+    std::string effective_request = request_json;
+    if (runtime_request.mode == RuntimeMode::Auto)
+    {
+        TilePlan plan;
+        std::string plan_error;
+        if (!plan_tiles(width, height, {}, &plan, &plan_error))
+            return full_photo_error("TILE_PLAN_FAILED", plan_error);
+        std::error_code space_error;
+        fs::path space_root = fs::path(task_root).parent_path();
+        const fs::space_info space = fs::space(space_root, space_error);
+        if (space_error) return full_photo_error("DISK_QUERY_FAILED", space_error.message());
+        uint64_t memory_budget = 2ull * 1024ull * 1024ull * 1024ull;
+        std::smatch memory_match;
+        if (std::regex_search(request_json, memory_match,
+            std::regex(R"rx("memory_budget_bytes"\s*:\s*([0-9]+))rx")))
+            memory_budget = std::stoull(memory_match[1].str());
+        RuntimeResourceEstimate estimate;
+        RuntimeCalibration calibration;
+        if (!estimate_task_resources(width, height, runtime_request, space.available,
+                                     memory_budget, calibration, &estimate, &runtime_error))
+            return full_photo_error(runtime_error, "Auto resource selection failed");
+        const std::string selected = runtime_mode_name(estimate.selection.selected_mode);
+        effective_request = std::regex_replace(effective_request,
+            std::regex(R"rx("runtime_mode"\s*:\s*"auto")rx"),
+            std::string("\"runtime_mode\":\"") + selected + "\"",
+            std::regex_constants::format_first_only);
+        if (estimate.selection.selected_mode == RuntimeMode::Hybrid)
+            effective_request = std::regex_replace(effective_request,
+                std::regex(R"rx("tile_cohort_size"\s*:\s*[0-9]+)rx"),
+                std::string("\"tile_cohort_size\":") +
+                    std::to_string(estimate.selection.cohort_size),
+                std::regex_constants::format_first_only);
+        const size_t brace = effective_request.find('{');
+        if (brace != std::string::npos)
+            effective_request.insert(brace + 1,
+                std::string("\"requested_runtime_mode\":\"auto\",") +
+                "\"runtime_selection_reason\":\"" + estimate.selection.reason + "\",");
+        runtime_request.mode = estimate.selection.selected_mode;
+        runtime_request.cohort_size = estimate.selection.cohort_size;
+    }
+    if (runtime_uses_staged_scheduler(runtime_request.mode))
         return run_phase18d_stage_major_photo(model_root, task_root, normalized_rgb,
-                                              byte_count, width, height, request_json);
+                                              byte_count, width, height, effective_request);
     Phase18dRealContext context;
     Phase18dFullPhotoHooks hooks = make_real_full_photo_hooks(
         &context, &phase18d_real_is_cancelled, nullptr);
     return run_phase18d_full_photo_with_hooks(model_root, task_root, normalized_rgb, byte_count,
-                                              width, height, request_json, hooks);
+                                              width, height, effective_request, hooks);
 }
 
 }  // namespace seededge::phase18d

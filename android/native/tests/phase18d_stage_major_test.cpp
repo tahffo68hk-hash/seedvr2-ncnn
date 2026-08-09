@@ -137,9 +137,16 @@ void test_atomic_persistence_and_identity()
 
     std::ofstream(root / "stage_major_checkpoint.json", std::ios::trunc)
         << "{corrupt";
+    expect(p18d::load_stage_major_checkpoint(root.string(), &loaded, &error) &&
+               p18d::validate_stage_major_checkpoint(identity(4), loaded, &error),
+           "corrupt compatibility alias recovers from newest valid generation");
+    for (const auto& entry : fs::directory_iterator(root / "checkpoints"))
+        if (entry.path().filename().string().rfind("generation_", 0) == 0 &&
+            entry.path().extension() == ".json")
+            std::ofstream(entry.path(), std::ios::trunc) << "corrupt";
     expect(!p18d::load_stage_major_checkpoint(root.string(), &loaded, &error) &&
                error == "CHECKPOINT_CORRUPT",
-           "corrupted checkpoint is rejected");
+           "all corrupted checkpoint sources are rejected");
     fs::remove_all(root, ec);
 }
 

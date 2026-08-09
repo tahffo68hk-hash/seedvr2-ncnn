@@ -1,4 +1,6 @@
 #include "phase18d_stage_major.h"
+#include "phase18d_checkpoint_store.h"
+#include "phase18d_tile_core.h"
 
 #include <filesystem>
 #include <fstream>
@@ -288,6 +290,16 @@ bool persist_stage_major_checkpoint(const std::string& task_root,
     const fs::path target = root / "stage_major_checkpoint.json";
     const fs::path temporary = root / "stage_major_checkpoint.json.tmp";
     const std::string json = serialize(checkpoint);
+    const std::string identity_text = checkpoint.identity.task_id + "\n" +
+        checkpoint.identity.model_version + "\n" + checkpoint.identity.source_sha256 + "\n" +
+        checkpoint.identity.normalized_image_sha256 + "\n" +
+        std::to_string(checkpoint.identity.tile_count) + "\n" + checkpoint.identity.tile_plan_sha256;
+    const std::string identity_sha = sha256_hex(
+        reinterpret_cast<const uint8_t*>(identity_text.data()), identity_text.size());
+    uint64_t generation = 0;
+    if (!publish_checkpoint_generation(task_root, json, identity_sha,
+            CheckpointCrashPoint::None, &generation, error))
+        return false;
     {
         std::ofstream output(temporary, std::ios::binary | std::ios::trunc);
         output.write(json.data(), static_cast<std::streamsize>(json.size()));
@@ -309,12 +321,18 @@ bool load_stage_major_checkpoint(const std::string& task_root,
 {
     if (error) error->clear();
     if (!checkpoint) return fail(error, "CHECKPOINT_OUTPUT_NULL");
-    std::ifstream input(fs::path(task_root) / "stage_major_checkpoint.json", std::ios::binary);
-    std::ostringstream buffer;
-    buffer << input.rdbuf();
-    const std::string json = buffer.str();
+    LoadedCheckpoint generation;
+    std::string generation_error;
+    std::string json;
+    if (load_newest_valid_generation_any(task_root, &generation, &generation_error))
+        json = generation.payload;
+    else {
+        std::ifstream input(fs::path(task_root) / "stage_major_checkpoint.json", std::ios::binary);
+        std::ostringstream buffer; buffer << input.rdbuf(); json = buffer.str();
+        if (!input && json.empty()) return fail(error, "CHECKPOINT_CORRUPT");
+    }
     StageMajorCheckpoint loaded;
-    if (!input || json.empty() || json.front() != '{' || json.back() != '}' ||
+    if (json.empty() || json.front() != '{' || json.back() != '}' ||
         !int_field(json, "schema_version", &loaded.schema_version) ||
         !string_field(json, "task_id", &loaded.identity.task_id) ||
         !string_field(json, "model_version", &loaded.identity.model_version) ||
