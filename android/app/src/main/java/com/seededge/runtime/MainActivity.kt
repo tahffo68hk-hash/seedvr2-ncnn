@@ -206,12 +206,24 @@ class MainActivity : Activity() {
         stopPoller(); running.set(false); base()
         text("准备增强", true)
         image(bitmap)
+        val plan = PhotoTask.planTiles(bitmap.width, bitmap.height, availableDiskBytes = filesDir.usableSpace)
         text(buildString {
             append("任务：$taskId\n输入：${bitmap.width} × ${bitmap.height}\n")
             if (sourceBytes >= 0) append("源文件：$sourceBytes bytes\n")
             append("source_sha256=$sourceSha\nnormalized_image_sha256=$currentNormalizedSha")
         })
-        text("运行真实 SeedVR2 全图增强：按计划拆成多个 tile（每个 128×128 含 padding），逐 tile 完整推理后加权融合回原尺寸。\n引擎：ncnn CPU FP32 / OpenMP 多线程；不会静默回退。\n预计耗时随设备与图片尺寸而定：Encoder + 32 DiT Block + Decoder 全链路。")
+        text(buildString {
+            append("切分计划\n")
+            append("tile=${plan.tileSize}×${plan.tileSize}，overlap=${plan.overlap}，stride=${plan.stride}\n")
+            append("网格=${plan.columns}×${plan.rows}，总计=${plan.tileCount} tiles\n")
+            append("Auto → ${plan.selectedMode}")
+            if (plan.cohortSize > 0) append(" K=${plan.cohortSize}，cohorts=${plan.cohortCount}")
+            append("\n预计耗时≈${PhotoTask.formatDuration(plan.estimate.estimatedRuntimeMs)}")
+            append("，峰值空间≈${PhotoTask.formatBytes(plan.estimate.estimatedPeakBytes)}")
+            append("，需空闲≈${PhotoTask.formatBytes(plan.estimate.requiredFreeBytes)}")
+        })
+        text("tile map：# 已完成，> 当前，@ 待处理\n${PhotoTask.tileMapText(plan, 0, 0)}")
+        text("运行真实 SeedVR2 全图增强：按计划拆成多个 tile（每个 128×128 含 padding），逐 tile 完整推理后加权融合回原尺寸。\n引擎：ncnn CPU FP32 / OpenMP 多线程；不会静默回退。\n主进度条显示整张图总进度；详情行显示当前 tile 内部阶段。")
         button("开始增强") { startEnhancement() }
         button("返回") { showHome() }
     }
@@ -223,15 +235,12 @@ class MainActivity : Activity() {
         if (currentRgb == null || currentWidth <= 0 || currentHeight <= 0)
             return showError("任务无效", "RGB 输入或尺寸无效")
         val normalizedRgb = File(taskRoot, "normalized.rgb")
-        val columns = ((currentWidth - PhotoTask.TILE_SIZE).coerceAtLeast(0) + 95) / 96 + 1
-        val rows = ((currentHeight - PhotoTask.TILE_SIZE).coerceAtLeast(0) + 95) / 96 + 1
-        val tileCount = columns * rows
+        val plan = PhotoTask.planTiles(currentWidth, currentHeight, availableDiskBytes = filesDir.usableSpace)
+        val tileCount = plan.tileCount
         if (currentWidth.toLong() * currentHeight > PhotoTask.MAX_SOURCE_PIXELS ||
             tileCount > PhotoTask.MAX_TILE_COUNT)
             return showError("图片超过安全上限", "pixels=${currentWidth.toLong() * currentHeight}, tiles=$tileCount")
-        val estimate = PhotoTask.estimateTaskResources(currentWidth, currentHeight,
-            availableDiskBytes = filesDir.usableSpace)
-        val required = estimate.requiredFreeBytes
+        val required = plan.estimate.requiredFreeBytes
         if (!normalizedRgb.isFile || !PhotoTask.hasStorageCapacity(filesDir.usableSpace, required))
             return showError("存储空间不足", "required=$required available=${filesDir.usableSpace}")
 
@@ -239,11 +248,14 @@ class MainActivity : Activity() {
         text("正在增强 · 真实 SeedVR2", true)
         val state = text("准备中")
         val meter = ProgressBar(this, null, android.R.attr.progressBarStyleHorizontal).apply {
-            max = 40; page.addView(this)
+            max = 100; progress = 0; page.addView(this)
         }
-        val details = text("Auto → ${estimate.selectedMode}" +
-            (if (estimate.cohortSize > 0) " K=${estimate.cohortSize}" else "") +
-            " · $tileCount tiles · 设备阈值 READY_FOR_DEVICE")
+        val details = text(buildString {
+            append("总体 0% · tile 0/${plan.tileCount}")
+            if (plan.cohortSize > 0) append(" · cohort 0/${plan.cohortCount}")
+            append("\n${plan.summaryText()}")
+            append("\n# 已完成，> 当前，@ 待处理\n${PhotoTask.tileMapText(plan, 0, 0)}")
+        })
         button("暂停任务") {
             startService(PhotoEnhanceService.commandIntent(this, PhotoEnhanceService.ACTION_PAUSE))
             state.text = "已请求暂停（在下一个安全阶段边界生效）"
@@ -318,19 +330,27 @@ class MainActivity : Activity() {
             override fun run() {
                 if (!running.get()) return
                 try {
+                    val planned = if (currentWidth > 0 && currentHeight > 0)
+                        PhotoTask.planTiles(currentWidth, currentHeight, availableDiskBytes = filesDir.usableSpace)
+                    else null
+                    var tileCount = planned?.tileCount ?: 0
+                    var completed = 0
+                    var taskState = "running"
                     val taskStatus = File(taskRoot, "status.json")
                     if (taskStatus.isFile) {
                         val s = JSONObject(taskStatus.readText())
-                        val sState = s.optString("state", "running")
-                        val tileCount = s.optInt("tile_count", 0)
-                        val completed = s.optInt("completed_tiles", 0)
-                        state.text = when (sState) {
-                            "completed" -> "全图增强完成（$completed/$tileCount tile）"
-                            "cancelled" -> "已取消"
-                            "failed" -> "增强失败：${s.optString("error_message", "")}"
-                            else -> "增强中（$completed/$tileCount tile 完成）…"
+                        taskState = s.optString("state", "running")
+                        tileCount = s.optInt("tile_count", tileCount)
+                        completed = s.optInt("completed_tiles", 0)
+                        if (taskState == "completed") {
+                            meter.progress = 100
+                            state.text = "全图增强完成（$completed/$tileCount tile）"
+                            running.set(false)
+                            return
                         }
-                        if (sState == "completed" || sState == "cancelled" || sState == "failed") {
+                        if (taskState == "cancelled" || taskState == "failed") {
+                            state.text = if (taskState == "cancelled") "已取消"
+                            else "增强失败：${s.optString("error_message", "")}"
                             running.set(false)
                             return
                         }
@@ -347,6 +367,7 @@ class MainActivity : Activity() {
                         val block = p.optInt("dit_block_index", 0)
                         val decoderTotal = p.optInt("decoder_stage_total", 7)
                         val frame = p.optInt("frame_index", 0)
+                        val activeTile = p.optInt("tile_index", completed).coerceAtLeast(completed)
                         val stateValue = p.optString("state", "running")
                         val label = when (phase) {
                             "checking_model" -> "模型检查"
@@ -357,19 +378,32 @@ class MainActivity : Activity() {
                             "writing_frames" -> "写入帧 ${frame + 1} / 4"
                             else -> phase
                         }
-                        if (stateValue == "running") state.text = "当前阶段：$label"
-                        meter.progress = when (phase) {
-                            "checking_model" -> 1
-                            "verifying_manifest" -> 2
-                            "vae_encoder" -> 3
-                            "dit_streaming" -> 4 + block
-                            "vae_decoder" -> 36
-                            "writing_frames" -> 37 + frame
-                            else -> 40
+                        val percent = PhotoTask.overallProgressPercent(completed, tileCount, phase, block, frame)
+                        meter.progress = percent
+                        val cohortSize = planned?.cohortSize ?: p.optInt("tile_cohort_size", 0)
+                        val cohortCount = planned?.cohortCount ?: if (cohortSize > 0 && tileCount > 0)
+                            (tileCount + cohortSize - 1) / cohortSize else 1
+                        val cohortIndex = if (cohortSize > 0) activeTile / cohortSize + 1 else 1
+                        if (stateValue == "running" || taskState == "running") {
+                            state.text = "总体 $percent% · tile $completed/$tileCount · 当前：$label"
                         }
-                        details.text = "elapsed=${p.optLong("elapsed_ms", 0) / 1000}s\n" +
-                            "backend=${p.optString("backend", "cpu_fp32")}\n" +
-                            "message=${p.optString("message", "")}"
+                        details.text = buildString {
+                            append("elapsed=${p.optLong("elapsed_ms", 0) / 1000}s\n")
+                            append("backend=${p.optString("backend", "cpu_fp32")}\n")
+                            append("mode=${p.optString("runtime_mode", planned?.selectedMode ?: "auto")}")
+                            if (cohortSize > 0) append(" K=$cohortSize · cohort $cohortIndex/$cohortCount")
+                            append("\nblock=${if (phase == "dit_streaming") block + 1 else "-"} / 32")
+                            append(" · message=${p.optString("message", "")}")
+                            val mapPlan = planned
+                            if (mapPlan != null) {
+                                append("\n# 已完成，> 当前，@ 待处理\n")
+                                append(PhotoTask.tileMapText(mapPlan, completed, activeTile))
+                            }
+                        }
+                    } else if (tileCount > 0) {
+                        val percent = PhotoTask.overallProgressPercent(completed, tileCount, "checking_model")
+                        meter.progress = percent
+                        state.text = "总体 $percent% · tile $completed/$tileCount · 等待 native 进度"
                     }
                 } catch (_: Throwable) {}
                 handler.postDelayed(this, 400)

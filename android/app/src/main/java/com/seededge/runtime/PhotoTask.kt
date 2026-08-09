@@ -120,6 +120,95 @@ object PhotoTask {
         val deviceCalibrated: Boolean
     )
 
+    data class TilePlan(
+        val width: Int,
+        val height: Int,
+        val tileSize: Int,
+        val overlap: Int,
+        val stride: Int,
+        val columns: Int,
+        val rows: Int,
+        val tileCount: Int,
+        val selectedMode: String,
+        val cohortSize: Int,
+        val cohortCount: Int,
+        val estimate: TaskResourceEstimate
+    ) {
+        fun summaryText(): String {
+            val mode = selectedMode + if (cohortSize > 0) " K=$cohortSize" else ""
+            return "input=${width}x$height tile=${tileSize} overlap=$overlap stride=$stride " +
+                "grid=${columns}x$rows tiles=$tileCount mode=$mode cohorts=$cohortCount " +
+                "runtime~${formatDuration(estimate.estimatedRuntimeMs)} " +
+                "peak~${formatBytes(estimate.estimatedPeakBytes)} " +
+                "required~${formatBytes(estimate.requiredFreeBytes)}"
+        }
+    }
+
+    fun planTiles(width: Int, height: Int, runtimeMode: String = "auto",
+                  cohortSize: Int = 4,
+                  availableDiskBytes: Long = Long.MAX_VALUE): TilePlan {
+        require(width > 0 && height > 0)
+        val stride = TILE_SIZE - 32
+        val columns = ((width - TILE_SIZE).coerceAtLeast(0) + stride - 1) / stride + 1
+        val rows = ((height - TILE_SIZE).coerceAtLeast(0) + stride - 1) / stride + 1
+        val estimate = estimateTaskResources(width, height, runtimeMode, cohortSize, availableDiskBytes)
+        val selectedK = estimate.cohortSize
+        val cohorts = if (selectedK > 0) (estimate.tileCount + selectedK - 1) / selectedK else 1
+        return TilePlan(width, height, TILE_SIZE, 32, stride, columns, rows, estimate.tileCount,
+            estimate.selectedMode, selectedK, cohorts, estimate)
+    }
+
+    fun tileMapText(plan: TilePlan, completedTiles: Int, activeTileIndex: Int = completedTiles): String {
+        val completed = completedTiles.coerceIn(0, plan.tileCount)
+        val active = activeTileIndex.coerceIn(0, plan.tileCount - 1)
+        return buildString {
+            for (row in 0 until plan.rows) {
+                if (row > 0) append('\n')
+                for (column in 0 until plan.columns) {
+                    val index = row * plan.columns + column
+                    append(when {
+                        index < completed -> '#'
+                        index == active && completed < plan.tileCount -> '>'
+                        else -> '@'
+                    })
+                }
+            }
+        }
+    }
+
+    fun tileWorkUnits(phase: String, ditBlockIndex: Int = 0, frameIndex: Int = 0): Int = when (phase) {
+        "checking_model", "verifying_manifest" -> 0
+        "vae_encoder" -> 1
+        "dit_streaming" -> 2 + ditBlockIndex.coerceIn(0, 31)
+        "vae_decoder" -> 35
+        "writing_frames" -> 36 + frameIndex.coerceIn(0, 3)
+        FullPhotoStages.FUSING -> 39
+        FullPhotoStages.ENCODING_PNG, FullPhotoStages.SAVING, FullPhotoStages.COMPLETED -> 40
+        else -> 0
+    }
+
+    fun overallProgressPercent(completedTiles: Int, totalTiles: Int, phase: String,
+                               ditBlockIndex: Int = 0, frameIndex: Int = 0): Int {
+        if (totalTiles <= 0) return 0
+        val completed = completedTiles.coerceIn(0, totalTiles)
+        val tileUnits = 40
+        val doneUnits = completed * tileUnits +
+            if (completed < totalTiles) tileWorkUnits(phase, ditBlockIndex, frameIndex) else 0
+        val totalUnits = totalTiles * tileUnits
+        return (doneUnits * 100 / totalUnits).coerceIn(0, 100)
+    }
+
+    fun formatBytes(bytes: Long): String {
+        val gib = bytes.toDouble() / (1024.0 * 1024.0 * 1024.0)
+        val mib = bytes.toDouble() / (1024.0 * 1024.0)
+        return if (gib >= 1.0) "%.2f GiB".format(gib) else "%.1f MiB".format(mib)
+    }
+
+    fun formatDuration(ms: Double): String {
+        val seconds = (ms / 1000.0).coerceAtLeast(0.0)
+        return if (seconds >= 90.0) "%.1f min".format(seconds / 60.0) else "%.1f s".format(seconds)
+    }
+
     /** Host-calibrated planning only; Pad thresholds remain READY_FOR_DEVICE. */
     fun estimateTaskResources(width: Int, height: Int, runtimeMode: String = "auto",
                               cohortSize: Int = 4,

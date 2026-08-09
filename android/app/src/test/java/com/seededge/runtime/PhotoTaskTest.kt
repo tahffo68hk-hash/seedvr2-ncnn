@@ -87,6 +87,57 @@ class PhotoTaskTest {
     }
 
     @Test
+    fun tilePlanExplainsArbitrarySizeSplitAndCohorts() {
+        val plan = PhotoTask.planTiles(640, 427, "auto", 4)
+        assertEquals(640, plan.width)
+        assertEquals(427, plan.height)
+        assertEquals(128, plan.tileSize)
+        assertEquals(32, plan.overlap)
+        assertEquals(96, plan.stride)
+        assertEquals(7, plan.columns)
+        assertEquals(5, plan.rows)
+        assertEquals(35, plan.tileCount)
+        assertEquals("hybrid", plan.selectedMode)
+        assertEquals(4, plan.cohortSize)
+        assertEquals(9, plan.cohortCount)
+        assertTrue(plan.summaryText().contains("grid=7x5"))
+        assertTrue(plan.summaryText().contains("tiles=35"))
+        assertTrue(plan.summaryText().contains("mode=hybrid K=4"))
+    }
+
+    @Test
+    fun tileMapMarksCompletedCurrentAndPendingCells() {
+        val plan = PhotoTask.planTiles(256, 256, "auto", 4)
+        val map = PhotoTask.tileMapText(plan, completedTiles = 3, activeTileIndex = 4)
+        assertEquals("###\n@>@\n@@@", map)
+    }
+
+    @Test
+    fun overallProgressAdvancesAcrossWholePhotoNotJustCurrentTile() {
+        val early = PhotoTask.overallProgressPercent(
+            completedTiles = 5,
+            totalTiles = 35,
+            phase = "dit_streaming",
+            ditBlockIndex = 0
+        )
+        val later = PhotoTask.overallProgressPercent(
+            completedTiles = 5,
+            totalTiles = 35,
+            phase = "dit_streaming",
+            ditBlockIndex = 31
+        )
+        val nextTile = PhotoTask.overallProgressPercent(
+            completedTiles = 6,
+            totalTiles = 35,
+            phase = "vae_encoder"
+        )
+        assertTrue(early >= 14)
+        assertTrue(later > early)
+        assertTrue(nextTile > later)
+        assertTrue(nextTile < 25)
+    }
+
+    @Test
     fun autoUsesMeasuredMediumModeAndFallsBackWhenDiskCannotFitIt() {
         val latency = PhotoTask.estimateTaskResources(512, 512, "auto", 4)
         assertEquals(25, latency.tileCount)
