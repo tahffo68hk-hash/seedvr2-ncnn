@@ -26,6 +26,7 @@ struct StageMajorCheckpoint
     int completed_tiles = 0;
     std::vector<int> encoder_completed_stage_per_tile;
     std::vector<bool> encoder_completed_tiles;
+    std::vector<bool> dit_input_completed_tiles;
     std::vector<int> dit_completed_block_per_tile;
     std::vector<bool> scheduler_completed_tiles;
     std::vector<int> decoder_completed_stage_per_tile;
@@ -39,6 +40,31 @@ struct StageMajorWork
     int stage_index = -1;
     int block_index = -1;
     int tile_index = -1;
+};
+
+using StageMajorBeginStage = bool (*)(void*, const StageMajorWork&, std::string*);
+using StageMajorExecuteWork = bool (*)(void*, const StageMajorWork&, std::string*);
+using StageMajorEndStage = void (*)(void*, const StageMajorWork&);
+using StageMajorPersist = bool (*)(void*, const StageMajorCheckpoint&, std::string*);
+using StageMajorCheckpointCommitted = void (*)(void*, const StageMajorWork&);
+
+struct StageMajorExecutionHooks
+{
+    void* context = nullptr;
+    StageMajorBeginStage begin_stage = nullptr;
+    StageMajorExecuteWork execute_work = nullptr;
+    StageMajorEndStage end_stage = nullptr;
+    StageMajorPersist persist_checkpoint = nullptr;
+    StageMajorCheckpointCommitted checkpoint_committed = nullptr;
+};
+
+struct StageMajorRunStats
+{
+    int model_stage_loads = 0;
+    int model_stage_unloads = 0;
+    int work_items_completed = 0;
+    int checkpoint_persists = 0;
+    int peak_resident_model_stages = 0;
 };
 
 StageMajorCheckpoint make_stage_major_checkpoint(const StageMajorIdentity& identity);
@@ -66,5 +92,10 @@ bool mark_stage_major_work_complete(StageMajorCheckpoint* checkpoint,
 bool set_stage_major_control(StageMajorCheckpoint* checkpoint,
                              const std::string& state,
                              std::string* error);
+
+bool run_stage_major_schedule(StageMajorCheckpoint* checkpoint,
+                              const StageMajorExecutionHooks& hooks,
+                              StageMajorRunStats* stats,
+                              std::string* error);
 
 }  // namespace seededge::phase18d

@@ -102,6 +102,17 @@ std::string run_phase18d_full_photo(const std::string& model_root,
                                     int height,
                                     const std::string& request_json);
 
+// Production CPU FP32 stage-major entry.  It persists one verified state per
+// tile, loads each weighted model stage once across all pending tiles, and
+// resumes from stage_major_checkpoint.json when identity matches.
+std::string run_phase18d_stage_major_photo(const std::string& model_root,
+                                           const std::string& task_root,
+                                           const uint8_t* normalized_rgb,
+                                           size_t byte_count,
+                                           int width,
+                                           int height,
+                                           const std::string& request_json);
+
 // Context used by the real production hooks.  The manifest validator and tile
 // executor read/write manifest; jni_bridge is an opaque caller handle that
 // the Android JNI progress/cancellation callbacks use to reach their bridge.

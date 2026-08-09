@@ -39,6 +39,7 @@ bool valid_structure(const StageMajorCheckpoint& checkpoint)
     return checkpoint.schema_version == 1 && count > 0 &&
            checkpoint.encoder_completed_stage_per_tile.size() == count &&
            checkpoint.encoder_completed_tiles.size() == count &&
+           checkpoint.dit_input_completed_tiles.size() == count &&
            checkpoint.dit_completed_block_per_tile.size() == count &&
            checkpoint.scheduler_completed_tiles.size() == count &&
            checkpoint.decoder_completed_stage_per_tile.size() == count &&
@@ -104,6 +105,8 @@ std::string serialize(const StageMajorCheckpoint& checkpoint)
     append_array(output, checkpoint.encoder_completed_stage_per_tile);
     output << ",\"encoder_completed_tiles\":";
     append_bool_array(output, checkpoint.encoder_completed_tiles);
+    output << ",\"dit_input_completed_tiles\":";
+    append_bool_array(output, checkpoint.dit_input_completed_tiles);
     output << ",\"dit_completed_block_per_tile\":";
     append_array(output, checkpoint.dit_completed_block_per_tile);
     output << ",\"scheduler_completed_tiles\":";
@@ -201,6 +204,12 @@ bool expected_work(const StageMajorCheckpoint& checkpoint, StageMajorWork* work)
                 *work = {"encoder", stage, -1, tile};
                 return true;
             }
+    for (int tile = 0; tile < tiles; ++tile)
+        if (!checkpoint.dit_input_completed_tiles[tile])
+        {
+            *work = {"dit_input", -1, -1, tile};
+            return true;
+        }
     for (int block = 0; block < 32; ++block)
         for (int tile = 0; tile < tiles; ++tile)
             if (checkpoint.dit_completed_block_per_tile[tile] < block)
@@ -239,6 +248,7 @@ StageMajorCheckpoint make_stage_major_checkpoint(const StageMajorIdentity& ident
         ? static_cast<size_t>(identity.tile_count) : 0u;
     checkpoint.encoder_completed_stage_per_tile.assign(count, -1);
     checkpoint.encoder_completed_tiles.assign(count, false);
+    checkpoint.dit_input_completed_tiles.assign(count, false);
     checkpoint.dit_completed_block_per_tile.assign(count, -1);
     checkpoint.scheduler_completed_tiles.assign(count, false);
     checkpoint.decoder_completed_stage_per_tile.assign(count, -1);
@@ -319,6 +329,7 @@ bool load_stage_major_checkpoint(const std::string& task_root,
         !int_field(json, "completed_tiles", &loaded.completed_tiles) ||
         !int_array(json, "encoder_completed_stage_per_tile", &loaded.encoder_completed_stage_per_tile) ||
         !bool_array(json, "encoder_completed_tiles", &loaded.encoder_completed_tiles) ||
+        !bool_array(json, "dit_input_completed_tiles", &loaded.dit_input_completed_tiles) ||
         !int_array(json, "dit_completed_block_per_tile", &loaded.dit_completed_block_per_tile) ||
         !bool_array(json, "scheduler_completed_tiles", &loaded.scheduler_completed_tiles) ||
         !int_array(json, "decoder_completed_stage_per_tile", &loaded.decoder_completed_stage_per_tile) ||
@@ -363,6 +374,8 @@ bool mark_stage_major_work_complete(StageMajorCheckpoint* checkpoint,
         checkpoint->encoder_completed_stage_per_tile[work.tile_index] = work.stage_index;
         checkpoint->encoder_completed_tiles[work.tile_index] = work.stage_index == 6;
     }
+    else if (work.stage == "dit_input")
+        checkpoint->dit_input_completed_tiles[work.tile_index] = true;
     else if (work.stage == "dit")
         checkpoint->dit_completed_block_per_tile[work.tile_index] = work.block_index;
     else if (work.stage == "scheduler")
@@ -399,6 +412,64 @@ bool set_stage_major_control(StageMajorCheckpoint* checkpoint,
     if (!allowed) return fail(error, "INVALID_CONTROL_TRANSITION");
     checkpoint->state = state;
     return true;
+}
+
+bool run_stage_major_schedule(StageMajorCheckpoint* checkpoint,
+                              const StageMajorExecutionHooks& hooks,
+                              StageMajorRunStats* stats,
+                              std::string* error)
+{
+    if (error) error->clear();
+    if (!checkpoint || !stats || !valid_structure(*checkpoint))
+        return fail(error, "CHECKPOINT_CORRUPT");
+    if (!hooks.begin_stage || !hooks.execute_work || !hooks.end_stage ||
+        !hooks.persist_checkpoint)
+        return fail(error, "STAGE_MAJOR_HOOKS_REQUIRED");
+    *stats = StageMajorRunStats{};
+    StageMajorWork work;
+    std::string next_error;
+    while (next_stage_major_work(*checkpoint, &work, &next_error))
+    {
+        const StageMajorWork stage_key = work;
+        if (!hooks.begin_stage(hooks.context, stage_key, error)) return false;
+        const bool model_stage = stage_key.stage != "fusion";
+        if (model_stage)
+        {
+            ++stats->model_stage_loads;
+            stats->peak_resident_model_stages = 1;
+        }
+        bool stage_ok = true;
+        while (stage_ok)
+        {
+            if (!hooks.execute_work(hooks.context, work, error) ||
+                !mark_stage_major_work_complete(checkpoint, work, error) ||
+                !hooks.persist_checkpoint(hooks.context, *checkpoint, error))
+            {
+                stage_ok = false;
+                break;
+            }
+            ++stats->work_items_completed;
+            ++stats->checkpoint_persists;
+            if (hooks.checkpoint_committed)
+                hooks.checkpoint_committed(hooks.context, work);
+            StageMajorWork next;
+            next_error.clear();
+            if (!next_stage_major_work(*checkpoint, &next, &next_error)) break;
+            if (next.stage != stage_key.stage ||
+                next.stage_index != stage_key.stage_index ||
+                next.block_index != stage_key.block_index)
+                break;
+            work = next;
+        }
+        hooks.end_stage(hooks.context, stage_key);
+        if (model_stage) ++stats->model_stage_unloads;
+        if (!stage_ok) return false;
+        if (!next_error.empty() && checkpoint->state != "completed")
+            return fail(error, next_error);
+    }
+    if (!next_error.empty() && checkpoint->state != "completed")
+        return fail(error, next_error);
+    return checkpoint->state == "completed";
 }
 
 }  // namespace seededge::phase18d

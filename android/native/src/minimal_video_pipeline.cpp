@@ -3,6 +3,7 @@
 #include "model_manifest.h"
 #include "phase18c_contract.h"
 #include "phase18d_tile_core.h"
+#include "phase18d_stage_major.h"
 #include "runtime_progress.h"
 #include "fast_convolution3d.h"
 
@@ -24,6 +25,7 @@
 #include <iomanip>
 #include <limits>
 #include <map>
+#include <memory>
 #include <regex>
 #include <sstream>
 #include <string>
@@ -317,6 +319,81 @@ bool run_model(const fs::path& param, const fs::path& bin,
     if (conv3d_profile_ms) *conv3d_profile_ms = seededge::fast_convolution3d_profile_ms();
     return rc == 0;
 }
+
+class ReusableCpuModel
+{
+public:
+    bool load(const fs::path& param, const fs::path& bin, int threads,
+              OperationProfile* profile, std::string& error)
+    {
+        clear(nullptr);
+        profile_ = profile;
+        if (profile_)
+        {
+            profile_->rss_before_mb = current_rss_mb();
+            profile_->load_ms = profile_->forward_ms = profile_->unload_ms = 0.0;
+        }
+        force_fp32(net_.opt, false, threads);
+        net_.register_custom_layer(ncnn::layer_to_index("Convolution3D"),
+                                   seededge::fast_convolution3d_creator,
+                                   seededge::fast_convolution3d_destroyer);
+        const auto started = std::chrono::steady_clock::now();
+        int rc = net_.load_param(param.string().c_str());
+        if (!rc) rc = net_.load_model(bin.string().c_str());
+        if (profile_) profile_->load_ms = elapsed_ms(started);
+        loaded_ = rc == 0;
+        if (!loaded_) error = "model_load_failed:" + std::to_string(rc);
+        return loaded_;
+    }
+
+    bool forward(const std::vector<float>& input, const Shape& input_shape,
+                 const Shape& output_shape, std::vector<float>& output,
+                 std::string& error)
+    {
+        if (!loaded_) { error = "model_not_loaded"; return false; }
+        const auto started = std::chrono::steady_clock::now();
+        ncnn::Mat host(input_shape.w, input_shape.h, input_shape.t, input_shape.c,
+                       const_cast<float*>(input.data()));
+        ncnn::Extractor extractor = net_.create_extractor();
+        ncnn::Mat result;
+        int rc = extractor.input("in0", host);
+        if (!rc) rc = extractor.extract("out0", result);
+        if (!rc)
+        {
+            output = contiguous(result);
+            if (output.size() != count(output_shape))
+            {
+                error = "model_output_shape_mismatch";
+                rc = -1;
+            }
+        }
+        if (profile_) profile_->forward_ms += elapsed_ms(started);
+        if (rc && error.empty()) error = "model_execute_failed:" + std::to_string(rc);
+        return rc == 0;
+    }
+
+    void clear(OperationProfile* profile)
+    {
+        if (!loaded_ && !profile_) return;
+        const auto started = std::chrono::steady_clock::now();
+        net_.clear();
+        loaded_ = false;
+        OperationProfile* target = profile ? profile : profile_;
+        if (target)
+        {
+            target->unload_ms += elapsed_ms(started);
+            target->rss_after_mb = current_rss_mb();
+        }
+        profile_ = nullptr;
+    }
+
+    ~ReusableCpuModel() { clear(nullptr); }
+
+private:
+    ncnn::Net net_;
+    bool loaded_ = false;
+    OperationProfile* profile_ = nullptr;
+};
 
 bool run_vae_chain(const fs::path& root, const Stage* stages, size_t stage_count,
                    const std::vector<float>& input, bool first_stage_vulkan,
@@ -1382,6 +1459,714 @@ Phase18dFullPhotoHooks make_real_full_photo_hooks(
     return hooks;
 }
 
+namespace {
+
+bool atomic_replace_file(const fs::path& temporary, const fs::path& target)
+{
+#ifdef _WIN32
+    return MoveFileExW(temporary.wstring().c_str(), target.wstring().c_str(),
+                       MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH) != 0;
+#else
+    std::error_code error;
+    fs::rename(temporary, target, error);
+    return !error;
+#endif
+}
+
+bool atomic_write(const fs::path& target, const void* data, size_t size,
+                  std::string& error)
+{
+    const fs::path temporary = target.string() + ".tmp";
+    if (!write_bytes(temporary, data, size))
+    {
+        error = "atomic temporary write failed: " + temporary.string();
+        return false;
+    }
+    if (!atomic_replace_file(temporary, target))
+    {
+        std::error_code ignored;
+        fs::remove(temporary, ignored);
+        error = "atomic checkpoint replace failed: " + target.string();
+        return false;
+    }
+    return true;
+}
+
+std::string shape_json(const std::vector<int>& shape)
+{
+    std::ostringstream output;
+    output << '[';
+    for (size_t index = 0; index < shape.size(); ++index)
+    {
+        if (index) output << ',';
+        output << shape[index];
+    }
+    output << ']';
+    return output.str();
+}
+
+bool write_stage_tensor(const fs::path& path, const std::vector<float>& values,
+                        const std::string& label, const std::vector<int>& shape,
+                        std::string& error)
+{
+    if (!phase18c_all_finite(values))
+    {
+        error = "non-finite stage tensor: " + label;
+        return false;
+    }
+    if (!atomic_write(path, values.data(), values.size() * sizeof(float), error)) return false;
+    const std::string digest = sha256_hex(
+        reinterpret_cast<const uint8_t*>(values.data()), values.size() * sizeof(float));
+    std::ostringstream metadata;
+    metadata << "{\"schema_version\":1,\"label\":\"" << escape_json(label)
+             << "\",\"dtype\":\"fp32\",\"shape\":" << shape_json(shape)
+             << ",\"byte_count\":" << values.size() * sizeof(float)
+             << ",\"sha256\":\"" << digest << "\",\"finite\":true}";
+    const std::string text = metadata.str();
+    return atomic_write(path.string() + ".json", text.data(), text.size(), error);
+}
+
+bool read_stage_tensor(const fs::path& path, size_t expected_count,
+                       const std::string& label, const std::vector<int>& shape,
+                       std::vector<float>& values, std::string& error)
+{
+    std::ifstream metadata_file(path.string() + ".json", std::ios::binary);
+    std::ostringstream metadata_stream;
+    metadata_stream << metadata_file.rdbuf();
+    const std::string metadata = metadata_stream.str();
+    std::smatch match;
+    if (!metadata_file ||
+        metadata.find("\"label\":\"" + escape_json(label) + "\"") == std::string::npos ||
+        metadata.find("\"shape\":" + shape_json(shape)) == std::string::npos ||
+        metadata.find("\"finite\":true") == std::string::npos ||
+        !std::regex_search(metadata, match,
+                           std::regex(R"json("sha256"\s*:\s*"([0-9a-f]{64})")json")))
+    {
+        error = "stage tensor metadata invalid: " + label;
+        return false;
+    }
+    if (!read_floats(path, values) || values.size() != expected_count ||
+        !phase18c_all_finite(values))
+    {
+        error = "stage tensor data invalid: " + label;
+        return false;
+    }
+    const std::string digest = sha256_hex(
+        reinterpret_cast<const uint8_t*>(values.data()), values.size() * sizeof(float));
+    if (digest != match[1].str())
+    {
+        error = "stage tensor sha256 mismatch: " + label;
+        return false;
+    }
+    return true;
+}
+
+void remove_stage_tensor(const fs::path& path)
+{
+    std::error_code ignored;
+    fs::remove(path, ignored);
+    fs::remove(path.string() + ".json", ignored);
+}
+
+fs::path encoder_state(const fs::path& tile_root, int stage)
+{
+    return tile_root / ("state_encoder_" + std::to_string(stage) + ".f32");
+}
+
+fs::path dit_state(const fs::path& tile_root, int block, const char* branch)
+{
+    const std::string prefix = block < 0 ? "state_dit_input_" :
+        "state_dit_" + std::to_string(block) + "_";
+    return tile_root / (prefix + branch + ".f32");
+}
+
+fs::path scheduler_state(const fs::path& tile_root)
+{
+    return tile_root / "state_scheduler.f32";
+}
+
+fs::path decoder_state(const fs::path& tile_root, int stage)
+{
+    return tile_root / ("state_decoder_" + std::to_string(stage) + ".f32");
+}
+
+struct StageMajorRealContext
+{
+    fs::path model_root;
+    fs::path task_root;
+    TilePlan plan;
+    StageMajorCheckpoint* checkpoint = nullptr;
+    int encoder_threads = 1;
+    int dit_threads = 1;
+    int decoder_threads = 1;
+    int stop_after_dit_block = -1;
+    ReusableCpuModel model;
+    ArtifactRegistry registry;
+    std::unique_ptr<NcnnModelCache> cache;
+    std::unique_ptr<HybridDiTBlockRuntime> dit_runtime;
+    std::vector<float> noise;
+    std::vector<float> input_txt;
+    std::vector<float> emb;
+    std::vector<float> norm_weight;
+    std::vector<float> out_shift;
+    std::vector<float> out_scale;
+    OperationProfile active_profile;
+    std::vector<OperationProfile> profiles;
+    double checkpoint_io_ms = 0.0;
+    double peak_rss_mb = -1.0;
+};
+
+fs::path work_tile_root(const StageMajorRealContext& context, int tile_index)
+{
+    return context.task_root / "tiles" / tile_dir_name(tile_index);
+}
+
+bool stage_major_begin(void* opaque, const StageMajorWork& work, std::string* error_out)
+{
+    auto* context = static_cast<StageMajorRealContext*>(opaque);
+    std::string error;
+    context->active_profile = OperationProfile{};
+    context->active_profile.name = work.stage;
+    if (work.stage_index >= 0) context->active_profile.name += "_" + std::to_string(work.stage_index);
+    if (work.block_index >= 0) context->active_profile.name += "_" + std::to_string(work.block_index);
+    context->active_profile.rss_before_mb = current_rss_mb();
+    context->peak_rss_mb = std::max(context->peak_rss_mb, context->active_profile.rss_before_mb);
+    bool ok = true;
+    if (work.stage == "encoder")
+    {
+        const Stage& stage = kEncoder[work.stage_index];
+        const fs::path root = context->model_root / "vae" / "encoder" / stage.name;
+        ok = context->model.load(root / "model.ncnn.param", root / "model.ncnn.bin",
+                                 context->encoder_threads, &context->active_profile, error);
+    }
+    else if (work.stage == "dit_input")
+    {
+        const fs::path root = context->model_root / "dit" / "vid_in";
+        ok = context->model.load(root / "model.ncnn.param", root / "model.ncnn.bin",
+                                 context->dit_threads, &context->active_profile, error);
+    }
+    else if (work.stage == "dit")
+    {
+        const std::string variant = "real_seedvr2_block" + std::to_string(work.block_index) +
+                                    "_c2560_h20_hd128";
+        const CoreInfo* core = context->registry.lookup(CoreKey{4,3,3,1,1,1,variant});
+        if (!core) { error = "artifact lookup failed for " + variant; ok = false; }
+        if (ok)
+        {
+            context->cache = std::make_unique<NcnnModelCache>(context->dit_threads);
+            context->dit_runtime = std::make_unique<HybridDiTBlockRuntime>(*context->cache);
+            const auto started = std::chrono::steady_clock::now();
+            ok = context->dit_runtime->initialize(*core, error);
+            context->active_profile.load_ms = elapsed_ms(started);
+        }
+    }
+    else if (work.stage == "scheduler")
+    {
+        const fs::path root = context->model_root / "dit" / "vid_out";
+        ok = context->model.load(root / "model.ncnn.param", root / "model.ncnn.bin",
+                                 context->dit_threads, &context->active_profile, error);
+    }
+    else if (work.stage == "decoder")
+    {
+        const Stage& stage = kDecoder[work.stage_index];
+        const fs::path root = context->model_root / "vae" / "decoder" / stage.name;
+        ok = context->model.load(root / "model.ncnn.param", root / "model.ncnn.bin",
+                                 context->decoder_threads, &context->active_profile, error);
+    }
+    if (!ok && error_out) *error_out = error;
+    return ok;
+}
+
+bool stage_major_execute(void* opaque, const StageMajorWork& work, std::string* error_out)
+{
+    auto* context = static_cast<StageMajorRealContext*>(opaque);
+    std::string error;
+    if (seededge_progress::cancelled())
+    {
+        if (error_out) *error_out = "TASK_CANCELLED";
+        return false;
+    }
+    seededge_progress::update("stage_major", work.stage,
+        "executing stage-major tile boundary", work.tile_index,
+        context->plan.tiles.size(), 0, 0, work.block_index,
+        work.stage_index, 7, 0, 0);
+    if (work.stage == "fusion")
+    {
+        std::vector<std::vector<uint8_t>> outputs(context->plan.tiles.size());
+        for (size_t index = 0; index < outputs.size(); ++index)
+        {
+            if (!read_bytes(work_tile_root(*context, static_cast<int>(index)) / "output_valid.rgb",
+                            outputs[index]))
+            {
+                if (error_out) *error_out = "missing valid tile output before fusion";
+                return false;
+            }
+        }
+        FusionResult fusion;
+        if (!weighted_fuse_rgb8(context->plan, outputs, &fusion, &error))
+        {
+            if (error_out) *error_out = error;
+            return false;
+        }
+        std::vector<uint8_t> rgb(fusion.rgb.size());
+        for (size_t index = 0; index < rgb.size(); ++index)
+            rgb[index] = static_cast<uint8_t>(std::clamp(std::lround(fusion.rgb[index]), 0L, 255L));
+        if (!atomic_write(context->task_root / "output_full.rgb", rgb.data(), rgb.size(), error))
+        {
+            if (error_out) *error_out = error;
+            return false;
+        }
+        return true;
+    }
+
+    const fs::path tile_root = work_tile_root(*context, work.tile_index);
+    std::vector<float> input, output;
+    if (work.stage == "encoder")
+    {
+        const Stage& stage = kEncoder[work.stage_index];
+        if (work.stage_index == 0)
+        {
+            if (!read_floats(tile_root / "input_norm.f32", input) || input.size() != count(stage.in))
+                error = "encoder input missing or wrong shape";
+        }
+        else
+        {
+            const Stage& previous = kEncoder[work.stage_index - 1];
+            read_stage_tensor(encoder_state(tile_root, work.stage_index - 1), count(previous.out),
+                              "encoder_" + std::to_string(work.stage_index - 1),
+                              {previous.out.c, previous.out.t, previous.out.h, previous.out.w}, input, error);
+        }
+        if (!error.empty() || !context->model.forward(input, stage.in, stage.out, output, error) ||
+            !write_stage_tensor(encoder_state(tile_root, work.stage_index), output,
+                                "encoder_" + std::to_string(work.stage_index),
+                                {stage.out.c, stage.out.t, stage.out.h, stage.out.w}, error))
+        {
+            if (error_out) *error_out = error;
+            return false;
+        }
+    }
+    else if (work.stage == "dit_input")
+    {
+        const Stage& encoded_stage = kEncoder[6];
+        if (!read_stage_tensor(encoder_state(tile_root, 6), count(encoded_stage.out), "encoder_6",
+                               {32,2,16,16}, input, error))
+        {
+            if (error_out) *error_out = error;
+            return false;
+        }
+        std::vector<float> latent_thwc(2u * 16u * 16u * 16u);
+        for (int t=0;t<2;++t) for(int h=0;h<16;++h) for(int w=0;w<16;++w) for(int c=0;c<16;++c)
+            latent_thwc[(((t*16+h)*16+w)*16)+c] = input[(((c*2+t)*16+h)*16+w)] * 0.9152f;
+        std::vector<float> dit_input(2u * 16u * 16u * 33u);
+        for (size_t token=0; token<2u*16u*16u; ++token)
+        {
+            for(int c=0;c<16;++c) dit_input[token*33+c]=context->noise[token*16+c];
+            for(int c=0;c<16;++c) dit_input[token*33+16+c]=latent_thwc[token*16+c];
+            dit_input[token*33+32]=1.f;
+        }
+        const std::vector<float> patched = phase18c_patchify_thwc(dit_input,2,16,16,33,2,2);
+        if (!context->model.forward(patched, {1,1,128,132}, {1,1,128,2560}, output, error) ||
+            !write_stage_tensor(dit_state(tile_root, -1, "vid"), output, "dit_input_vid",
+                                {128,2560}, error) ||
+            !write_stage_tensor(dit_state(tile_root, -1, "txt"), context->input_txt, "dit_input_txt",
+                                {58,2560}, error))
+        {
+            if (error_out) *error_out = error;
+            return false;
+        }
+    }
+    else if (work.stage == "dit")
+    {
+        const int previous = work.block_index - 1;
+        std::vector<float> vid, txt;
+        const std::string vid_label = previous < 0 ? "dit_input_vid" : "dit_" + std::to_string(previous) + "_vid";
+        const std::string txt_label = previous < 0 ? "dit_input_txt" : "dit_" + std::to_string(previous) + "_txt";
+        if (!read_stage_tensor(dit_state(tile_root, previous, "vid"), 128u*2560u, vid_label,
+                               {128,2560}, vid, error) ||
+            !read_stage_tensor(dit_state(tile_root, previous, "txt"), 58u*2560u, txt_label,
+                               {58,2560}, txt, error))
+        {
+            if (error_out) *error_out = error;
+            return false;
+        }
+        DiTBlockInput block_input;
+        block_input.vid=ncnn::Mat(2560,128,vid.data());
+        block_input.txt=ncnn::Mat(2560,58,txt.data());
+        block_input.emb=ncnn::Mat(15360,1,context->emb.data());
+        block_input.vid_shapes={{2,8,8}};
+        block_input.txt_lengths={58};
+        DiTBlockOutput block_output;
+        DiTBlockRunStats stats;
+        const auto started = std::chrono::steady_clock::now();
+        if (!context->dit_runtime->run(block_input, block_output, nullptr, stats))
+        {
+            if (error_out) *error_out = stats.error_message;
+            return false;
+        }
+        context->active_profile.forward_ms += elapsed_ms(started);
+        const std::vector<float> next_vid = contiguous(block_output.vid);
+        const std::vector<float> next_txt = work.block_index < 31 ? contiguous(block_output.txt) : txt;
+        if (!write_stage_tensor(dit_state(tile_root, work.block_index, "vid"), next_vid,
+                                "dit_" + std::to_string(work.block_index) + "_vid", {128,2560}, error) ||
+            (work.block_index < 31 &&
+             !write_stage_tensor(dit_state(tile_root, work.block_index, "txt"), next_txt,
+                                 "dit_" + std::to_string(work.block_index) + "_txt", {58,2560}, error)))
+        {
+            if (error_out) *error_out = error;
+            return false;
+        }
+    }
+    else if (work.stage == "scheduler")
+    {
+        std::vector<float> vid;
+        if (!read_stage_tensor(dit_state(tile_root, 31, "vid"), 128u*2560u, "dit_31_vid",
+                               {128,2560}, vid, error))
+        {
+            if (error_out) *error_out = error;
+            return false;
+        }
+        for(int row=0;row<128;++row)
+        {
+            double square=0.; for(int c=0;c<2560;++c){const float v=vid[row*2560+c];square+=double(v)*v;}
+            const float inv=1.f/std::sqrt(float(square/2560.)+1e-5f);
+            for(int c=0;c<2560;++c)
+            {
+                const float normalized=vid[row*2560+c]*inv*context->norm_weight[c];
+                vid[row*2560+c]=normalized*(context->emb[c*3+1]+context->out_scale[c])+
+                                 (context->emb[c*3]+context->out_shift[c]);
+            }
+        }
+        std::vector<float> prediction_patched;
+        if (!context->model.forward(vid, {1,1,128,2560}, {1,1,128,64}, prediction_patched, error))
+        {
+            if (error_out) *error_out = error;
+            return false;
+        }
+        const std::vector<float> prediction = phase18c_unpatchify_thwc(prediction_patched,2,8,8,16,2,2);
+        const std::vector<float> final_latent = phase18c_euler_endpoint(context->noise,prediction);
+        output.resize(16u*2u*16u*16u);
+        for(int t=0;t<2;++t)for(int h=0;h<16;++h)for(int w=0;w<16;++w)for(int c=0;c<16;++c)
+            output[(((c*2+t)*16+h)*16+w)] = final_latent[(((t*16+h)*16+w)*16)+c]/0.9152f;
+        if (!write_stage_tensor(scheduler_state(tile_root), output, "scheduler", {16,2,16,16}, error))
+        {
+            if (error_out) *error_out = error;
+            return false;
+        }
+    }
+    else if (work.stage == "decoder")
+    {
+        const Stage& stage = kDecoder[work.stage_index];
+        if (work.stage_index == 0)
+            read_stage_tensor(scheduler_state(tile_root), count(stage.in), "scheduler", {16,2,16,16}, input, error);
+        else
+        {
+            const Stage& previous = kDecoder[work.stage_index - 1];
+            read_stage_tensor(decoder_state(tile_root, work.stage_index - 1), count(previous.out),
+                              "decoder_" + std::to_string(work.stage_index - 1),
+                              {previous.out.c,previous.out.t,previous.out.h,previous.out.w}, input, error);
+        }
+        if (!error.empty() || !context->model.forward(input, stage.in, stage.out, output, error) ||
+            !write_stage_tensor(decoder_state(tile_root, work.stage_index), output,
+                                "decoder_" + std::to_string(work.stage_index),
+                                {stage.out.c,stage.out.t,stage.out.h,stage.out.w}, error))
+        {
+            if (error_out) *error_out = error;
+            return false;
+        }
+        if (work.stage_index == 6)
+        {
+            const TileSpec& tile = context->plan.tiles.at(static_cast<size_t>(work.tile_index));
+            std::vector<uint8_t> frame(128u*128u*3u);
+            for(int h=0;h<128;++h)for(int w=0;w<128;++w)for(int c=0;c<3;++c)
+            {
+                const float value=output[(((c*5)*128+h)*128+w)];
+                frame[(h*128+w)*3+c]=static_cast<uint8_t>(std::clamp(std::lround((value*.5f+.5f)*255.f),0l,255l));
+            }
+            std::vector<uint8_t> valid(static_cast<size_t>(tile.valid_width)*tile.valid_height*3u);
+            for(int y=0;y<tile.valid_height;++y)for(int x=0;x<tile.valid_width;++x)
+            {
+                const size_t source=(static_cast<size_t>(y+tile.padding_top)*128u+x+tile.padding_left)*3u;
+                const size_t target=(static_cast<size_t>(y)*tile.valid_width+x)*3u;
+                std::copy_n(frame.data()+source,3,valid.data()+target);
+            }
+            if (!atomic_write(tile_root/"frame_000.rgb",frame.data(),frame.size(),error) ||
+                !atomic_write(tile_root/"output_valid.rgb",valid.data(),valid.size(),error))
+            {
+                if (error_out) *error_out = error;
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+void stage_major_end(void* opaque, const StageMajorWork& work)
+{
+    auto* context = static_cast<StageMajorRealContext*>(opaque);
+    const auto started = std::chrono::steady_clock::now();
+    if (work.stage == "dit")
+    {
+        context->dit_runtime.reset();
+        if (context->cache) context->cache->clear();
+        context->cache.reset();
+        context->active_profile.unload_ms += elapsed_ms(started);
+        context->active_profile.rss_after_mb = current_rss_mb();
+    }
+    else if (work.stage != "fusion") context->model.clear(&context->active_profile);
+    else context->active_profile.rss_after_mb = current_rss_mb();
+    context->peak_rss_mb = std::max(context->peak_rss_mb, context->active_profile.rss_after_mb);
+    context->profiles.push_back(context->active_profile);
+    if (work.stage == "dit" && work.block_index == context->stop_after_dit_block &&
+        context->checkpoint && context->checkpoint->state == "running")
+    {
+        std::string ignored;
+        set_stage_major_control(context->checkpoint, "paused", &ignored);
+        persist_stage_major_checkpoint(context->task_root.string(), *context->checkpoint, &ignored);
+    }
+}
+
+bool stage_major_persist(void* opaque, const StageMajorCheckpoint& checkpoint,
+                         std::string* error)
+{
+    auto* context = static_cast<StageMajorRealContext*>(opaque);
+    const auto started = std::chrono::steady_clock::now();
+    const bool ok = persist_stage_major_checkpoint(context->task_root.string(), checkpoint, error);
+    context->checkpoint_io_ms += elapsed_ms(started);
+    return ok;
+}
+
+void stage_major_committed(void* opaque, const StageMajorWork& work)
+{
+    auto* context = static_cast<StageMajorRealContext*>(opaque);
+    if (work.tile_index < 0) return;
+    const fs::path root = work_tile_root(*context, work.tile_index);
+    if (work.stage == "decoder" && work.stage_index == 6)
+    {
+        std::vector<uint8_t> output;
+        if (read_bytes(root / "output_valid.rgb", output))
+        {
+            const TileSpec& tile = context->plan.tiles.at(static_cast<size_t>(work.tile_index));
+            const std::string digest = sha256_hex(output.data(), output.size());
+            std::ostringstream status;
+            status << "{\"schema_version\":1,\"state\":\"completed\",\"tile_index\":"
+                   << work.tile_index << ",\"tile_bounds\":{\"left\":" << tile.source_left
+                   << ",\"top\":" << tile.source_top << ",\"right\":" << tile.source_right
+                   << ",\"bottom\":" << tile.source_bottom << "},\"encoder_completed\":true,"
+                   << "\"dit_block_completed\":32,\"scheduler_completed\":true,"
+                   << "\"decoder_completed\":true,\"finite\":true,\"nan_count\":0,"
+                   << "\"inf_count\":0,\"output_valid_sha256\":\"" << digest << "\"}";
+            const std::string text = status.str();
+            std::string ignored;
+            atomic_write(root / "status.json", text.data(), text.size(), ignored);
+        }
+    }
+    if (work.stage == "encoder" && work.stage_index > 0)
+        remove_stage_tensor(encoder_state(root, work.stage_index - 1));
+    else if (work.stage == "dit_input")
+        remove_stage_tensor(encoder_state(root, 6));
+    else if (work.stage == "dit")
+    {
+        const int previous = work.block_index - 1;
+        remove_stage_tensor(dit_state(root, previous, "vid"));
+        remove_stage_tensor(dit_state(root, previous, "txt"));
+    }
+    else if (work.stage == "scheduler")
+        remove_stage_tensor(dit_state(root, 31, "vid"));
+    else if (work.stage == "decoder" && work.stage_index == 0)
+        remove_stage_tensor(scheduler_state(root));
+    else if (work.stage == "decoder" && work.stage_index > 0)
+        remove_stage_tensor(decoder_state(root, work.stage_index - 1));
+}
+
+std::string stage_major_profile_json(const StageMajorRealContext& context,
+                                     const StageMajorRunStats& stats,
+                                     double wall_ms, const std::string& state)
+{
+    double load_ms=0.,forward_ms=0.,unload_ms=0.;
+    std::ostringstream output;
+    output << "{\"schema_version\":1,\"runtime_mode\":\"stage_major\",\"state\":\""
+           << state << "\",\"wall_time_ms\":" << wall_ms
+           << ",\"checkpoint_metadata_io_ms\":" << context.checkpoint_io_ms
+           << ",\"peak_rss_mb\":" << context.peak_rss_mb
+           << ",\"model_stage_loads\":" << stats.model_stage_loads
+           << ",\"model_stage_unloads\":" << stats.model_stage_unloads
+           << ",\"peak_resident_model_stages\":" << stats.peak_resident_model_stages
+           << ",\"work_items_completed\":" << stats.work_items_completed
+           << ",\"stages\":[";
+    for(size_t index=0;index<context.profiles.size();++index)
+    {
+        const OperationProfile& profile=context.profiles[index];
+        load_ms+=profile.load_ms; forward_ms+=profile.forward_ms; unload_ms+=profile.unload_ms;
+        if(index) output << ',';
+        append_operation_profile(output,profile);
+    }
+    const double state_io_and_other_ms = std::max(0.0, wall_ms-load_ms-forward_ms-unload_ms);
+    output << "],\"model_load_ms\":" << load_ms << ",\"forward_ms\":" << forward_ms
+           << ",\"unload_ms\":" << unload_ms
+           << ",\"state_io_and_other_ms\":" << state_io_and_other_ms
+           << ",\"finite\":" << (state=="completed"?"true":"false")
+           << ",\"nan_count\":0,\"inf_count\":0,\"silent_fallback\":false}";
+    return output.str();
+}
+
+}  // namespace
+
+std::string run_phase18d_stage_major_photo(const std::string& model_root,
+                                           const std::string& task_root,
+                                           const uint8_t* normalized_rgb,
+                                           size_t byte_count,
+                                           int width,
+                                           int height,
+                                           const std::string& request_json)
+{
+    const auto started = std::chrono::steady_clock::now();
+    seededge_progress::reset("phase18d_stage_major", task_root);
+    if (!looks_like_json_object(request_json) || !normalized_rgb || width <= 0 || height <= 0)
+        return full_photo_error("INVALID_REQUEST", "valid request and RGB input are required");
+    const size_t expected_bytes = static_cast<size_t>(width) * static_cast<size_t>(height) * 3u;
+    if (byte_count != expected_bytes)
+        return full_photo_error("RGB_BUFFER_SIZE_MISMATCH", "normalized RGB byte count mismatch");
+    std::smatch match;
+    auto request_string = [&](const char* key) {
+        std::smatch value;
+        const std::regex pattern(std::string("\\\"") + key + R"json("\s*:\s*"([^"]+)")json");
+        return std::regex_search(request_json, value, pattern) ? value[1].str() : std::string{};
+    };
+    auto request_int = [&](const char* key, int fallback) {
+        std::smatch value;
+        const std::regex pattern(std::string("\\\"") + key + "\\\"\\s*:\\s*(-?[0-9]+)");
+        return std::regex_search(request_json, value, pattern) ? std::stoi(value[1].str()) : fallback;
+    };
+    const std::string task_id=request_string("task_id");
+    const std::string model_version=request_string("model_version");
+    const std::string source_sha=request_string("source_image_sha256");
+    if(task_id.empty()||model_version.empty()||source_sha.size()!=64)
+        return full_photo_error("TASK_IDENTITY_REQUIRED","task/model/source identity is required");
+    const fs::path task_path(task_root);
+    if(task_path.filename()!=task_id||task_path.parent_path().filename()!="tasks")
+        return full_photo_error("TASK_ROOT_MISMATCH","task_root must be files/tasks/<task_id>");
+    std::error_code directory_error;
+    fs::create_directories(task_path/"tiles",directory_error);
+    if(directory_error) return full_photo_error("TASK_DIRECTORY_CREATE_FAILED",directory_error.message());
+    const std::string normalized_sha=sha256_hex(normalized_rgb,byte_count);
+    const std::string declared_normalized=request_string("normalized_image_sha256");
+    if(!declared_normalized.empty()&&declared_normalized!=normalized_sha)
+        return full_photo_error("NORMALIZED_SHA_MISMATCH","normalized RGB SHA-256 does not match request");
+    const std::string manifest=validate_model_manifest(model_root);
+    if(manifest.find("\"valid\":true")==std::string::npos)
+        return full_photo_error("MODEL_MANIFEST_FAILED",manifest);
+    std::vector<uint8_t> manifest_bytes;
+    read_bytes(fs::path(model_root)/"manifest.json",manifest_bytes);
+    const std::string manifest_sha=sha256_hex(manifest_bytes.data(),manifest_bytes.size());
+    TilePlan plan;
+    std::string error;
+    if(!plan_tiles(width,height,{},&plan,&error)) return full_photo_error("TILE_PLAN_FAILED",error);
+    PhotoRuntimeLimits limits;
+    const int max_pixels=request_int("max_pixels",static_cast<int>(limits.max_pixels));
+    const int max_tiles=request_int("max_tiles",static_cast<int>(limits.max_tiles));
+    if(max_pixels<=0||max_tiles<=0) return full_photo_error("INVALID_RUNTIME_LIMIT","max_pixels/max_tiles must be positive");
+    limits.max_pixels=static_cast<size_t>(max_pixels); limits.max_tiles=static_cast<size_t>(max_tiles);
+    if(!validate_photo_limits(width,height,plan,limits,&error)) return full_photo_error(error,error);
+    PhotoStorageEstimate estimate;
+    if(!estimate_photo_storage(width,height,plan.tiles.size(),&estimate,&error))
+        return full_photo_error("STORAGE_ESTIMATE_FAILED",error);
+    const fs::space_info space=fs::space(task_path,directory_error);
+    if(directory_error||!has_required_free_space(estimate.required_bytes,space.available,&error))
+        return full_photo_error("INSUFFICIENT_FREE_SPACE",error.empty()?directory_error.message():error);
+    StageMajorIdentity identity;
+    identity.task_id=task_id; identity.model_version=model_version; identity.source_sha256=source_sha;
+    identity.normalized_image_sha256=normalized_sha; identity.tile_count=static_cast<int>(plan.tiles.size());
+    identity.tile_plan_sha256=tile_plan_sha256(plan);
+    StageMajorCheckpoint checkpoint;
+    const fs::path checkpoint_path=task_path/"stage_major_checkpoint.json";
+    if(fs::is_regular_file(checkpoint_path))
+    {
+        if(!load_stage_major_checkpoint(task_root,&checkpoint,&error)||
+           !validate_stage_major_checkpoint(identity,checkpoint,&error))
+            return full_photo_error(error,error);
+        if(checkpoint.state=="paused"&&request_json.find("\"resume\":true")!=std::string::npos)
+            set_stage_major_control(&checkpoint,"running",&error);
+    }
+    else
+    {
+        for(const TileSpec& tile:plan.tiles)
+        {
+            const fs::path tile_root=task_path/"tiles"/tile_dir_name(tile.tile_index);
+            fs::create_directories(tile_root,directory_error);
+            PaddedTile padded;
+            if(directory_error||!extract_and_pad_rgb8(normalized_rgb,byte_count,width,height,tile,&padded,&error))
+                return full_photo_error("TILE_PREPARE_FAILED",error.empty()?directory_error.message():error);
+            const std::vector<float> model_input=make_five_frame_model_input(padded);
+            if(!atomic_write(tile_root/"tile_input.rgb",padded.rgb.data(),padded.rgb.size(),error)||
+               !atomic_write(tile_root/"input_norm.f32",model_input.data(),model_input.size()*sizeof(float),error))
+                return full_photo_error("TILE_INPUT_WRITE_FAILED",error);
+        }
+        checkpoint=make_stage_major_checkpoint(identity);
+        if(!persist_stage_major_checkpoint(task_root,checkpoint,&error))
+            return full_photo_error("CHECKPOINT_WRITE_FAILED",error);
+        std::ostringstream plan_json;
+        plan_json << "{\"schema_version\":1,\"width\":" << width << ",\"height\":" << height
+                  << ",\"tile_count\":" << plan.tiles.size() << ",\"tile_plan_sha256\":\""
+                  << identity.tile_plan_sha256 << "\"}";
+        const std::string plan_text=plan_json.str();
+        atomic_write(task_path/"tile_plan.json",plan_text.data(),plan_text.size(),error);
+    }
+    StageMajorRealContext context;
+    context.model_root=model_root; context.task_root=task_root; context.plan=plan; context.checkpoint=&checkpoint;
+    Phase18dRealContext threads; configure_real_context_threads(&threads,request_json);
+    context.encoder_threads=threads.encoder_threads; context.dit_threads=threads.dit_threads;
+    context.decoder_threads=threads.decoder_threads;
+    context.stop_after_dit_block=request_int("stop_after_dit_block",-1);
+    if(!read_floats(context.model_root/"constants"/"noise.f32",context.noise)||context.noise.size()!=8192u||
+       !read_floats(context.model_root/"constants"/"input_txt.f32",context.input_txt)||context.input_txt.size()!=58u*2560u||
+       !read_floats(context.model_root/"constants"/"emb.f32",context.emb)||context.emb.size()!=15360u||
+       !read_floats(context.model_root/"dit"/"post"/"norm_weight.f32",context.norm_weight)||context.norm_weight.size()!=2560u||
+       !read_floats(context.model_root/"dit"/"post"/"out_shift.f32",context.out_shift)||context.out_shift.size()!=2560u||
+       !read_floats(context.model_root/"dit"/"post"/"out_scale.f32",context.out_scale)||context.out_scale.size()!=2560u||
+       !context.registry.scan(context.model_root/"dit"/"blocks",error))
+        return full_photo_error("STAGE_MAJOR_INITIALIZE_FAILED",error.empty()?"constants missing":error);
+    StageMajorExecutionHooks hooks;
+    hooks.context=&context; hooks.begin_stage=&stage_major_begin; hooks.execute_work=&stage_major_execute;
+    hooks.end_stage=&stage_major_end; hooks.persist_checkpoint=&stage_major_persist;
+    hooks.checkpoint_committed=&stage_major_committed;
+    StageMajorRunStats stats;
+    std::atomic<bool> sampling_rss(true);
+    std::atomic<long long> sampled_peak_kib(0);
+    std::thread rss_sampler([&] {
+        while (sampling_rss.load())
+        {
+            const long long kib = static_cast<long long>(current_rss_mb() * 1024.0);
+            long long observed = sampled_peak_kib.load();
+            while (kib > observed && !sampled_peak_kib.compare_exchange_weak(observed, kib)) {}
+            std::this_thread::sleep_for(std::chrono::milliseconds(2));
+        }
+    });
+    const bool completed=run_stage_major_schedule(&checkpoint,hooks,&stats,&error);
+    sampling_rss.store(false);
+    rss_sampler.join();
+    context.peak_rss_mb=std::max(context.peak_rss_mb,
+                                 static_cast<double>(sampled_peak_kib.load())/1024.0);
+    std::string state=checkpoint.state;
+    if(!completed&&state=="running")
+    {
+        if(seededge_progress::cancelled()) { set_stage_major_control(&checkpoint,"cancelled",nullptr); state="cancelled"; }
+        else state="failed";
+        persist_stage_major_checkpoint(task_root,checkpoint,nullptr);
+    }
+    const double wall_ms=elapsed_ms(started);
+    const std::string profile=stage_major_profile_json(context,stats,wall_ms,state);
+    atomic_write(task_path/"performance_profile.json",profile.data(),profile.size(),error);
+    std::string output_sha;
+    if(state=="completed") output_sha=runtime_sha256_file((task_path/"output_full.rgb").string());
+    const std::string status=full_photo_task_status(task_id,model_version,manifest_sha,normalized_sha,
+        static_cast<int>(plan.tiles.size()),checkpoint.completed_tiles,state,output_sha,
+        state=="completed"?"":(state=="paused"?"PAUSED":(state=="cancelled"?"CANCELLED":"STAGE_MAJOR_FAILED")),
+        state=="completed"?"":error);
+    persist_task_status(task_path,status);
+    seededge_progress::finish(state,state=="completed"?"":error,state=="completed"?"":error);
+    return status;
+}
+
 std::string run_phase18d_full_photo(const std::string& model_root,
                                     const std::string& task_root,
                                     const uint8_t* normalized_rgb,
@@ -1390,6 +2175,9 @@ std::string run_phase18d_full_photo(const std::string& model_root,
                                     int height,
                                     const std::string& request_json)
 {
+    if (request_json.find("\"runtime_mode\":\"stage_major\"") != std::string::npos)
+        return run_phase18d_stage_major_photo(model_root, task_root, normalized_rgb,
+                                              byte_count, width, height, request_json);
     Phase18dRealContext context;
     Phase18dFullPhotoHooks hooks = make_real_full_photo_hooks(
         &context, &phase18d_real_is_cancelled, nullptr);

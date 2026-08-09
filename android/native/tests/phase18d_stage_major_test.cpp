@@ -172,6 +172,86 @@ void test_pause_cancel_and_duplicate_work()
     expect(!p18d::set_stage_major_control(&checkpoint, "running", &error),
            "cancelled task cannot resume implicitly");
 }
+
+struct HookContext
+{
+    int model_loads = 0;
+    int model_unloads = 0;
+    int work_items = 0;
+    int persists = 0;
+    int committed = 0;
+    std::string active_key;
+};
+
+std::string work_key(const p18d::StageMajorWork& work)
+{
+    return work.stage + ":" + std::to_string(work.stage_index) + ":" +
+           std::to_string(work.block_index);
+}
+
+bool hook_begin(void* opaque, const p18d::StageMajorWork& work, std::string*)
+{
+    auto* context = static_cast<HookContext*>(opaque);
+    context->active_key = work_key(work);
+    if (work.stage != "fusion") ++context->model_loads;
+    return true;
+}
+
+bool hook_execute(void* opaque, const p18d::StageMajorWork& work, std::string*)
+{
+    auto* context = static_cast<HookContext*>(opaque);
+    if (context->active_key != work_key(work)) return false;
+    ++context->work_items;
+    return true;
+}
+
+void hook_end(void* opaque, const p18d::StageMajorWork& work)
+{
+    auto* context = static_cast<HookContext*>(opaque);
+    if (work.stage != "fusion") ++context->model_unloads;
+    context->active_key.clear();
+}
+
+bool hook_persist(void* opaque, const p18d::StageMajorCheckpoint&, std::string*)
+{
+    ++static_cast<HookContext*>(opaque)->persists;
+    return true;
+}
+
+void hook_committed(void* opaque, const p18d::StageMajorWork&)
+{
+    ++static_cast<HookContext*>(opaque)->committed;
+}
+
+void test_grouped_stage_scheduler()
+{
+    for (int tiles : {2, 4})
+    {
+        p18d::StageMajorCheckpoint checkpoint =
+            p18d::make_stage_major_checkpoint(identity(tiles));
+        HookContext context;
+        p18d::StageMajorExecutionHooks hooks;
+        hooks.context = &context;
+        hooks.begin_stage = &hook_begin;
+        hooks.execute_work = &hook_execute;
+        hooks.end_stage = &hook_end;
+        hooks.persist_checkpoint = &hook_persist;
+        hooks.checkpoint_committed = &hook_committed;
+        p18d::StageMajorRunStats stats;
+        std::string error;
+        expect(p18d::run_stage_major_schedule(&checkpoint, hooks, &stats, &error),
+               "grouped stage-major schedule completes");
+        const int expected_work = tiles * (7 + 1 + 32 + 1 + 7) + 1;
+        expect(context.model_loads == 48 && context.model_unloads == 48,
+               "model stages load and unload once independent of tile count");
+        expect(context.work_items == expected_work && context.persists == expected_work &&
+                   context.committed == expected_work,
+               "every tile boundary persists exactly once");
+        expect(stats.model_stage_loads == 48 && stats.work_items_completed == expected_work &&
+                   stats.peak_resident_model_stages == 1,
+               "scheduler reports bounded residency and exact counts");
+    }
+}
 }  // namespace
 
 int main()
@@ -179,6 +259,7 @@ int main()
     test_stage_order_and_resume();
     test_atomic_persistence_and_identity();
     test_pause_cancel_and_duplicate_work();
+    test_grouped_stage_scheduler();
     std::cout << "phase18d_stage_major_test failed=" << failed << '\n';
     return failed == 0 ? 0 : 1;
 }
