@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "host": [
+    {
+      "threads": 1,
+      "dit_only_wall_ms": 16925.6,
+      "all_stage_wall_ms": 27326.7,
+      "output_sha256": "e0f95d8316e9b68a5a978b6c1eccb2ade1d4056008f465150ea2173b82206673"
+    },
+    {
+      "threads": 2,
+      "dit_only_wall_ms": 15275.1,
+      "all_stage_wall_ms": 20495.7,
+      "output_sha256": "e0f95d8316e9b68a5a978b6c1eccb2ade1d4056008f465150ea2173b82206673"
+    },
+    {
+      "threads": 4,
+      "dit_only_wall_ms": 14114.0,
+      "all_stage_wall_ms": 15568.6,
+      "output_sha256": "e0f95d8316e9b68a5a978b6c1eccb2ade1d4056008f465150ea2173b82206673"
+    },
+    {
+      "threads": 5,
+      "dit_only_wall_ms": 14385.4,
+      "all_stage_wall_ms": 15360.9,
+      "output_sha256": "e0f95d8316e9b68a5a978b6c1eccb2ade1d4056008f465150ea2173b82206673"
+    },
+    {
+      "threads": 6,
+      "dit_only_wall_ms": 14046.9,
+      "all_stage_wall_ms": 14596.6,
+      "output_sha256": "e0f95d8316e9b68a5a978b6c1eccb2ade1d4056008f465150ea2173b82206673"
+    },
+    {
+      "threads": 8,
+      "dit_only_wall_ms": 13688.7,
+      "all_stage_wall_ms": 13584.0,
+      "output_sha256": "e0f95d8316e9b68a5a978b6c1eccb2ade1d4056008f465150ea2173b82206673"
+    }
+  ],
+  "host_best_threads": 8,
+  "android_selected_threads": 5,
+  "android_selection_basis": "existing Pad balanced mode; device after benchmark pending",
+  "all_outputs_bit_identical": true
+}

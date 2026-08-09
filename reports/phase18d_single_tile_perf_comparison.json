@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "before_sec": 93.3,
+  "after_sec": 30.380800000000004,
+  "speedup": 3.0710185380240147,
+  "time_saved_sec": 62.91919999999999,
+  "encoder_before": 1.693276,
+  "encoder_after": 1.6960350000000002,
+  "dit_before": 10.508504,
+  "dit_after": 8.026078,
+  "decoder_before": 4.354099,
+  "decoder_after": 5.222154000000001,
+  "model_validation_before": 56.398471,
+  "model_validation_after": 0.20555099999999998,
+  "model_loading_before": 5.774591999999999,
+  "model_loading_after": 5.198201,
+  "peak_rss_before": 133.605,
+  "peak_rss_after": 133.207,
+  "parity_pass": true,
+  "parity_kind": "bit-identical formal same-input full RGB SHA-256",
+  "before_output_sha256": "cb8ca128082adc3a655f3d32993f95d5430466c8f362c0066812d6fba90184dd",
+  "after_output_sha256": "cb8ca128082adc3a655f3d32993f95d5430466c8f362c0066812d6fba90184dd",
+  "single_tile_same_pad_input_thread_only": {
+    "before_5_1_5_sec": 18.269,
+    "after_5_5_5_sec": 15.3569,
+    "speedup": 1.1896281150492611,
+    "output_sha256": "0cb9fb65ad56c20b9044a5b6885489a8b09635391a6ff63e9df4e651cf4fb520",
+    "bit_identical": true
+  },
+  "cross_arch_host_vs_historical_pad": {
+    "max_abs": 28.0,
+    "mean_abs": 0.5822347005208334,
+    "rmse": 1.16606197126625,
+    "cosine": 0.9999251636704584,
+    "pixel_diff_count": 19814,
+    "pixel_total": 49152,
+    "parity_kind": "tolerance; not bit-identical"
+  }
+}
