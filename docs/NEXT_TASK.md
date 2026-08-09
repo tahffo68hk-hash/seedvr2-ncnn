@@ -20,3 +20,9 @@ Investigate the independent PKB110 ARM64 synthetic CPU finite/determinism failur
 # Phase 18B runtime checkpoint
 
 Find X8 PKB110 temporary runtime validation is PASS (CPU 20/20, Vulkan 10/10, parity max error 0, no fallback). Complete Phase 18 remains NOT READY. Next run real VAE stage, real DiT block, 2/4 and 32-block streaming, minimal video restoration, then repeat final acceptance on Xiaomi Pad 7 Pro.
+
+# Current handoff: Phase 18D Pad final gate
+
+Phase 18D Host productization is complete through real 1024×1024 and 640×427 full-photo gates, Hybrid K=4 production checkpoint/GC, measured Auto selection, one-command CLI, seam/coverage diagnostics, resource estimates, and device-free Android integration. Use `reports/phase18d_runtime_mode_benchmark.json`, `reports/phase18d_checkpoint_gc.json`, `reports/phase18d_host_photo_cli.json`, and `docs/PHASE18D_PAD_FINAL_GATE.md` as the current evidence entry points. Do not repeat expensive Host gates unless a core runtime/checkpoint/fusion change invalidates them.
+
+Only the Xiaomi Pad 7 Pro gates remain for Phase 18D: connect and authorize USB; install the rebuilt arm64-v8a APK; recalibrate TileMajor/StageMajor/Hybrid/Auto thresholds; execute natural 256 and 512 full-photo inference; validate real RSS/swap/thermal/battery/storage; exercise notification, background/lock, pause/resume/cancel, Activity recreation and offline repeat; compare resumed/uninterrupted outputs; pull task reports and clean device state. Until those executed artifacts exist, Android remains **READY_FOR_DEVICE / NOT_RUN** and complete Phase 18 remains **NOT READY**.
