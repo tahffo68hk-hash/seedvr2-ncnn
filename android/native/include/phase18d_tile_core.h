@@ -56,6 +56,26 @@ struct FusionResult
     float max_abs_error = 0.f;
 };
 
+struct PhotoRuntimeLimits
+{
+    // 16 megapixels covers the target 4032x3024 photos without claiming
+    // unbounded allocations.  Callers may lower either limit per device.
+    size_t max_pixels = 16u * 1024u * 1024u;
+    size_t max_tiles = 2048u;
+};
+
+struct PhotoStorageEstimate
+{
+    size_t input_rgb_bytes = 0;
+    size_t output_rgb_bytes = 0;
+    size_t tile_rgb_bytes = 0;
+    size_t checkpoint_bytes = 0;
+    size_t fusion_bytes = 0;
+    size_t metadata_bytes = 0;
+    size_t atomic_write_reserve_bytes = 0;
+    size_t required_bytes = 0;
+};
+
 struct CheckpointIdentity
 {
     std::string task_id;
@@ -72,6 +92,21 @@ struct CheckpointIdentity
 
 bool plan_tiles(int image_width, int image_height, const TileConfig& config,
                 TilePlan* plan, std::string* error);
+
+bool validate_photo_limits(int image_width, int image_height,
+                           const TilePlan& plan,
+                           const PhotoRuntimeLimits& limits,
+                           std::string* error);
+
+bool estimate_photo_storage(int image_width, int image_height,
+                            size_t tile_count,
+                            PhotoStorageEstimate* estimate,
+                            std::string* error);
+
+bool has_required_free_space(size_t required_bytes, size_t available_bytes,
+                             std::string* error);
+
+std::string tile_plan_sha256(const TilePlan& plan);
 
 bool extract_and_pad_rgb8(const uint8_t* image_rgb, size_t byte_count,
                            int image_width, int image_height, const TileSpec& tile,

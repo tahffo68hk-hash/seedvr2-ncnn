@@ -862,9 +862,11 @@ int main()
     expect(p18d::sha256_hex(abc.data(), abc.size()) ==
                "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad",
            "sha256 abc vector");
+    std::string error;
     const std::vector<std::pair<int, int>> sizes{
-        {1, 1}, {64, 64}, {128, 128}, {129, 128}, {256, 256},
-        {320, 240}, {512, 512}, {1024, 768}, {3200, 2136}};
+        {1, 1}, {127, 127}, {128, 128}, {129, 129}, {255, 257},
+        {256, 256}, {511, 513}, {1920, 1080}, {1976, 1267},
+        {3200, 2136}, {4032, 3024}};
     for (const auto& size : sizes)
     {
         p18d::TilePlan plan;
@@ -872,10 +874,59 @@ int main()
         expect(p18d::plan_tiles(size.first, size.second, p18d::TileConfig{}, &plan, &error),
                "planner accepts fixed profile");
         expect(has_exact_coverage(plan, size.first, size.second), "planner covers every pixel");
+        p18d::PhotoRuntimeLimits limits;
+        expect(p18d::validate_photo_limits(size.first, size.second, plan, limits, &error),
+               "runtime limits accept supported size matrix");
+        p18d::PhotoStorageEstimate estimate;
+        expect(p18d::estimate_photo_storage(size.first, size.second, plan.tiles.size(),
+                                             &estimate, &error),
+               "storage estimate accepts supported size matrix");
+        expect(estimate.required_bytes >= estimate.input_rgb_bytes + estimate.output_rgb_bytes &&
+                   estimate.checkpoint_bytes > 0 && estimate.fusion_bytes > 0,
+               "storage estimate includes checkpoints and fusion buffers");
     }
 
+    p18d::TilePlan identity_plan;
+    expect(p18d::plan_tiles(256, 256, p18d::TileConfig{}, &identity_plan, &error),
+           "identity plan exists");
+    const std::string plan_sha = p18d::tile_plan_sha256(identity_plan);
+    expect(plan_sha.size() == 64 && plan_sha == p18d::tile_plan_sha256(identity_plan),
+           "tile plan SHA is deterministic");
+    identity_plan.tiles[0].source_left += 1;
+    expect(plan_sha != p18d::tile_plan_sha256(identity_plan),
+           "tile plan SHA changes with bounds");
+
+    p18d::PhotoRuntimeLimits tiny_limits;
+    tiny_limits.max_pixels = 100;
+    tiny_limits.max_tiles = 1;
+    p18d::TilePlan over_limit_plan;
+    expect(p18d::plan_tiles(128, 128, p18d::TileConfig{}, &over_limit_plan, &error),
+           "over-limit fixture plan exists");
+    expect(!p18d::validate_photo_limits(128, 128, over_limit_plan, tiny_limits, &error) &&
+               error == "MAX_PIXELS_EXCEEDED",
+           "max_pixels is enforced");
+    tiny_limits.max_pixels = 128u * 128u;
+    expect(!p18d::validate_photo_limits(129, 128, over_limit_plan, tiny_limits, &error) &&
+               error == "PLAN_DIMENSION_MISMATCH",
+           "plan identity dimensions are enforced");
+    p18d::TilePlan two_tile_plan;
+    expect(p18d::plan_tiles(160, 96, p18d::TileConfig{}, &two_tile_plan, &error),
+           "two-tile limit fixture plan exists");
+    expect(!p18d::validate_photo_limits(160, 96, two_tile_plan, tiny_limits, &error) &&
+               error == "MAX_TILES_EXCEEDED",
+           "max_tiles is enforced");
+    expect(!p18d::validate_photo_limits(0, 1, p18d::TilePlan{}, p18d::PhotoRuntimeLimits{}, &error) &&
+               error == "INVALID_IMAGE_DIMENSIONS",
+           "zero dimensions are rejected by runtime guard");
+    expect(!p18d::estimate_photo_storage(-1, 1, 1, nullptr, &error),
+           "invalid storage estimate request is rejected");
+    expect(p18d::has_required_free_space(1024, 1024, &error),
+           "exact required free space is accepted");
+    expect(!p18d::has_required_free_space(1025, 1024, &error) &&
+               error == "INSUFFICIENT_FREE_SPACE",
+           "insufficient free space is rejected");
+
     p18d::TilePlan small_plan;
-    std::string error;
     expect(p18d::plan_tiles(1, 1, p18d::TileConfig{}, &small_plan, &error), "one pixel plan");
     const std::vector<unsigned char> one_pixel{7, 11, 19};
     p18d::PaddedTile padded;

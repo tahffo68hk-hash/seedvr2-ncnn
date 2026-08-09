@@ -250,6 +250,138 @@ bool plan_tiles(int image_width, int image_height, const TileConfig& config,
     return true;
 }
 
+bool validate_photo_limits(int image_width, int image_height,
+                           const TilePlan& plan,
+                           const PhotoRuntimeLimits& limits,
+                           std::string* error)
+{
+    if (error) error->clear();
+    if (image_width <= 0 || image_height <= 0)
+    {
+        if (error) *error = "INVALID_IMAGE_DIMENSIONS";
+        return false;
+    }
+    if (plan.image_width != image_width || plan.image_height != image_height)
+    {
+        if (error) *error = "PLAN_DIMENSION_MISMATCH";
+        return false;
+    }
+    size_t pixels = 0;
+    if (!phase18d_checked_multiply(static_cast<size_t>(image_width),
+                                   static_cast<size_t>(image_height), &pixels))
+    {
+        if (error) *error = "PIXEL_COUNT_OVERFLOW";
+        return false;
+    }
+    if (limits.max_pixels == 0 || pixels > limits.max_pixels)
+    {
+        if (error) *error = "MAX_PIXELS_EXCEEDED";
+        return false;
+    }
+    if (limits.max_tiles == 0 || plan.tiles.size() > limits.max_tiles)
+    {
+        if (error) *error = "MAX_TILES_EXCEEDED";
+        return false;
+    }
+    if (plan.tiles.empty())
+    {
+        if (error) *error = "EMPTY_TILE_PLAN";
+        return false;
+    }
+    return true;
+}
+
+bool estimate_photo_storage(int image_width, int image_height,
+                            size_t tile_count,
+                            PhotoStorageEstimate* estimate,
+                            std::string* error)
+{
+    if (error) error->clear();
+    if (!estimate || image_width <= 0 || image_height <= 0 || tile_count == 0)
+    {
+        if (error) *error = "INVALID_STORAGE_ESTIMATE_INPUT";
+        return false;
+    }
+    *estimate = PhotoStorageEstimate{};
+    size_t pixels = 0;
+    size_t rgb_bytes = 0;
+    if (!phase18d_checked_multiply(static_cast<size_t>(image_width),
+                                   static_cast<size_t>(image_height), &pixels) ||
+        !phase18d_checked_multiply(pixels, 3u, &rgb_bytes))
+    {
+        if (error) *error = "STORAGE_ESTIMATE_OVERFLOW";
+        return false;
+    }
+    // The largest persisted per-tile activation is below 84 MiB.  Reserve
+    // 96 MiB per tile plus one same-sized atomic-write temporary so an
+    // interrupted replacement never destroys the last verified checkpoint.
+    constexpr size_t kCheckpointPerTile = 96u * 1024u * 1024u;
+    constexpr size_t kTileRgbBytes = 128u * 128u * 3u * 2u;
+    constexpr size_t kMetadataPerTile = 64u * 1024u;
+    size_t checkpoint = 0, tile_rgb = 0, metadata = 0, fusion = 0;
+    if (!phase18d_checked_multiply(tile_count, kCheckpointPerTile, &checkpoint) ||
+        !phase18d_checked_multiply(tile_count, kTileRgbBytes, &tile_rgb) ||
+        !phase18d_checked_multiply(tile_count, kMetadataPerTile, &metadata) ||
+        !phase18d_checked_multiply(pixels, 48u, &fusion))
+    {
+        if (error) *error = "STORAGE_ESTIMATE_OVERFLOW";
+        return false;
+    }
+    const size_t parts[] = {rgb_bytes, rgb_bytes, tile_rgb, checkpoint, fusion,
+                            metadata, kCheckpointPerTile};
+    size_t total = 0;
+    for (size_t part : parts)
+    {
+        if (part > (std::numeric_limits<size_t>::max)() - total)
+        {
+            if (error) *error = "STORAGE_ESTIMATE_OVERFLOW";
+            return false;
+        }
+        total += part;
+    }
+    estimate->input_rgb_bytes = rgb_bytes;
+    estimate->output_rgb_bytes = rgb_bytes;
+    estimate->tile_rgb_bytes = tile_rgb;
+    estimate->checkpoint_bytes = checkpoint;
+    estimate->fusion_bytes = fusion;
+    estimate->metadata_bytes = metadata;
+    estimate->atomic_write_reserve_bytes = kCheckpointPerTile;
+    estimate->required_bytes = total;
+    return true;
+}
+
+bool has_required_free_space(size_t required_bytes, size_t available_bytes,
+                             std::string* error)
+{
+    if (error) error->clear();
+    if (available_bytes < required_bytes)
+    {
+        if (error) *error = "INSUFFICIENT_FREE_SPACE";
+        return false;
+    }
+    return true;
+}
+
+std::string tile_plan_sha256(const TilePlan& plan)
+{
+    std::ostringstream canonical;
+    canonical << "phase18d_tile_plan_v1\n"
+              << plan.image_width << ',' << plan.image_height << ','
+              << plan.config.tile_size << ',' << plan.config.overlap << ','
+              << plan.config.stride << '\n';
+    for (const TileSpec& tile : plan.tiles)
+    {
+        canonical << tile.tile_index << ',' << tile.grid_x << ',' << tile.grid_y << ','
+                  << tile.source_left << ',' << tile.source_top << ','
+                  << tile.source_right << ',' << tile.source_bottom << ','
+                  << tile.valid_width << ',' << tile.valid_height << ','
+                  << tile.padding_left << ',' << tile.padding_top << ','
+                  << tile.padding_right << ',' << tile.padding_bottom << '\n';
+    }
+    const std::string bytes = canonical.str();
+    return sha256_hex(reinterpret_cast<const uint8_t*>(bytes.data()), bytes.size());
+}
+
 bool extract_and_pad_rgb8(const uint8_t* image_rgb, size_t byte_count,
                            int image_width, int image_height, const TileSpec& tile,
                            PaddedTile* padded, std::string* error)
