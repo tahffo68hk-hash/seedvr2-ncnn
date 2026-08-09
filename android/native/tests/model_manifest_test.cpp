@@ -50,6 +50,13 @@ std::string valid_manifest(const std::string& hash =
            "\"files\":[{\"relative_path\":\"x\",\"size_bytes\":4,\"sha256\":\"" +
            hash + "\"}]}";
 }
+
+std::string manifest_with_model_set(const std::string& model_set)
+{
+    return "{\"schema_version\":1,\"model_set\":\"" + model_set +
+           "\",\"files\":[{\"relative_path\":\"x\",\"size_bytes\":4,"
+           "\"sha256\":\"9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08\"}]}";
+}
 }
 
 int main()
@@ -98,6 +105,30 @@ int main()
     expect_contains("cache hit hashes zero model files", second,
                     R"("full_sha256_files":0)");
 
+    const fs::file_time_type original_mtime = fs::last_write_time(root / "x");
+    fs::last_write_time(root / "x", original_mtime + std::chrono::seconds(2));
+    const std::string mtime_changed = validate_model_manifest(root.string());
+    expect_contains("mtime change remains valid after full verification", mtime_changed,
+                    R"("valid":true)");
+    expect_contains("mtime change invalidates identity cache", mtime_changed,
+                    R"("validation_mode":"full_sha256")");
+
+    write_file(root / "x", "tests");
+    expect_contains("model size change is rejected",
+                    validate_model_manifest(root.string()), "size mismatch");
+    write_file(root / "x", "test");
+    write_file(root / "manifest.json", valid_manifest());
+    expect_contains("size fixture restore verifies", validate_model_manifest(root.string()),
+                    R"("valid":true)");
+
+    write_file(root / "manifest.json", manifest_with_model_set("unexpected_model_set"));
+    expect_contains("unexpected model set is rejected before cache reuse",
+                    validate_model_manifest(root.string()), "model_set mismatch");
+    write_file(root / "manifest.json", valid_manifest());
+    expect_contains("rejected model set does not poison trusted cache",
+                    validate_model_manifest(root.string()),
+                    R"("validation_mode":"identity_cache")");
+
     // Break caught: same-size model replacement is accepted by a size-only cache.
     std::this_thread::sleep_for(std::chrono::milliseconds(20));
     write_file(root / "x", "tEst");
@@ -122,6 +153,15 @@ int main()
     expect_contains("malformed cache forces full SHA", malformed,
                     R"("validation_mode":"full_sha256")");
 
+    // Break caught: a cache from a future or incompatible schema is reused.
+    write_file(root / ".seededge_manifest_verified_v1",
+               "seededge_verified_manifest_v999\n");
+    const std::string incompatible_schema = validate_model_manifest(root.string());
+    expect_contains("incompatible cache schema falls back safely", incompatible_schema,
+                    R"("valid":true)");
+    expect_contains("incompatible cache schema forces full SHA", incompatible_schema,
+                    R"("validation_mode":"full_sha256")");
+
     // Break caught: a cache copied from another model root is trusted.
     const fs::path other = fs::temp_directory_path() / "seededge_manifest_test_other";
     fs::remove_all(other);
@@ -135,7 +175,6 @@ int main()
     expect_contains("foreign cache validation valid", copied, R"("valid":true)");
     expect_contains("foreign cache rejected and full SHA performed", copied,
                     R"("validation_mode":"full_sha256")");
-
     fs::remove_all(root);
     fs::remove_all(other);
     std::cout << "manifest_tests passed=" << passed << " failed=" << failed << '\n';
