@@ -14,6 +14,11 @@ target_compile_features(phase18c_contract_test PRIVATE cxx_std_17)
 add_executable(phase18d_tile_core_test phase18d_tile_core_test.cpp ../src/phase18d_tile_core.cpp)
 target_include_directories(phase18d_tile_core_test PRIVATE ../include)
 target_compile_features(phase18d_tile_core_test PRIVATE cxx_std_17)
+add_executable(phase18d_stage_major_test
+  phase18d_stage_major_test.cpp
+  ../src/phase18d_stage_major.cpp)
+target_include_directories(phase18d_stage_major_test PRIVATE ../include)
+target_compile_features(phase18d_stage_major_test PRIVATE cxx_std_17)
 add_executable(phase18d_single_tile_contract_test
   phase18d_single_tile_contract_test.cpp
   ../src/minimal_video_pipeline.cpp ../src/model_manifest.cpp ../src/phase18c_contract.cpp

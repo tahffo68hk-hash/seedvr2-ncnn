@@ -17,7 +17,7 @@ if(NOT EXISTS "${NCNN_SOURCE_DIR}/CMakeLists.txt")
   message(FATAL_ERROR "Pinned ncnn source missing; run scripts/prepare_ncnn.ps1")
 endif()
 add_subdirectory("${NCNN_SOURCE_DIR}" ncnn-build)
-add_library(seededge SHARED native/src/jni_runtime.cpp native/src/runtime_info.cpp native/src/runtime_progress.cpp native/src/synthetic_cpu_test.cpp native/src/vulkan_probe.cpp native/src/model_manifest.cpp native/src/phase18c_contract.cpp native/src/minimal_video_pipeline.cpp native/src/fast_convolution3d.cpp native/src/phase18d_tile_core.cpp native/src/phase18d_image_artifacts.cpp native/src/phase18d_full_photo_artifacts.cpp native/third_party/stb/stb_impl.cpp
+add_library(seededge SHARED native/src/jni_runtime.cpp native/src/runtime_info.cpp native/src/runtime_progress.cpp native/src/synthetic_cpu_test.cpp native/src/vulkan_probe.cpp native/src/model_manifest.cpp native/src/phase18c_contract.cpp native/src/minimal_video_pipeline.cpp native/src/fast_convolution3d.cpp native/src/phase18d_tile_core.cpp native/src/phase18d_stage_major.cpp native/src/phase18d_image_artifacts.cpp native/src/phase18d_full_photo_artifacts.cpp native/third_party/stb/stb_impl.cpp
   ../tests/attention_dispatcher/artifact_registry.cpp
   ../tests/attention_dispatcher/model_cache.cpp
   ../tests/seedvr2_dit_block_ncnn/hybrid_dit_block_runtime.cpp)
