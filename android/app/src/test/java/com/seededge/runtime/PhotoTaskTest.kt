@@ -62,6 +62,26 @@ class PhotoTaskTest {
         assertTrue(json.contains("\"encoder_threads\":5"))
         assertTrue(json.contains("\"dit_threads\":5"))
         assertTrue(json.contains("\"decoder_threads\":5"))
+        assertTrue(json.contains("\"runtime_mode\":\"stage_major\""))
+        assertTrue(json.contains("\"max_source_pixels\":16000000"))
+        assertTrue(json.contains("\"max_tile_count\":2048"))
+        assertTrue(json.contains("\"resume\":false"))
+    }
+
+    @Test
+    fun resumedRequestCarriesExplicitResumeFlag() {
+        val json = PhotoTask.buildRequestJson("task_1", PhotoTask.MODEL_VERSION,
+            "src", "norm", "manifest", resume = true)
+        assertTrue(json.contains("\"runtime_mode\":\"stage_major\""))
+        assertTrue(json.contains("\"resume\":true"))
+    }
+
+    @Test
+    fun storagePreflightIncludesCheckpointAndAtomicReserve() {
+        val estimate = PhotoTask.estimateRequiredStorageBytes(512, 512, 25)
+        assertTrue(estimate > 25L * 96L * 1024L * 1024L)
+        assertTrue(PhotoTask.hasStorageCapacity(estimate + 1, estimate))
+        assertFalse(PhotoTask.hasStorageCapacity(estimate - 1, estimate))
     }
 
 

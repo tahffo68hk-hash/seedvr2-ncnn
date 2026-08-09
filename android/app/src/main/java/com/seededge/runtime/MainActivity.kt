@@ -154,6 +154,7 @@ class MainActivity : Activity() {
                 val bitmap = rotateForExif(source, decoded)
                 if (bitmap !== decoded) decoded.recycle()
                 val rgb = PhotoTask.bitmapToRgb8(bitmap)
+                File(taskRoot, "normalized.rgb").writeBytes(rgb)
                 val normalizedSha = PhotoTask.sha256Hex(rgb)
                 val manifestFile = File(modelRoot, "manifest.json")
                 val manifestSha = if (manifestFile.isFile) PhotoTask.sha256Hex(manifestFile) else ""
@@ -216,6 +217,52 @@ class MainActivity : Activity() {
     }
 
     private fun startEnhancement() {
+        if (running.get()) return
+        val taskId = currentTaskId ?: return showError("任务无效", "未选择照片")
+        val taskRoot = currentTaskRoot ?: return showError("任务无效", "任务目录缺失")
+        if (currentRgb == null || currentWidth <= 0 || currentHeight <= 0)
+            return showError("任务无效", "RGB 输入或尺寸无效")
+        val normalizedRgb = File(taskRoot, "normalized.rgb")
+        val columns = ((currentWidth - PhotoTask.TILE_SIZE).coerceAtLeast(0) + 95) / 96 + 1
+        val rows = ((currentHeight - PhotoTask.TILE_SIZE).coerceAtLeast(0) + 95) / 96 + 1
+        val tileCount = columns * rows
+        if (currentWidth.toLong() * currentHeight > PhotoTask.MAX_SOURCE_PIXELS ||
+            tileCount > PhotoTask.MAX_TILE_COUNT)
+            return showError("图片超过安全上限", "pixels=${currentWidth.toLong() * currentHeight}, tiles=$tileCount")
+        val required = PhotoTask.estimateRequiredStorageBytes(currentWidth, currentHeight, tileCount)
+        if (!normalizedRgb.isFile || !PhotoTask.hasStorageCapacity(filesDir.usableSpace, required))
+            return showError("存储空间不足", "required=$required available=${filesDir.usableSpace}")
+
+        running.set(true); base()
+        text("正在增强 · 真实 SeedVR2", true)
+        val state = text("准备中")
+        val meter = ProgressBar(this, null, android.R.attr.progressBarStyleHorizontal).apply {
+            max = 40; page.addView(this)
+        }
+        val details = text("stage-major · $tileCount tiles")
+        button("暂停任务") {
+            startService(PhotoEnhanceService.commandIntent(this, PhotoEnhanceService.ACTION_PAUSE))
+            state.text = "已请求暂停（在下一个安全阶段边界生效）"
+        }
+        button("恢复任务") {
+            startForegroundService(PhotoEnhanceService.commandIntent(this, PhotoEnhanceService.ACTION_RESUME))
+            state.text = "正在从已验证 checkpoint 恢复"
+        }
+        button("取消任务") {
+            startService(PhotoEnhanceService.commandIntent(this, PhotoEnhanceService.ACTION_CANCEL))
+            state.text = "已请求取消（不可恢复）"
+        }
+        val manifest = File(modelRoot, "manifest.json")
+        val requestJson = PhotoTask.buildRequestJson(taskId, PhotoTask.MODEL_VERSION,
+            currentSourceSha, currentNormalizedSha,
+            if (manifest.isFile) PhotoTask.sha256Hex(manifest) else "")
+        startForegroundService(PhotoEnhanceService.startIntent(this, taskId, taskRoot, modelRoot,
+            normalizedRgb, currentWidth, currentHeight, requestJson))
+        startPoller(taskId, taskRoot, state, meter, details)
+    }
+
+    @Suppress("unused")
+    private fun startEnhancementLegacy() {
         if (running.get()) return  // already enhancing; the UI shows cancel instead
         val taskId = currentTaskId ?: return showError("任务无效", "未选择照片")
         val taskRoot = currentTaskRoot ?: return showError("任务无效", "任务目录缺失")

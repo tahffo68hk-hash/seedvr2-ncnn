@@ -1,6 +1,7 @@
 #include "runtime_info.h"
 #include "minimal_video_pipeline.h"
 #include "phase18d_full_photo_artifacts.h"
+#include "phase18d_stage_major.h"
 #include "runtime_progress.h"
 #include "model_manifest.h"
 #include "fast_convolution3d.h"
@@ -172,6 +173,17 @@ extern "C" JNIEXPORT jstring JNICALL Java_com_seededge_runtime_NativeRuntime_nat
 }
 extern "C" JNIEXPORT jstring JNICALL Java_com_seededge_runtime_NativeRuntime_nativeGetProgressJson(JNIEnv*e,jobject){return js(e,seededge_progress::json());}
 extern "C" JNIEXPORT jstring JNICALL Java_com_seededge_runtime_NativeRuntime_nativeRequestCancel(JNIEnv*e,jobject){seededge_progress::cancel();return js(e,seededge_progress::json());}
+extern "C" JNIEXPORT jstring JNICALL Java_com_seededge_runtime_NativeRuntime_nativeRequestPause(JNIEnv*e,jobject){seededge_progress::pause();return js(e,seededge_progress::json());}
+extern "C" JNIEXPORT jstring JNICALL Java_com_seededge_runtime_NativeRuntime_nativeControlStageMajor(JNIEnv*e,jobject,jstring root,jstring state){
+    const char*r=e->GetStringUTFChars(root,nullptr),*s=e->GetStringUTFChars(state,nullptr);
+    seededge::phase18d::StageMajorCheckpoint checkpoint; std::string error;
+    const bool ok=seededge::phase18d::load_stage_major_checkpoint(r,&checkpoint,&error)&&
+        seededge::phase18d::set_stage_major_control(&checkpoint,s,&error)&&
+        seededge::phase18d::persist_stage_major_checkpoint(r,checkpoint,&error);
+    const std::string result=ok?"{\"ok\":true,\"state\":\""+checkpoint.state+"\"}":
+        "{\"ok\":false,\"error\":\""+error+"\"}";
+    e->ReleaseStringUTFChars(root,r);e->ReleaseStringUTFChars(state,s);return js(e,result);
+}
 extern "C" JNIEXPORT jstring JNICALL Java_com_seededge_runtime_NativeRuntime_nativeInspectModel(JNIEnv*e,jobject,jstring root){const char*r=e->GetStringUTFChars(root,nullptr);namespace fs=std::filesystem;fs::path base(r),m=base/"manifest.json";std::ifstream f(m);std::stringstream b;b<<f.rdbuf();std::string j=b.str();size_t expected=0,found=0;unsigned long long expected_bytes=0,found_bytes=0;std::smatch x;std::regex ent(R"xx("relative_path"\s*:\s*"([^"]+)"\s*,\s*"size_bytes"\s*:\s*([0-9]+))xx");for(auto it=std::sregex_iterator(j.begin(),j.end(),ent);it!=std::sregex_iterator();++it){++expected;auto rel=(*it)[1].str();auto bytes=std::stoull((*it)[2].str());expected_bytes+=bytes;fs::path p=base/rel;if(fs::is_regular_file(p)){++found;found_bytes+=fs::file_size(p);}}bool manifest=fs::exists(m)&&!j.empty();std::string s="{\"schema_version\":1,\"inspection\":\"quick\",\"model_root\":\"models/phase18c\",\"manifest_present\":"+(manifest?std::string("true"):"false")+",\"expected_files\":"+std::to_string(expected)+",\"found_files\":"+std::to_string(found)+",\"expected_bytes\":"+std::to_string(expected_bytes)+",\"found_bytes\":"+std::to_string(found_bytes)+",\"ready\":"+((manifest&&expected>0&&expected==found&&expected_bytes==found_bytes)?std::string("true"):"false")+",\"full_sha256\":false}";e->ReleaseStringUTFChars(root,r);return js(e,s);}
 extern "C" JNIEXPORT jstring JNICALL Java_com_seededge_runtime_NativeRuntime_nativeInspectCheckpoints(JNIEnv*e,jobject,jstring root){const char*r=e->GetStringUTFChars(root,nullptr);namespace fs=std::filesystem;fs::path p=fs::path(r)/"frames";bool v=fs::exists(p/"gate_dit_block_32_vid.f32"),t=fs::exists(p/"gate_dit_block_32_txt.f32");auto sz=[&](const fs::path&x){return fs::exists(x)?static_cast<long long>(fs::file_size(x)):0LL;};bool bridge=fs::exists(fs::path(r)/"decoder_bridge_result.json")&&fs::exists(fs::path(r)/"frame_000.rgb");std::string s="{\"schema_version\":1,\"block32_vid\":"+(v?std::string("true"):"false")+",\"block32_txt\":"+(t?std::string("true"):"false")+",\"block32_vid_bytes\":"+std::to_string(sz(p/"gate_dit_block_32_vid.f32"))+",\"block32_txt_bytes\":"+std::to_string(sz(p/"gate_dit_block_32_txt.f32"))+",\"checkpoint_verified\":"+((v&&t)?std::string("true"):"false")+",\"decoder_bridge_verified\":"+(bridge?std::string("true"):"false")+",\"ready_to_generate_video\":false}";e->ReleaseStringUTFChars(root,r);return js(e,s);}
 extern "C" JNIEXPORT jstring JNICALL Java_com_seededge_runtime_NativeRuntime_nativeRunDecoderOnly(JNIEnv*e,jobject,jstring model,jstring checkpoint,jstring output,jstring config){const char*m=e->GetStringUTFChars(model,nullptr),*k=e->GetStringUTFChars(checkpoint,nullptr),*o=e->GetStringUTFChars(output,nullptr),*c=e->GetStringUTFChars(config,nullptr);auto r=run_phase18c_decoder_only(m,k,o,c);e->ReleaseStringUTFChars(model,m);e->ReleaseStringUTFChars(checkpoint,k);e->ReleaseStringUTFChars(output,o);e->ReleaseStringUTFChars(config,c);return js(e,r);}

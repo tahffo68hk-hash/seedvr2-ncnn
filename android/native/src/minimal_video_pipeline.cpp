@@ -2182,7 +2182,8 @@ std::string run_phase18d_stage_major_photo(const std::string& model_root,
     std::string state=checkpoint.state;
     if(!completed&&state=="running")
     {
-        if(seededge_progress::cancelled()) { set_stage_major_control(&checkpoint,"cancelled",nullptr); state="cancelled"; }
+        if(seededge_progress::pause_requested()) { set_stage_major_control(&checkpoint,"paused",nullptr); state="paused"; }
+        else if(seededge_progress::cancelled()) { set_stage_major_control(&checkpoint,"cancelled",nullptr); state="cancelled"; }
         else state="failed";
         persist_stage_major_checkpoint(task_root,checkpoint,nullptr);
     }

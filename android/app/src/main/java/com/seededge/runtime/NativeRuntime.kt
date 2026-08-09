@@ -17,6 +17,8 @@ object NativeRuntime {
                                                 progressBridge: FullPhotoProgressBridge): String
     external fun nativeGetProgressJson(): String
     external fun nativeRequestCancel(): String
+    external fun nativeRequestPause(): String
+    external fun nativeControlStageMajor(taskRoot: String, state: String): String
     external fun nativeInspectModel(modelRoot: String): String
     external fun nativeValidateModelManifest(modelRoot: String): String
     external fun nativeInspectCheckpoints(outputRoot: String): String

@@ -23,6 +23,10 @@ object PhotoTask {
     const val MODEL_VERSION = "phase18d-android-v1"
     const val TILE_SIZE = 128
     const val BALANCED_THREADS = 5
+    const val MAX_SOURCE_PIXELS = 16_000_000L
+    const val MAX_TILE_COUNT = 2048
+    private const val STATE_BYTES_PER_TILE = 96L * 1024L * 1024L
+    private const val ATOMIC_RESERVE_BYTES = 64L * 1024L * 1024L
 
     /** Returns a task id matching the native `[A-Za-z0-9_-]+` contract. */
     fun newTaskId(): String =
@@ -59,7 +63,8 @@ object PhotoTask {
         modelVersion: String,
         sourceImageSha256: String,
         normalizedImageSha256: String,
-        manifestSha256: String
+        manifestSha256: String,
+        resume: Boolean = false
     ): String {
         val quoted = { value: String ->
             "\"" + value.replace("\\", "\\\\").replace("\"", "\\\"") + "\""
@@ -71,6 +76,12 @@ object PhotoTask {
             "\"source_image_sha256\":" + quoted(sourceImageSha256) + "," +
             "\"normalized_image_sha256\":" + quoted(normalizedImageSha256) + "," +
             "\"model_manifest_sha256\":" + quoted(manifestSha256) + "," +
+            "\"runtime_mode\":\"stage_major\"," +
+            "\"max_source_pixels\":$MAX_SOURCE_PIXELS," +
+            "\"max_tile_count\":$MAX_TILE_COUNT," +
+            "\"max_pixels\":$MAX_SOURCE_PIXELS," +
+            "\"max_tiles\":$MAX_TILE_COUNT," +
+            "\"resume\":$resume," +
             "\"tile_index\":0,\"tile_size\":$TILE_SIZE,\"overlap\":32,\"stride\":96," +
             "\"temporal_frames\":5,\"target_frame_index\":0," +
             "\"encoder_threads\":$BALANCED_THREADS," +
@@ -78,6 +89,18 @@ object PhotoTask {
             "\"decoder_threads\":$BALANCED_THREADS" +
             "}"
     }
+
+    /** Conservative device preflight: tensor checkpoints dominate; fusion is FP32 accumulation. */
+    fun estimateRequiredStorageBytes(width: Int, height: Int, tileCount: Int): Long {
+        require(width > 0 && height > 0 && tileCount > 0)
+        val pixels = Math.multiplyExact(width.toLong(), height.toLong())
+        val imageAndFusion = Math.multiplyExact(pixels, 54L) // RGB input/output + fusion sums/weights.
+        return Math.addExact(Math.addExact(Math.multiplyExact(tileCount.toLong(), STATE_BYTES_PER_TILE),
+            imageAndFusion), ATOMIC_RESERVE_BYTES)
+    }
+
+    fun hasStorageCapacity(availableBytes: Long, requiredBytes: Long): Boolean =
+        availableBytes >= requiredBytes && requiredBytes > 0
 
     /** Converts an ARGB_8888 bitmap into contiguous RGB8 HWC bytes (row-major). */
     fun bitmapToRgb8(bitmap: Bitmap): ByteArray {

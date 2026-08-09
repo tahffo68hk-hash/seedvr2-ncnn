@@ -9,6 +9,8 @@ void update(const std::string& phase, const std::string& stage, const std::strin
             int frame_index = 0, int output_frames = 0, const std::string& current_file = "");
 void finish(const std::string& state, const std::string& error_code = "", const std::string& error_message = "");
 void cancel();
+void pause();
 bool cancelled();
+bool pause_requested();
 std::string json();
 }
