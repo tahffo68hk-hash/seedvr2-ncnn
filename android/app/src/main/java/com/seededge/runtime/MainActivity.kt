@@ -239,7 +239,10 @@ class MainActivity : Activity() {
         val meter = ProgressBar(this, null, android.R.attr.progressBarStyleHorizontal).apply {
             max = 40; page.addView(this)
         }
-        val details = text("stage-major · $tileCount tiles")
+        val estimate = PhotoTask.estimateTaskResources(currentWidth, currentHeight)
+        val details = text("Auto → ${estimate.selectedMode}" +
+            (if (estimate.cohortSize > 0) " K=${estimate.cohortSize}" else "") +
+            " · $tileCount tiles · 设备阈值 READY_FOR_DEVICE")
         button("暂停任务") {
             startService(PhotoEnhanceService.commandIntent(this, PhotoEnhanceService.ACTION_PAUSE))
             state.text = "已请求暂停（在下一个安全阶段边界生效）"

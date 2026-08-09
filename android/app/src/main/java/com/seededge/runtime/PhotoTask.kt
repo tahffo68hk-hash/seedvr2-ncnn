@@ -64,7 +64,10 @@ object PhotoTask {
         sourceImageSha256: String,
         normalizedImageSha256: String,
         manifestSha256: String,
-        resume: Boolean = false
+        resume: Boolean = false,
+        runtimeMode: String = "auto",
+        tileCohortSize: Int = 4,
+        checkpointMode: String = "production"
     ): String {
         val quoted = { value: String ->
             "\"" + value.replace("\\", "\\\\").replace("\"", "\\\"") + "\""
@@ -76,7 +79,9 @@ object PhotoTask {
             "\"source_image_sha256\":" + quoted(sourceImageSha256) + "," +
             "\"normalized_image_sha256\":" + quoted(normalizedImageSha256) + "," +
             "\"model_manifest_sha256\":" + quoted(manifestSha256) + "," +
-            "\"runtime_mode\":\"stage_major\"," +
+            "\"runtime_mode\":" + quoted(runtimeMode) + "," +
+            "\"tile_cohort_size\":$tileCohortSize," +
+            "\"checkpoint_mode\":" + quoted(checkpointMode) + "," +
             "\"max_source_pixels\":$MAX_SOURCE_PIXELS," +
             "\"max_tile_count\":$MAX_TILE_COUNT," +
             "\"max_pixels\":$MAX_SOURCE_PIXELS," +
@@ -101,6 +106,53 @@ object PhotoTask {
 
     fun hasStorageCapacity(availableBytes: Long, requiredBytes: Long): Boolean =
         availableBytes >= requiredBytes && requiredBytes > 0
+
+    data class TaskResourceEstimate(
+        val tileCount: Int,
+        val selectedMode: String,
+        val cohortSize: Int,
+        val estimatedRuntimeMs: Double,
+        val estimatedPeakBytes: Long,
+        val estimatedFinalBytes: Long,
+        val requiredFreeBytes: Long,
+        val estimatedPeakRssMb: Double,
+        val calibrationSource: String,
+        val deviceCalibrated: Boolean
+    )
+
+    /** Host-calibrated planning only; Pad thresholds remain READY_FOR_DEVICE. */
+    fun estimateTaskResources(width: Int, height: Int, runtimeMode: String = "auto",
+                              cohortSize: Int = 4): TaskResourceEstimate {
+        require(width > 0 && height > 0 && cohortSize > 0)
+        val columns = ((width - TILE_SIZE).coerceAtLeast(0) + 95) / 96 + 1
+        val rows = ((height - TILE_SIZE).coerceAtLeast(0) + 95) / 96 + 1
+        val tiles = Math.multiplyExact(columns, rows)
+        val selected = if (runtimeMode == "auto") if (tiles <= 2) "tile_major" else "hybrid" else runtimeMode
+        val selectedK = if (selected == "hybrid") minOf(cohortSize, tiles) else 0
+        val liveTiles = when (selected) { "stage_major" -> tiles; "hybrid" -> selectedK; else -> 1 }
+        val finalBytes = Math.multiplyExact(tiles.toLong(), 2_114_073L)
+        val peakBytes = Math.addExact(Math.multiplyExact(liveTiles.toLong(), 84_918_726L), finalBytes)
+        val cohorts = if (selected == "hybrid") (tiles + selectedK - 1) / selectedK else 1
+        val runtime = if (selected == "tile_major") 15_190.4 * tiles else
+            41_799.59302326 + 13_743.10465116 * tiles + 8_413.613 * (cohorts - 1)
+        return TaskResourceEstimate(tiles, selected, selectedK, runtime, peakBytes, finalBytes,
+            Math.addExact(peakBytes, 1_073_741_824L), 1480.41,
+            "HOST_MEASURED_256_512_1024_2026-08-09", false)
+    }
+
+    fun runtimeProgressLabel(progressJson: String): String {
+        val p = JSONObject(progressJson)
+        val mode = p.optString("runtime_mode", "auto")
+        val cohort = p.optInt("tile_cohort_size", 0)
+        return buildString {
+            append(mode); if (cohort > 0) append(" K=$cohort")
+            append(" generation=${p.optLong("checkpoint_generation", 0)}")
+            append(" stage=${p.optString("stage_name", "preparing")}")
+            append(" tile=${p.optInt("tile_index", 0)}/${p.optInt("tile_count", 0)}")
+            append(" block=${p.optInt("dit_block_index", -1)}")
+            append(" disk=${p.optLong("actual_task_disk_bytes", 0)}")
+        }
+    }
 
     /** Converts an ARGB_8888 bitmap into contiguous RGB8 HWC bytes (row-major). */
     fun bitmapToRgb8(bitmap: Bitmap): ByteArray {

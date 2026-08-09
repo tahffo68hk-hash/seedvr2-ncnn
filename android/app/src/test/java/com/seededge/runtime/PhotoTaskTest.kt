@@ -62,17 +62,36 @@ class PhotoTaskTest {
         assertTrue(json.contains("\"encoder_threads\":5"))
         assertTrue(json.contains("\"dit_threads\":5"))
         assertTrue(json.contains("\"decoder_threads\":5"))
-        assertTrue(json.contains("\"runtime_mode\":\"stage_major\""))
+        assertTrue(json.contains("\"runtime_mode\":\"auto\""))
+        assertTrue(json.contains("\"tile_cohort_size\":4"))
+        assertTrue(json.contains("\"checkpoint_mode\":\"production\""))
         assertTrue(json.contains("\"max_source_pixels\":16000000"))
         assertTrue(json.contains("\"max_tile_count\":2048"))
         assertTrue(json.contains("\"resume\":false"))
     }
 
     @Test
+    fun resourceEstimateAndRuntimeLabelExposeRealMetadata() {
+        val estimate = PhotoTask.estimateTaskResources(640, 427, "auto", 4)
+        assertEquals(35, estimate.tileCount)
+        assertEquals("hybrid", estimate.selectedMode)
+        assertEquals(4, estimate.cohortSize)
+        assertTrue(estimate.requiredFreeBytes > estimate.estimatedPeakBytes)
+        assertFalse(estimate.deviceCalibrated)
+        val label = PhotoTask.runtimeProgressLabel("""{"runtime_mode":"hybrid","tile_cohort_size":4,"checkpoint_generation":9,"stage_name":"dit","tile_index":3,"tile_count":35,"dit_block_index":7,"actual_task_disk_bytes":1234}""")
+        assertTrue(label.contains("hybrid K=4"))
+        assertTrue(label.contains("generation=9"))
+        assertTrue(label.contains("tile=3/35"))
+        assertTrue(label.contains("block=7"))
+        assertTrue(label.contains("disk=1234"))
+    }
+
+    @Test
     fun resumedRequestCarriesExplicitResumeFlag() {
         val json = PhotoTask.buildRequestJson("task_1", PhotoTask.MODEL_VERSION,
             "src", "norm", "manifest", resume = true)
-        assertTrue(json.contains("\"runtime_mode\":\"stage_major\""))
+        assertTrue(json.contains("\"runtime_mode\":\"auto\""))
+        assertTrue(json.contains("\"tile_cohort_size\":4"))
         assertTrue(json.contains("\"resume\":true"))
     }
 
