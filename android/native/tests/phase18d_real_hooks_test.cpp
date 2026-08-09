@@ -81,6 +81,24 @@ int main()
     expect(hooks.is_cancelled == nullptr, "hooks.is_cancelled preserved");
     expect(hooks.on_progress == progress, "hooks.on_progress preserved");
 
+    // Break caught: requested stage-specific thread counts never reach the
+    // shared Host/Android real runtime context.
+    p18d::configure_real_context_threads(
+        &real,
+        R"({"encoder_threads":4,"dit_threads":5,"decoder_threads":6})");
+    expect(real.encoder_threads == 4, "encoder thread request parsed");
+    expect(real.dit_threads == 5, "DiT thread request parsed");
+    expect(real.decoder_threads == 6, "decoder thread request parsed");
+    p18d::configure_real_context_threads(
+        &real,
+        R"({"encoder_threads":0,"dit_threads":99,"decoder_threads":-1})");
+    expect(real.encoder_threads > 0 && real.encoder_threads <= 16,
+           "invalid encoder threads safely defaulted");
+    expect(real.dit_threads > 0 && real.dit_threads <= 16,
+           "invalid DiT threads safely defaulted");
+    expect(real.decoder_threads > 0 && real.decoder_threads <= 16,
+           "invalid decoder threads safely defaulted");
+
     fs::remove_all(root);
     std::cout << "real_hooks_tests passed=" << passed << " failed=" << failed << "\n";
     return failed ? 1 : 0;

@@ -59,6 +59,9 @@ class PhotoTaskTest {
         assertTrue(json.contains("\"normalized_image_sha256\":\"normsha\""))
         assertTrue(json.contains("\"model_manifest_sha256\":\"mfsha\""))
         assertTrue(json.contains("\"tile_index\":0"))
+        assertTrue(json.contains("\"encoder_threads\":5"))
+        assertTrue(json.contains("\"dit_threads\":5"))
+        assertTrue(json.contains("\"decoder_threads\":5"))
     }
 
 

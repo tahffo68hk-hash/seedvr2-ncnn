@@ -6,7 +6,7 @@ namespace { std::string key_for(const SingleModelArtifact& c) { return std::file
 ncnn::Net* NcnnModelCache::get_or_load(const NcnnModelFiles& files, CacheLoadStats& stats, std::string& error_message) {
     stats={}; stats.cache_size_before=models_.size(); const std::string key=std::filesystem::absolute(files.param_path).lexically_normal().string()+"|"+std::filesystem::absolute(files.bin_path).lexically_normal().string();
     auto found=models_.find(key); if(found!=models_.end()){stats.cache_hit=true;stats.cache_size_after=models_.size();error_message.clear();return found->second.get();}
-    stats.cache_miss=true; const auto begin=std::chrono::steady_clock::now(); auto net=std::make_unique<ncnn::Net>();net->opt.use_vulkan_compute=false;net->opt.num_threads=1;net->opt.use_packing_layout=false;
+    stats.cache_miss=true; const auto begin=std::chrono::steady_clock::now(); auto net=std::make_unique<ncnn::Net>();net->opt.use_vulkan_compute=false;net->opt.num_threads=num_threads_;net->opt.use_packing_layout=false;
     if(net->load_param(files.param_path.string().c_str())!=0||net->load_model(files.bin_path.string().c_str())!=0){stats.cache_size_after=models_.size();error_message="cache load failed stage=model name="+files.name+" param="+files.param_path.string()+" bin="+files.bin_path.string();return nullptr;}
     stats.load_ms=std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-begin).count();auto*result=net.get();models_.emplace(key,std::move(net));stats.cache_size_after=models_.size();error_message.clear();
     std::error_code ec; const auto sz=std::filesystem::file_size(files.bin_path, ec); bytes_by_key_[key]=ec?0:static_cast<std::size_t>(sz);

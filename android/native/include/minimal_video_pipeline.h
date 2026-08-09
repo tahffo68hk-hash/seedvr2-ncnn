@@ -111,7 +111,14 @@ struct Phase18dRealContext
 {
     std::string manifest;
     void* jni_bridge = nullptr;
+    int encoder_threads = 0;
+    int dit_threads = 1;
+    int decoder_threads = 0;
 };
+
+void configure_real_context_threads(
+    Phase18dRealContext* context,
+    const std::string& request_json);
 
 bool phase18d_real_validate_manifest(
     void* opaque,

@@ -22,6 +22,7 @@ object PhotoTask {
     const val REQUEST_SCHEMA_VERSION = 1
     const val MODEL_VERSION = "phase18d-android-v1"
     const val TILE_SIZE = 128
+    const val BALANCED_THREADS = 5
 
     /** Returns a task id matching the native `[A-Za-z0-9_-]+` contract. */
     fun newTaskId(): String =
@@ -71,7 +72,10 @@ object PhotoTask {
             "\"normalized_image_sha256\":" + quoted(normalizedImageSha256) + "," +
             "\"model_manifest_sha256\":" + quoted(manifestSha256) + "," +
             "\"tile_index\":0,\"tile_size\":$TILE_SIZE,\"overlap\":32,\"stride\":96," +
-            "\"temporal_frames\":5,\"target_frame_index\":0" +
+            "\"temporal_frames\":5,\"target_frame_index\":0," +
+            "\"encoder_threads\":$BALANCED_THREADS," +
+            "\"dit_threads\":$BALANCED_THREADS," +
+            "\"decoder_threads\":$BALANCED_THREADS" +
             "}"
     }
 

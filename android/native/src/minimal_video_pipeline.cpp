@@ -22,12 +22,19 @@
 #include <filesystem>
 #include <fstream>
 #include <iomanip>
+#include <limits>
 #include <map>
 #include <regex>
 #include <sstream>
 #include <string>
 #include <vector>
 #include <thread>
+
+#ifdef _WIN32
+#include <windows.h>
+#include <psapi.h>
+#pragma comment(lib, "Psapi.lib")
+#endif
 
 namespace fs = std::filesystem;
 using attention_dispatcher::ArtifactRegistry;
@@ -44,6 +51,86 @@ namespace
 {
 struct Shape { int c, t, h, w; };
 struct Stage { const char* name; Shape in, out; };
+
+struct OperationProfile
+{
+    std::string name;
+    double load_ms = 0.0;
+    double forward_ms = 0.0;
+    double unload_ms = 0.0;
+    double rss_before_mb = -1.0;
+    double rss_after_mb = -1.0;
+};
+
+struct BlockProfile : OperationProfile
+{
+    int block_index = -1;
+};
+
+struct RuntimePerformanceProfile
+{
+    double wall_time_ms = 0.0;
+    double image_prepare_ms = 0.0;
+    double manifest_validation_ms = 0.0;
+    double model_sha_validation_ms = 0.0;
+    double dit_input_load_ms = 0.0;
+    double dit_input_model_load_ms = 0.0;
+    double dit_input_forward_ms = 0.0;
+    double dit_output_ms = 0.0;
+    double dit_output_model_load_ms = 0.0;
+    double cfg_ms = 0.0;
+    double scheduler_ms = 0.0;
+    double checkpoint_io_ms = 0.0;
+    double other_io_ms = 0.0;
+    double rgb_output_ms = 0.0;
+    int threads = 1;
+    int encoder_threads = 1;
+    int dit_threads = 1;
+    int decoder_threads = 1;
+    bool finite = false;
+    size_t nan_count = 0;
+    size_t inf_count = 0;
+    std::vector<OperationProfile> encoder_stages;
+    std::vector<BlockProfile> dit_blocks;
+    std::vector<OperationProfile> decoder_stages;
+};
+
+double elapsed_ms(std::chrono::steady_clock::time_point start)
+{
+    return std::chrono::duration<double, std::milli>(
+        std::chrono::steady_clock::now() - start).count();
+}
+
+double current_rss_mb()
+{
+#ifdef _WIN32
+    PROCESS_MEMORY_COUNTERS counters{};
+    counters.cb = sizeof(counters);
+    if (GetProcessMemoryInfo(GetCurrentProcess(), &counters, sizeof(counters)))
+        return static_cast<double>(counters.WorkingSetSize) / (1024.0 * 1024.0);
+#else
+    std::ifstream status("/proc/self/status");
+    std::string key;
+    while (status >> key)
+    {
+        if (key == "VmRSS:")
+        {
+            double kib = 0.0;
+            status >> kib;
+            return kib / 1024.0;
+        }
+        status.ignore((std::numeric_limits<std::streamsize>::max)(), '\n');
+    }
+#endif
+    return -1.0;
+}
+
+double json_number_or_zero(const std::string& json, const char* key)
+{
+    std::smatch match;
+    const std::regex pattern(std::string("\\\"") + key + "\\\"\\s*:\\s*([0-9]+(?:\\.[0-9]+)?)");
+    return std::regex_search(json, match, pattern) ? std::stod(match[1]) : 0.0;
+}
 
 const Stage kEncoder[] = {
     {"enc_conv_in", {3,5,128,128}, {128,5,128,128}},
@@ -122,8 +209,16 @@ bool run_model(const fs::path& param, const fs::path& bin,
                const std::vector<float>& input, const Shape& in_shape,
                const Shape& out_shape, bool vulkan,
                std::vector<float>& output, std::string& error, int threads = 0,
-               std::vector<long long>* conv3d_profile_ms = nullptr)
+               std::vector<long long>* conv3d_profile_ms = nullptr,
+               OperationProfile* profile = nullptr)
 {
+    if (profile)
+    {
+        profile->rss_before_mb = current_rss_mb();
+        profile->load_ms = 0.0;
+        profile->forward_ms = 0.0;
+        profile->unload_ms = 0.0;
+    }
     ncnn::Net net;
     force_fp32(net.opt, vulkan, threads);
     if (!vulkan)
@@ -161,11 +256,14 @@ bool run_model(const fs::path& param, const fs::path& bin,
         return false;
 #endif
     }
+    const auto load_started = std::chrono::steady_clock::now();
     int rc = net.load_param(param.string().c_str());
     if (!rc) rc = net.load_model(bin.string().c_str());
+    if (profile) profile->load_ms = elapsed_ms(load_started);
     if (rc) error = "model_load_failed:" + std::to_string(rc);
     if (!rc)
     {
+        const auto forward_started = std::chrono::steady_clock::now();
         ncnn::Mat host(in_shape.w, in_shape.h, in_shape.t, in_shape.c,
                        const_cast<float*>(input.data()));
         ncnn::Extractor extractor = net.create_extractor();
@@ -199,7 +297,9 @@ bool run_model(const fs::path& param, const fs::path& bin,
             output = contiguous(result);
             if (output.size() != count(out_shape)) { error = "model_output_shape_mismatch"; rc = -1; }
         }
+        if (profile) profile->forward_ms = elapsed_ms(forward_started);
     }
+    const auto unload_started = std::chrono::steady_clock::now();
     net.clear();
 #if NCNN_VULKAN
     if (device)
@@ -209,6 +309,11 @@ bool run_model(const fs::path& param, const fs::path& bin,
         ncnn::destroy_gpu_instance();
     }
 #endif
+    if (profile)
+    {
+        profile->unload_ms = elapsed_ms(unload_started);
+        profile->rss_after_mb = current_rss_mb();
+    }
     if (conv3d_profile_ms) *conv3d_profile_ms = seededge::fast_convolution3d_profile_ms();
     return rc == 0;
 }
@@ -216,12 +321,15 @@ bool run_model(const fs::path& param, const fs::path& bin,
 bool run_vae_chain(const fs::path& root, const Stage* stages, size_t stage_count,
                    const std::vector<float>& input, bool first_stage_vulkan,
                    std::vector<float>& output, std::string& error,
-                   int threads = 0, bool report_decoder_progress = false)
+                   int threads = 0, bool report_decoder_progress = false,
+                   std::vector<OperationProfile>* profiles = nullptr)
 {
     output = input;
     for (size_t index = 0; index < stage_count; ++index)
     {
         const Stage& stage = stages[index];
+        OperationProfile profile;
+        profile.name = stage.name;
         std::vector<float> next;
         const fs::path directory = root / stage.name;
         if (report_decoder_progress)
@@ -230,11 +338,13 @@ bool run_vae_chain(const fs::path& root, const Stage* stages, size_t stage_count
                                       (fs::path("vae/decoder") / stage.name / "model.ncnn.bin").string());
         if (!run_model(directory / "model.ncnn.param", directory / "model.ncnn.bin",
                        output, stage.in, stage.out, first_stage_vulkan && index == 0,
-                       next, error, threads))
+                       next, error, threads, nullptr, profiles ? &profile : nullptr))
         {
+            if (profiles) profiles->push_back(profile);
             error = std::string(stage.name) + ":" + error;
             return false;
         }
+        if (profiles) profiles->push_back(profile);
         output.swap(next);
         if (report_decoder_progress)
             seededge_progress::update("vae_decoder", stage.name, "inference completed", 0, 0, 0, 0, 32,
@@ -246,10 +356,12 @@ bool run_vae_chain(const fs::path& root, const Stage* stages, size_t stage_count
 
 bool run_linear_model(const fs::path& directory, const std::vector<float>& input,
                       int rows, int in_dim, int out_dim, bool vulkan,
-                      std::vector<float>& output, std::string& error)
+                      std::vector<float>& output, std::string& error,
+                      OperationProfile* profile = nullptr, int threads = 0)
 {
     return run_model(directory / "model.ncnn.param", directory / "model.ncnn.bin",
-                     input, {1,1,rows,in_dim}, {1,1,rows,out_dim}, vulkan, output, error);
+                     input, {1,1,rows,in_dim}, {1,1,rows,out_dim}, vulkan,
+                     output, error, threads, nullptr, profile);
 }
 
 std::string escape_json(const std::string& input)
@@ -264,9 +376,111 @@ std::string escape_json(const std::string& input)
     return output;
 }
 
+double operation_total_ms(const OperationProfile& profile)
+{
+    return profile.load_ms + profile.forward_ms + profile.unload_ms;
+}
+
+void append_optional_number(std::ostringstream& output, double value)
+{
+    if (value < 0.0 || !std::isfinite(value)) output << "null";
+    else output << std::fixed << std::setprecision(3) << value;
+}
+
+void append_operation_profile(std::ostringstream& output,
+                              const OperationProfile& profile,
+                              const char* index_name = nullptr,
+                              int index = -1)
+{
+    output << '{';
+    if (index_name) output << '"' << index_name << "\":" << index << ',';
+    else output << "\"stage\":\"" << escape_json(profile.name) << "\",";
+    output << "\"load_ms\":" << std::fixed << std::setprecision(3) << profile.load_ms
+           << ",\"forward_ms\":" << profile.forward_ms
+           << ",\"unload_ms\":" << profile.unload_ms
+           << ",\"total_ms\":" << operation_total_ms(profile)
+           << ",\"rss_before_mb\":";
+    append_optional_number(output, profile.rss_before_mb);
+    output << ",\"rss_after_mb\":";
+    append_optional_number(output, profile.rss_after_mb);
+    output << '}';
+}
+
+std::string performance_profile_json(const RuntimePerformanceProfile& profile)
+{
+    double model_load_ms = profile.dit_input_model_load_ms +
+                           profile.dit_output_model_load_ms;
+    double forward_ms = profile.dit_input_forward_ms +
+                        std::max(0.0, profile.dit_output_ms - profile.dit_output_model_load_ms) +
+                        profile.cfg_ms + profile.scheduler_ms;
+    for (const auto& stage : profile.encoder_stages)
+    {
+        model_load_ms += stage.load_ms;
+        forward_ms += stage.forward_ms;
+    }
+    for (const auto& block : profile.dit_blocks)
+    {
+        model_load_ms += block.load_ms;
+        forward_ms += block.forward_ms;
+    }
+    for (const auto& stage : profile.decoder_stages)
+    {
+        model_load_ms += stage.load_ms;
+        forward_ms += stage.forward_ms;
+    }
+
+    std::ostringstream output;
+    output << "{\"schema_version\":1,\"backend\":\"ncnn_cpu_fp32\","
+           << "\"threads\":" << profile.threads
+           << ",\"threads_per_stage\":{\"encoder\":" << profile.encoder_threads
+           << ",\"dit\":" << profile.dit_threads
+           << ",\"decoder\":" << profile.decoder_threads << '}'
+           << ",\"wall_time_ms\":" << std::fixed << std::setprecision(3) << profile.wall_time_ms
+           << ",\"image_prepare_ms\":" << profile.image_prepare_ms
+           << ",\"manifest_validation_ms\":" << profile.manifest_validation_ms
+           << ",\"model_sha_validation_ms\":" << profile.model_sha_validation_ms
+           << ",\"model_load_ms\":" << model_load_ms
+           << ",\"forward_ms\":" << forward_ms
+           << ",\"dit_input_load_ms\":" << profile.dit_input_load_ms
+           << ",\"dit_input_model_load_ms\":" << profile.dit_input_model_load_ms
+           << ",\"dit_input_forward_ms\":" << profile.dit_input_forward_ms
+           << ",\"dit_output_ms\":" << profile.dit_output_ms
+           << ",\"dit_output_model_load_ms\":" << profile.dit_output_model_load_ms
+           << ",\"cfg_ms\":" << profile.cfg_ms
+           << ",\"scheduler_ms\":" << profile.scheduler_ms
+           << ",\"checkpoint_io_ms\":" << profile.checkpoint_io_ms
+           << ",\"other_io_ms\":" << profile.other_io_ms
+           << ",\"rgb_output_ms\":" << profile.rgb_output_ms
+           << ",\"encoder_stages\":[";
+    for (size_t index = 0; index < profile.encoder_stages.size(); ++index)
+    {
+        if (index) output << ',';
+        append_operation_profile(output, profile.encoder_stages[index]);
+    }
+    output << "],\"dit_blocks\":[";
+    for (size_t index = 0; index < profile.dit_blocks.size(); ++index)
+    {
+        if (index) output << ',';
+        append_operation_profile(output, profile.dit_blocks[index], "block_index",
+                                 profile.dit_blocks[index].block_index);
+    }
+    output << "],\"decoder_stages\":[";
+    for (size_t index = 0; index < profile.decoder_stages.size(); ++index)
+    {
+        if (index) output << ',';
+        append_operation_profile(output, profile.decoder_stages[index]);
+    }
+    output << "],\"finite\":" << (profile.finite ? "true" : "false")
+           << ",\"nan_count\":" << profile.nan_count
+           << ",\"inf_count\":" << profile.inf_count
+           << ",\"silent_fallback\":false}";
+    return output.str();
+}
+
 std::string result_json(bool verified, bool encoder, int blocks, bool decoder,
                         int output_frames, bool finite, long long duration_ms,
-                        const std::string& error_stage, const std::string& error_message)
+                        const std::string& error_stage, const std::string& error_message,
+                        const std::string& profile_json)
 {
     const bool pass = verified && encoder && blocks == 32 && decoder && output_frames == 4 && finite && error_stage.empty();
     std::ostringstream out;
@@ -283,7 +497,8 @@ std::string result_json(bool verified, bool encoder, int blocks, bool decoder,
     if (error_stage.empty()) out << "null"; else out << '"' << escape_json(error_stage) << '"';
     out << ",\"error_code\":" << (error_stage.empty()?"null":"\"runtime_failure\"") << ",\"error_message\":";
     if (error_message.empty()) out << "null"; else out << '"' << escape_json(error_message) << '"';
-    out << ",\"overall_pass\":" << (pass?"true":"false") << '}';
+    out << ",\"performance_profile\":" << profile_json
+        << ",\"overall_pass\":" << (pass?"true":"false") << '}';
     return out.str();
 }
 
@@ -641,6 +856,10 @@ std::string run_phase18d_full_photo_with_hooks(
         return full_photo_error("TASK_ROOT_MISMATCH", "task_root must be files/tasks/<task_id>");
     if (!hooks.validate_manifest || !hooks.execute_tile)
         return full_photo_error("HOOKS_REQUIRED", "manifest validator and tile executor hooks are required");
+    if (hooks.validate_manifest == &phase18d_real_validate_manifest &&
+        hooks.execute_tile == &phase18d_real_execute_tile)
+        configure_real_context_threads(
+            static_cast<Phase18dRealContext*>(hooks.context), request_json);
 
     if (hooks.on_progress)
     {
@@ -858,6 +1077,16 @@ std::string run_phase18c_minimal_video_demo_after_validation(
     if (std::regex_search(config_json, match, std::regex(R"cfg("stop_after"\s*:\s*"([a-z_]+)")cfg")))
         stop_after = match[1];
     const auto started = std::chrono::steady_clock::now();
+    seededge::phase18d::Phase18dRealContext thread_config;
+    seededge::phase18d::configure_real_context_threads(&thread_config, config_json);
+    RuntimePerformanceProfile performance;
+    performance.threads = thread_config.dit_threads;
+    performance.encoder_threads = thread_config.encoder_threads;
+    performance.dit_threads = thread_config.dit_threads;
+    performance.decoder_threads = thread_config.decoder_threads;
+    performance.manifest_validation_ms = json_number_or_zero(manifest, "validation_ms");
+    if (manifest.find("\"validation_mode\":\"full_sha256\"") != std::string::npos)
+        performance.model_sha_validation_ms = performance.manifest_validation_ms;
     bool verified=false, encoder=false, decoder=false, finite=false;
     int blocks=0, frames_written=0;
     std::string error_stage, error;
@@ -872,16 +1101,22 @@ std::string run_phase18c_minimal_video_demo_after_validation(
     {
         std::vector<float> vae_input, encoded;
         seededge_progress::update("vae_encoder", "encoder", "loading VAE encoder");
+        const auto input_load_started = std::chrono::steady_clock::now();
         if (!read_floats(inputs / "input_norm.f32", vae_input) || vae_input.size() != count(kEncoder[0].in))
         { error_stage="input_frames"; error="input_norm.f32 missing or wrong shape"; goto done; }
+        performance.other_io_ms += elapsed_ms(input_load_started);
         if (!run_vae_chain(models / "vae" / "encoder", kEncoder, std::size(kEncoder),
-                           vae_input, false, encoded, error))
+                           vae_input, false, encoded, error, thread_config.encoder_threads, false,
+                           &performance.encoder_stages))
         { error_stage="vae_encoder"; goto done; }
         encoder=true;
         seededge_progress::update("dit_streaming", "vid_in", "VAE encoder complete");
+        auto checkpoint_started = std::chrono::steady_clock::now();
         write_bytes(outputs/"gate_vae_latent.f32", encoded.data(), encoded.size()*sizeof(float));
+        performance.checkpoint_io_ms += elapsed_ms(checkpoint_started);
         if (stop_after == "encoder") { finite=phase18c_all_finite(encoded); goto done; }
 
+        const auto dit_input_started = std::chrono::steady_clock::now();
         std::vector<float> latent_thwc(2*16*16*16);
         for (int t=0;t<2;++t) for(int h=0;h<16;++h) for(int w=0;w<16;++w) for(int c=0;c<16;++c)
             latent_thwc[(((t*16+h)*16+w)*16)+c] = encoded[(((c*2+t)*16+h)*16+w)] * 0.9152f;
@@ -899,20 +1134,32 @@ std::string run_phase18c_minimal_video_demo_after_validation(
             dit_input[token*33+32]=1.f;
         }
         std::vector<float> patched=phase18c_patchify_thwc(dit_input,2,16,16,33,2,2), vid;
-        if (!run_linear_model(models/"dit"/"vid_in", patched,128,132,2560,false,vid,error))
+        OperationProfile dit_input_model;
+        dit_input_model.name = "dit_vid_in";
+        if (!run_linear_model(models/"dit"/"vid_in", patched,128,132,2560,false,vid,error,
+                              &dit_input_model, thread_config.dit_threads))
         { error_stage="dit_vid_in"; goto done; }
+        performance.dit_input_model_load_ms = dit_input_model.load_ms;
+        performance.dit_input_forward_ms = dit_input_model.forward_ms;
 
         ArtifactRegistry registry;
         if (!registry.scan(models/"dit"/"blocks", error)) { error_stage="dit_registry"; goto done; }
+        performance.dit_input_load_ms = elapsed_ms(dit_input_started);
         for(int block=0;block<requested_blocks;++block)
         {
+            BlockProfile block_profile;
+            block_profile.block_index = block;
+            block_profile.name = "block_" + std::to_string(block);
+            block_profile.rss_before_mb = current_rss_mb();
             seededge_progress::update("dit_streaming", "block_"+std::to_string(block), "executing DiT block", 0, 0, 0, 0, block, 0, 0, 0, 0);
             const std::string variant="real_seedvr2_block"+std::to_string(block)+"_c2560_h20_hd128";
             const CoreInfo* core=registry.lookup(CoreKey{4,3,3,1,1,1,variant});
             if (!core) { error_stage="dit_block_"+std::to_string(block); error="artifact lookup failed"; goto done; }
-            NcnnModelCache cache;
+            NcnnModelCache cache(thread_config.dit_threads);
             HybridDiTBlockRuntime runtime(cache);
+            const auto block_load_started = std::chrono::steady_clock::now();
             if (!runtime.initialize(*core,error)) { error_stage="dit_block_"+std::to_string(block)+"_load"; goto done; }
+            block_profile.load_ms = elapsed_ms(block_load_started);
             DiTBlockInput block_input;
             block_input.vid=ncnn::Mat(2560,128,vid.data());
             block_input.txt=ncnn::Mat(2560,58,txt.data());
@@ -923,23 +1170,33 @@ std::string run_phase18c_minimal_video_demo_after_validation(
             DiTBlockRunStats stats;
             if (!runtime.run(block_input,block_output,nullptr,stats))
             { error_stage="dit_block_"+std::to_string(block)+"_execute"; error=stats.error_message; goto done; }
+            block_profile.forward_ms = stats.total_ms;
             vid=contiguous(block_output.vid);
             if (block < 31) txt=contiguous(block_output.txt);
+            const auto block_unload_started = std::chrono::steady_clock::now();
             cache.clear();
+            block_profile.unload_ms = elapsed_ms(block_unload_started);
+            block_profile.rss_after_mb = current_rss_mb();
+            performance.dit_blocks.push_back(block_profile);
             ++blocks;
             if (blocks == 1 || blocks == 2 || blocks == 4 || blocks == 32)
             {
+                checkpoint_started = std::chrono::steady_clock::now();
                 write_bytes(outputs/("gate_dit_block_"+std::to_string(blocks)+"_vid.f32"),vid.data(),vid.size()*sizeof(float));
                 if (!txt.empty()) write_bytes(outputs/("gate_dit_block_"+std::to_string(blocks)+"_txt.f32"),txt.data(),txt.size()*sizeof(float));
+                performance.checkpoint_io_ms += elapsed_ms(checkpoint_started);
             }
         }
         if (requested_blocks < 32 || stop_after == "blocks")
         {
             finite=phase18c_all_finite(vid) && phase18c_all_finite(txt);
+            checkpoint_started = std::chrono::steady_clock::now();
             write_bytes(outputs/"gate_dit_vid.f32",vid.data(),vid.size()*sizeof(float));
+            performance.checkpoint_io_ms += elapsed_ms(checkpoint_started);
             goto done;
         }
 
+        const auto dit_output_started = std::chrono::steady_clock::now();
         std::vector<float> norm_weight,out_shift,out_scale;
         if(!read_floats(models/"dit"/"post"/"norm_weight.f32",norm_weight)||norm_weight.size()!=2560||
            !read_floats(models/"dit"/"post"/"out_shift.f32",out_shift)||out_shift.size()!=2560||
@@ -956,10 +1213,17 @@ std::string run_phase18c_minimal_video_demo_after_validation(
             }
         }
         std::vector<float> prediction_patched;
-        if(!run_linear_model(models/"dit"/"vid_out",vid,128,2560,64,false,prediction_patched,error))
+        OperationProfile dit_output_model;
+        dit_output_model.name = "dit_vid_out";
+        if(!run_linear_model(models/"dit"/"vid_out",vid,128,2560,64,false,prediction_patched,error,
+                             &dit_output_model, thread_config.dit_threads))
         {error_stage="dit_vid_out";goto done;}
+        performance.dit_output_model_load_ms = dit_output_model.load_ms;
         const std::vector<float> prediction=phase18c_unpatchify_thwc(prediction_patched,2,8,8,16,2,2);
+        performance.dit_output_ms = elapsed_ms(dit_output_started);
+        const auto scheduler_started = std::chrono::steady_clock::now();
         const std::vector<float> final_latent=phase18c_euler_endpoint(noise,prediction);
+        performance.scheduler_ms = elapsed_ms(scheduler_started);
         if(!phase18c_all_finite(final_latent)){error_stage="dit_final";error="non-finite latent";goto done;}
 
         std::vector<float> decoder_input(16*2*16*16);
@@ -967,12 +1231,14 @@ std::string run_phase18c_minimal_video_demo_after_validation(
             decoder_input[(((c*2+t)*16+h)*16+w)] = final_latent[(((t*16+h)*16+w)*16)+c]/0.9152f;
         std::vector<float> decoded;
         seededge_progress::update("vae_decoder", "decoder", "loading VAE decoder", 0, 0, 0, 0, 32, 0, static_cast<int>(std::size(kDecoder)));
-        if(!run_vae_chain(models/"vae"/"decoder",kDecoder,std::size(kDecoder),decoder_input,false,decoded,error))
+        if(!run_vae_chain(models/"vae"/"decoder",kDecoder,std::size(kDecoder),decoder_input,false,decoded,error,
+                          thread_config.decoder_threads,false,&performance.decoder_stages))
         {error_stage="vae_decoder";goto done;}
         decoder=true; finite=phase18c_all_finite(decoded);
         if(!finite){error_stage="vae_decoder";error="non-finite decoded output";goto done;}
         for(int frame=0;frame<4;++frame)
         {
+            const auto rgb_started = std::chrono::steady_clock::now();
             seededge_progress::update("writing_frames", "frame_"+std::to_string(frame), "writing decoded frame", 0, 0, 0, 0, 32, static_cast<int>(std::size(kDecoder)), static_cast<int>(std::size(kDecoder)), frame, frames_written);
             std::vector<unsigned char> rgb(128*128*3);
             for(int h=0;h<128;++h) for(int w=0;w<128;++w) for(int c=0;c<3;++c)
@@ -982,14 +1248,19 @@ std::string run_phase18c_minimal_video_demo_after_validation(
             }
             std::ostringstream name; name<<"frame_"<<std::setw(3)<<std::setfill('0')<<frame<<".rgb";
             if(!write_bytes(outputs/name.str(),rgb.data(),rgb.size())){error_stage="output_frames";error="frame write failed";goto done;}
+            performance.rgb_output_ms += elapsed_ms(rgb_started);
             ++frames_written;
         }
     }
 done:
+    performance.wall_time_ms = elapsed_ms(started);
+    performance.finite = finite;
+    const std::string profile_json = performance_profile_json(performance);
+    write_bytes(outputs / "performance_profile.json", profile_json.data(), profile_json.size());
     seededge_progress::finish(error_stage.empty() ? "completed" : (seededge_progress::cancelled() ? "cancelled" : "failed"), error_stage, error);
     return result_json(verified,encoder,blocks,decoder,frames_written,finite,
         std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now()-started).count(),
-        error_stage,error);
+        error_stage,error,profile_json);
 }
 std::string run_phase18c_minimal_video_demo(const std::string& model_root,
                                              const std::string& input_root,
@@ -1002,6 +1273,24 @@ std::string run_phase18c_minimal_video_demo(const std::string& model_root,
 }
 
 namespace seededge::phase18d {
+
+void configure_real_context_threads(
+    Phase18dRealContext* context,
+    const std::string& request_json)
+{
+    if (!context) return;
+    const int default_threads = std::clamp(std::max(1, ncnn::get_big_cpu_count()), 1, 16);
+    const auto read_threads = [&](const char* key, int fallback) {
+        std::smatch match;
+        const std::regex pattern(std::string("\\\"") + key + "\\\"\\s*:\\s*([0-9]+)");
+        if (!std::regex_search(request_json, match, pattern)) return fallback;
+        const long long requested = std::stoll(match[1]);
+        return requested < 1 || requested > 16 ? fallback : static_cast<int>(requested);
+    };
+    context->encoder_threads = read_threads("encoder_threads", default_threads);
+    context->dit_threads = read_threads("dit_threads", 1);
+    context->decoder_threads = read_threads("decoder_threads", default_threads);
+}
 
 
 bool phase18d_real_validate_manifest(void* opaque, const std::string& model_root,
@@ -1039,8 +1328,12 @@ bool phase18d_real_execute_tile(void* opaque, const std::string& model_root,
         return false;
     }
     *result = Phase18dTileExecutionResult{};
+    std::ostringstream runtime_config;
+    runtime_config << "{\"max_blocks\":32,\"encoder_threads\":" << context->encoder_threads
+                   << ",\"dit_threads\":" << context->dit_threads
+                   << ",\"decoder_threads\":" << context->decoder_threads << '}';
     const std::string pipeline_result = run_phase18c_minimal_video_demo_after_validation(
-        model_root, tile_root, tile_root, "{\"max_blocks\":32}", context->manifest);
+        model_root, tile_root, tile_root, runtime_config.str(), context->manifest);
     result->encoder_completed = json_true(pipeline_result, "vae_encoder_executed");
     const bool dit_completed = json_int_equals(pipeline_result, "dit_blocks_executed", 32);
     result->dit_block_completed = dit_completed ? 32 : 0;
