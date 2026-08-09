@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "phase": "18D",
+  "classification": "EXECUTED_TEST_AND_MEASURED_RUNTIME",
+  "host_test": {
+    "executable": "build/phase18d-host-current/Release/phase18d_checkpoint_store_test.exe",
+    "result": "PASS",
+    "failed": 0,
+    "crash_points": ["before_write", "half_write", "before_rename", "before_control_update", "before_gc", "after_gc"],
+    "corrupt_newest_falls_back_to_prior_valid": true,
+    "wrong_task_identity_rejected": true,
+    "temporary_generations_ignored": true,
+    "production_valid_generations_retained": 2
+  },
+  "measured_runtime": {
+    "hybrid_256_process_exit_resume_exact_sha": true,
+    "hybrid_512_process_recovery_resume_exact_sha": true,
+    "hybrid_1024_checkpoint_generation": 5810,
+    "hybrid_1024_valid_generations": 2,
+    "hybrid_1024_peak_task_bytes": 596448430,
+    "hybrid_1024_final_task_bytes": 270616019
+  },
+  "overall_pass": true
+}

@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "phase": "18D",
+  "classification": "MEASURED",
+  "task_id": "host-stage-major-640x427-001",
+  "input": {"format":"PNG","width":640,"height":427,"source_file_sha256":"1a6b9a6d6c8480b6ceb9209dae7f18fb5ecfd5b4f6718640b23e7bfcbd33dc79","normalized_rgb_sha256":"a451cea791715c995c0e73c96f05eb3e90d610ca0799ee5f7df17e08049a72ad"},
+  "tile_plan": {"tile_count":35,"sha256":"b9f9f5372c2834b64706d7747ec06f5561458957d67d81e467a9215c0bf700d6","anchored_last_tile":{"grid_x":6,"grid_y":4,"left":512,"top":299,"right":640,"bottom":427,"valid_width":128,"valid_height":128},"non_stride_anchor_verified":true},
+  "runtime": {"requested_mode":"stage_major","selected_mode":"stage_major","checkpoint_mode":"production","completed_tiles":35,"work_items_completed":1681,"wall_time_ms":524986,"checkpoint_metadata_io_ms":18430,"model_stage_loads":48,"model_stage_unloads":48,"peak_resident_model_stages":1,"peak_rss_mb":1473.22},
+  "disk": {"peak_task_bytes":2972980657,"final_task_bytes":78902392,"monitor_samples":557,"monitor_interval_seconds":2,"bytes_per_tile_final":2114072},
+  "fusion": {"uncovered_pixels":0,"zero_weight_pixels":0,"min_weight":1,"max_weight":1.0048,"seam_bounds_valid":true,"duplicate_bounds":0,"vertical_mean_gradient":11.5264,"vertical_p95_gradient":39.6667,"vertical_max_gradient":114.333,"vertical_reference_mean_gradient":10.9722,"horizontal_mean_gradient":11.9958,"horizontal_p95_gradient":43,"horizontal_max_gradient":120.333,"horizontal_reference_mean_gradient":12.2004},
+  "output": {"width":640,"height":427,"mode":"RGB","rgb_sha256":"89d85b72d4786639368e0bfa5de27cc5d7bd5dec267145f06e34a7ef3842943b","png_sha256":"2edc06defe3b8d99245316c71e7f3c0c313df2f7263be3e1bbf84d934fa51477"},
+  "finite": true,
+  "nan_count": 0,
+  "inf_count": 0,
+  "silent_fallback": false,
+  "overall_pass": true
+}

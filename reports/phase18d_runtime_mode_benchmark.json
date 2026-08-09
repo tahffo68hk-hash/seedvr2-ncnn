@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "phase": "18D",
+  "classification": "MEASURED",
+  "calibration_scope": "Host CPU FP32",
+  "benchmarks": [
+    {"tiles":2,"input":"160x96","mode":"tile_major","wall_time_ms":30380.8,"model_stage_loads_equivalent":96,"output_rgb_sha256":"cb8ca128082adc3a655f3d32993f95d5430466c8f362c0066812d6fba90184dd"},
+    {"tiles":2,"input":"160x96","mode":"stage_major","wall_time_ms":45802.7,"model_stage_loads":48,"output_rgb_sha256":"cb8ca128082adc3a655f3d32993f95d5430466c8f362c0066812d6fba90184dd"},
+    {"tiles":2,"input":"160x96","mode":"hybrid","cohort_size":2,"wall_time_ms":43337.8,"model_stage_loads":48,"peak_rss_mb":1435.73,"output_rgb_sha256":"cb8ca128082adc3a655f3d32993f95d5430466c8f362c0066812d6fba90184dd"},
+    {"tiles":4,"input":"224x224","mode":"stage_major","wall_time_ms":71535.5,"model_stage_loads":48,"peak_rss_mb":1468.93,"output_rgb_sha256":"0351c0b69717858daf305c07cfb3189870436a5cb3abed5eaf4b71b456bf8670"},
+    {"tiles":4,"input":"224x224","mode":"hybrid","cohort_size":2,"wall_time_ms":76388.9,"model_stage_loads":96,"peak_rss_mb":1472.85,"output_rgb_sha256":"0351c0b69717858daf305c07cfb3189870436a5cb3abed5eaf4b71b456bf8670"},
+    {"tiles":4,"input":"224x224","mode":"hybrid","cohort_size":4,"wall_time_ms":71844.3,"model_stage_loads":48,"peak_rss_mb":1453.54,"output_rgb_sha256":"0351c0b69717858daf305c07cfb3189870436a5cb3abed5eaf4b71b456bf8670"},
+    {"tiles":9,"input":"256x256","mode":"stage_major","wall_time_ms":131796,"model_stage_loads":48,"peak_rss_mb":1477.39,"output_rgb_sha256":"e25ad3dbc709c0cef42dd40f239dfc85c14a584a86a0ae332068052c1449b5d2"},
+    {"tiles":9,"input":"256x256","mode":"hybrid","cohort_size":4,"cumulative_wall_time_ms":160377,"cumulative_model_stage_loads":144,"resume_segment_wall_time_ms":3435.38,"resume_segment_model_stage_loads":2,"interruption":"process_exit_after_committed_decoder_4_generation","resumed_from":"decoder_5","peak_rss_mb":1477.52,"output_rgb_sha256":"e25ad3dbc709c0cef42dd40f239dfc85c14a584a86a0ae332068052c1449b5d2"},
+    {"tiles":25,"input":"512x512","mode":"stage_major","wall_time_ms":424684,"model_stage_loads":48,"peak_rss_mb":1476.32,"output_rgb_sha256":"03ee69e4af40e2949f5e5472a98eb093bd56fbc671f05f299ca4da6a366ce194"},
+    {"tiles":25,"input":"512x512","mode":"hybrid","cohort_size":4,"cumulative_wall_time_ms":484875,"cumulative_model_stage_loads":336,"resume_segment_wall_time_ms":279386,"resume_segment_model_stage_loads":194,"interruption":"native_stderr_pipe_block_then_process_recovery","resumed_from":"decoder_5","peak_rss_mb":1477.52,"peak_task_bytes":425728469,"final_task_bytes":56874040,"output_rgb_sha256":"03ee69e4af40e2949f5e5472a98eb093bd56fbc671f05f299ca4da6a366ce194"},
+    {"tiles":121,"input":"1024x1024","mode":"stage_major","wall_time_ms":1699100,"model_stage_loads":48,"peak_rss_mb":1480.41,"peak_task_bytes":10275165815,"final_task_bytes":270228302,"output_rgb_sha256":"7f852ab6b1e9e2272a6263cf67373492408cd1b8a0f2d9a7652d2318f1bb8173"},
+    {"tiles":121,"input":"1024x1024","mode":"hybrid","cohort_size":4,"wall_time_ms":2058990,"model_stage_loads":1488,"peak_rss_mb":1483.05,"peak_task_bytes":596448430,"final_task_bytes":270616019,"checkpoint_generations_retained":2,"output_rgb_sha256":"7f852ab6b1e9e2272a6263cf67373492408cd1b8a0f2d9a7652d2318f1bb8173"}
+  ],
+  "selected_cohort_size": 4,
+  "auto_rule": {
+    "tiles_at_most_2": "tile_major",
+    "tiles_3_through_25_when_stage_major_fits": "stage_major",
+    "tiles_above_25": "hybrid_k4",
+    "resume_enabled": "hybrid_k4",
+    "stage_major_does_not_fit_available_disk": "hybrid_k4_then_reduce_k_if_needed"
+  },
+  "1024_hybrid_vs_stage_major": {
+    "exact_output_parity": true,
+    "peak_task_disk_reduction_percent": 94.195,
+    "hybrid_wall_time_increase_percent": 21.181,
+    "peak_resident_model_stages": 1
+  },
+  "xiaomi_pad_7_pro": {"status":"READY_FOR_DEVICE_RECALIBRATION","execution":"NOT_RUN"},
+  "overall_pass": true
+}

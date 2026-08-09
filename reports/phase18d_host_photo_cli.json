@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "phase": "18D",
+  "classification": "MIXED_EXECUTED",
+  "entry_point": "python tools/phase18d_enhance_photo.py",
+  "real_inference_commands": [
+    {"input_format":"PNG","input":"640x427","runtime_mode":"stage_major","tiles":35,"wall_time_ms":525298,"completed":true,"same_size_output":true,"silent_fallback":false,"output_png_sha256":"2b3a207487c987a33bfd0d898a7adb84a57f4354d21a13a4234ac11085c1d96d"},
+    {"input_format":"PNG","input":"1024x1024","runtime_mode":"hybrid","cohort_size":4,"tiles":121,"wall_time_ms":2059886,"completed":true,"same_size_output":true,"silent_fallback":false,"output_png_sha256":"d2033829656b4a265d49f47b0d0a16c78d3f69c9b31cafc616f962563a96ad3b"}
+  ],
+  "format_contract_tests": {
+    "JPEG": "PASS_REAL_PILLOW_IO_FAKE_NATIVE_BOUNDARY",
+    "PNG": "PASS_REAL_INFERENCE_AND_UNIT",
+    "WebP": "PASS_REAL_PILLOW_IO_FAKE_NATIVE_BOUNDARY",
+    "EXIF_orientation": "PASS_REAL_PILLOW_IO_FAKE_NATIVE_BOUNDARY",
+    "same_size_png_output": true
+  },
+  "control_contract_tests": {"new_task":"REAL_INFERENCE","resume":"REAL_HYBRID_256_512","pause_boundary":"NATIVE_STAGE_MAJOR_REAL_AND_CLI_REQUEST_FIELD","cancel":"UNIT_ATOMIC_CONTROL_FILE","real_progress_file":"REAL_INFERENCE"},
+  "large_native_stderr_deadlock_regression": {"lines":100000,"result":"PASS","logs":"task_local_files_with_64KiB_tail_on_error"},
+  "unit_tests": {"command":"python -m unittest discover -s tests/phase18d_host_cli -p test_*.py -v","passed":10,"failed":0},
+  "overall_pass": true
+}
