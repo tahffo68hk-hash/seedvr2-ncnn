@@ -895,6 +895,13 @@ int main()
     identity_plan.tiles[0].source_left += 1;
     expect(plan_sha != p18d::tile_plan_sha256(identity_plan),
            "tile plan SHA changes with bounds");
+    identity_plan.tiles[0].source_left -= 1;
+    const std::string plan_json = p18d::tile_plan_json(identity_plan);
+    expect(plan_json.find("\"tile_plan_sha256\":\"" + plan_sha + "\"") != std::string::npos &&
+               plan_json.find("\"tile_count\":9") != std::string::npos &&
+               plan_json.find("\"tile_index\":8") != std::string::npos &&
+               plan_json.find("\"source_right\":256") != std::string::npos,
+           "tile plan JSON records deterministic identity and every tile");
 
     p18d::PhotoRuntimeLimits tiny_limits;
     tiny_limits.max_pixels = 100;

@@ -33,7 +33,7 @@ struct ArtifactPaths {
     fs::path backup_path;
 };
 
-using ArtifactPathArray = std::array<ArtifactPaths, 3>;
+using ArtifactPathArray = std::array<ArtifactPaths, 4>;
 
 bool fail(
     std::string* error,
@@ -193,6 +193,7 @@ std::string success_result()
         "\"input_png\":\"input.png\","
         "\"output_png\":\"output.png\","
         "\"side_by_side_png\":\"side_by_side.png\""
+        ",\"diff_png\":\"diff.png\""
         "}";
 }
 
@@ -490,10 +491,11 @@ std::string incomplete_pipeline_result(
 ArtifactPathArray make_artifact_paths(
     const fs::path& task_root)
 {
-    const std::array<const char*, 3> names = {
+    const std::array<const char*, 4> names = {
         "input.png",
         "output.png",
         "side_by_side.png",
+        "diff.png",
     };
 
     ArtifactPathArray paths;
@@ -1089,6 +1091,31 @@ std::string write_phase18d_full_photo_artifacts(
 
         return error_result(
             "SIDE_BY_SIDE_PNG_WRITE_FAILED",
+            error);
+    }
+
+    std::vector<uint8_t> diff_rgb(output_rgb.size());
+    for (size_t index = 0u; index < diff_rgb.size(); ++index)
+    {
+        const int delta = std::abs(
+            static_cast<int>(output_rgb[index]) -
+            static_cast<int>(normalized_rgb[index]));
+        diff_rgb[index] = static_cast<uint8_t>(
+            std::min(255, delta * 4));
+    }
+
+    if (!write_rgb8_png(
+            paths[3].pending_path.string(),
+            diff_rgb.data(),
+            diff_rgb.size(),
+            width,
+            height,
+            &error))
+    {
+        cleanup_staging(paths);
+
+        return error_result(
+            "DIFF_PNG_WRITE_FAILED",
             error);
     }
 

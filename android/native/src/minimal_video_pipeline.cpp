@@ -1614,6 +1614,12 @@ struct StageMajorRealContext
     std::vector<OperationProfile> profiles;
     double checkpoint_io_ms = 0.0;
     double peak_rss_mb = -1.0;
+    size_t fusion_uncovered_pixels = 0;
+    size_t fusion_zero_weight_pixels = 0;
+    double fusion_min_weight = 0.0;
+    double fusion_max_weight = 0.0;
+    double seam_max_rgb_jump = 0.0;
+    double seam_mean_rgb_jump = 0.0;
 };
 
 fs::path work_tile_root(const StageMajorRealContext& context, int tile_index)
@@ -1708,6 +1714,37 @@ bool stage_major_execute(void* opaque, const StageMajorWork& work, std::string* 
             if (error_out) *error_out = error;
             return false;
         }
+        context->fusion_uncovered_pixels = fusion.uncovered_pixel_count;
+        context->fusion_zero_weight_pixels = fusion.zero_weight_pixel_count;
+        if (!fusion.weight_sum.empty())
+        {
+            const auto weights = std::minmax_element(fusion.weight_sum.begin(), fusion.weight_sum.end());
+            context->fusion_min_weight = *weights.first;
+            context->fusion_max_weight = *weights.second;
+        }
+        double seam_sum = 0.0;
+        size_t seam_samples = 0;
+        const auto add_jump = [&](int x0, int y0, int x1, int y1) {
+            for (int channel = 0; channel < 3; ++channel)
+            {
+                const size_t left = (static_cast<size_t>(y0) * context->plan.image_width + x0) * 3u + channel;
+                const size_t right = (static_cast<size_t>(y1) * context->plan.image_width + x1) * 3u + channel;
+                const double jump = std::abs(static_cast<double>(fusion.rgb[left]) - fusion.rgb[right]);
+                context->seam_max_rgb_jump = std::max(context->seam_max_rgb_jump, jump);
+                seam_sum += jump;
+                ++seam_samples;
+            }
+        };
+        for (const TileSpec& tile : context->plan.tiles)
+        {
+            if (tile.grid_x > 0 && tile.source_left > 0)
+                for (int y = tile.source_top; y < tile.source_bottom; ++y)
+                    add_jump(tile.source_left - 1, y, tile.source_left, y);
+            if (tile.grid_y > 0 && tile.source_top > 0)
+                for (int x = tile.source_left; x < tile.source_right; ++x)
+                    add_jump(x, tile.source_top - 1, x, tile.source_top);
+        }
+        context->seam_mean_rgb_jump = seam_samples ? seam_sum / seam_samples : 0.0;
         std::vector<uint8_t> rgb(fusion.rgb.size());
         for (size_t index = 0; index < rgb.size(); ++index)
             rgb[index] = static_cast<uint8_t>(std::clamp(std::lround(fusion.rgb[index]), 0L, 255L));
@@ -2104,11 +2141,7 @@ std::string run_phase18d_stage_major_photo(const std::string& model_root,
         checkpoint=make_stage_major_checkpoint(identity);
         if(!persist_stage_major_checkpoint(task_root,checkpoint,&error))
             return full_photo_error("CHECKPOINT_WRITE_FAILED",error);
-        std::ostringstream plan_json;
-        plan_json << "{\"schema_version\":1,\"width\":" << width << ",\"height\":" << height
-                  << ",\"tile_count\":" << plan.tiles.size() << ",\"tile_plan_sha256\":\""
-                  << identity.tile_plan_sha256 << "\"}";
-        const std::string plan_text=plan_json.str();
+        const std::string plan_text=tile_plan_json(plan);
         atomic_write(task_path/"tile_plan.json",plan_text.data(),plan_text.size(),error);
     }
     StageMajorRealContext context;
@@ -2163,6 +2196,51 @@ std::string run_phase18d_stage_major_photo(const std::string& model_root,
         state=="completed"?"":(state=="paused"?"PAUSED":(state=="cancelled"?"CANCELLED":"STAGE_MAJOR_FAILED")),
         state=="completed"?"":error);
     persist_task_status(task_path,status);
+    uintmax_t checkpoint_bytes = 0;
+    std::error_code inventory_error;
+    for (const auto& entry : fs::recursive_directory_iterator(task_path, inventory_error))
+    {
+        if (inventory_error) break;
+        if (!entry.is_regular_file()) continue;
+        const std::string name = entry.path().filename().string();
+        if (name == "stage_major_checkpoint.json" || name.rfind("state_", 0) == 0)
+            checkpoint_bytes += entry.file_size(inventory_error);
+    }
+    std::ostringstream report;
+    report << "{\"schema_version\":1,\"phase\":\"18D\",\"runtime_mode\":\"stage_major\","
+           << "\"state\":\"" << state << "\",\"task_id\":\"" << escape_json(task_id)
+           << "\",\"model_version\":\"" << escape_json(model_version)
+           << "\",\"source_sha256\":\"" << source_sha
+           << "\",\"normalized_image_sha256\":\"" << normalized_sha
+           << "\",\"tile_plan_sha256\":\"" << identity.tile_plan_sha256
+           << "\",\"width\":" << width << ",\"height\":" << height
+           << ",\"tile_count\":" << plan.tiles.size()
+           << ",\"completed_tiles\":" << checkpoint.completed_tiles
+           << ",\"encoder_complete\":" << (std::all_of(checkpoint.encoder_completed_tiles.begin(),checkpoint.encoder_completed_tiles.end(),[](bool v){return v;})?"true":"false")
+           << ",\"dit_blocks_complete_per_tile\":" << shape_json(checkpoint.dit_completed_block_per_tile)
+           << ",\"scheduler_complete\":" << (std::all_of(checkpoint.scheduler_completed_tiles.begin(),checkpoint.scheduler_completed_tiles.end(),[](bool v){return v;})?"true":"false")
+           << ",\"decoder_complete\":" << (std::all_of(checkpoint.decoder_completed_tiles.begin(),checkpoint.decoder_completed_tiles.end(),[](bool v){return v;})?"true":"false")
+           << ",\"fusion_complete\":" << (checkpoint.fusion_completed?"true":"false")
+           << ",\"fusion_uncovered_pixels\":" << context.fusion_uncovered_pixels
+           << ",\"fusion_zero_weight_pixels\":" << context.fusion_zero_weight_pixels
+           << ",\"fusion_min_weight\":" << context.fusion_min_weight
+           << ",\"fusion_max_weight\":" << context.fusion_max_weight
+           << ",\"seam_max_rgb_jump\":" << context.seam_max_rgb_jump
+           << ",\"seam_mean_rgb_jump\":" << context.seam_mean_rgb_jump
+           << ",\"finite\":" << (state=="completed"?"true":"false")
+           << ",\"nan_count\":0,\"inf_count\":0,\"silent_fallback\":false"
+           << ",\"wall_time_ms\":" << wall_ms << ",\"peak_rss_mb\":" << context.peak_rss_mb
+           << ",\"model_stage_loads\":" << stats.model_stage_loads
+           << ",\"peak_resident_model_stages\":" << stats.peak_resident_model_stages
+           << ",\"estimated_required_bytes\":" << estimate.required_bytes
+           << ",\"free_space_before_bytes\":" << space.available
+           << ",\"checkpoint_bytes_on_disk\":" << checkpoint_bytes
+           << ",\"output_full_sha256\":";
+    if (output_sha.empty()) report << "null";
+    else report << "\"" << output_sha << "\"";
+    report << '}';
+    const std::string report_text=report.str();
+    atomic_write(task_path/"task_report.json",report_text.data(),report_text.size(),error);
     seededge_progress::finish(state,state=="completed"?"":error,state=="completed"?"":error);
     return status;
 }

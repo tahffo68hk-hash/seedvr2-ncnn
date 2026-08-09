@@ -382,6 +382,38 @@ std::string tile_plan_sha256(const TilePlan& plan)
     return sha256_hex(reinterpret_cast<const uint8_t*>(bytes.data()), bytes.size());
 }
 
+std::string tile_plan_json(const TilePlan& plan)
+{
+    std::ostringstream output;
+    output << "{\"schema_version\":1,\"image_width\":" << plan.image_width
+           << ",\"image_height\":" << plan.image_height
+           << ",\"tile_size\":" << plan.config.tile_size
+           << ",\"overlap\":" << plan.config.overlap
+           << ",\"stride\":" << plan.config.stride
+           << ",\"tile_count\":" << plan.tiles.size()
+           << ",\"tile_plan_sha256\":\"" << tile_plan_sha256(plan)
+           << "\",\"tiles\":[";
+    for (size_t index = 0; index < plan.tiles.size(); ++index)
+    {
+        const TileSpec& tile = plan.tiles[index];
+        if (index) output << ',';
+        output << "{\"tile_index\":" << tile.tile_index
+               << ",\"grid_x\":" << tile.grid_x << ",\"grid_y\":" << tile.grid_y
+               << ",\"source_left\":" << tile.source_left
+               << ",\"source_top\":" << tile.source_top
+               << ",\"source_right\":" << tile.source_right
+               << ",\"source_bottom\":" << tile.source_bottom
+               << ",\"valid_width\":" << tile.valid_width
+               << ",\"valid_height\":" << tile.valid_height
+               << ",\"padding_left\":" << tile.padding_left
+               << ",\"padding_top\":" << tile.padding_top
+               << ",\"padding_right\":" << tile.padding_right
+               << ",\"padding_bottom\":" << tile.padding_bottom << '}';
+    }
+    output << "]}";
+    return output.str();
+}
+
 bool extract_and_pad_rgb8(const uint8_t* image_rgb, size_t byte_count,
                            int image_width, int image_height, const TileSpec& tile,
                            PaddedTile* padded, std::string* error)

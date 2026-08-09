@@ -107,6 +107,7 @@ bool has_required_free_space(size_t required_bytes, size_t available_bytes,
                              std::string* error);
 
 std::string tile_plan_sha256(const TilePlan& plan);
+std::string tile_plan_json(const TilePlan& plan);
 
 bool extract_and_pad_rgb8(const uint8_t* image_rgb, size_t byte_count,
                            int image_width, int image_height, const TileSpec& tile,

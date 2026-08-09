@@ -312,6 +312,7 @@ void expect_no_final_pngs(
     expect(!fs::exists(task_root / "input.png"), name + " leaves no input.png");
     expect(!fs::exists(task_root / "output.png"), name + " leaves no output.png");
     expect(!fs::exists(task_root / "side_by_side.png"), name + " leaves no side_by_side.png");
+    expect(!fs::exists(task_root / "diff.png"), name + " leaves no diff.png");
 }
 
 std::string make_request_json(const std::string& task_id)
@@ -320,7 +321,7 @@ std::string make_request_json(const std::string& task_id)
            "\",\"model_version\":\"phase18d-host-v2\"}";
 }
 
-void test_success_generates_three_pngs()
+void test_success_generates_four_pngs()
 {
     constexpr int width = 160;
     constexpr int height = 96;
@@ -356,10 +357,12 @@ void test_success_generates_three_pngs()
     const fs::path input_png = task_root / "input.png";
     const fs::path output_png = task_root / "output.png";
     const fs::path side_by_side_png = task_root / "side_by_side.png";
+    const fs::path diff_png = task_root / "diff.png";
 
     expect(fs::exists(input_png), "input.png exists");
     expect(fs::exists(output_png), "output.png exists");
     expect(fs::exists(side_by_side_png), "side_by_side.png exists");
+    expect(fs::exists(diff_png), "diff.png exists");
 
     expect(
         read_bytes(task_root / "output_full.rgb").size() ==
@@ -369,6 +372,7 @@ void test_success_generates_three_pngs()
     DecodedPng input_decoded;
     DecodedPng output_decoded;
     DecodedPng side_decoded;
+    DecodedPng diff_decoded;
 
     expect(decode_png(input_png, &input_decoded),
            "input.png decodes");
@@ -376,6 +380,7 @@ void test_success_generates_three_pngs()
            "output.png decodes");
     expect(decode_png(side_by_side_png, &side_decoded),
            "side_by_side.png decodes");
+    expect(decode_png(diff_png, &diff_decoded), "diff.png decodes");
 
     expect(
         input_decoded.width == width &&
@@ -389,6 +394,8 @@ void test_success_generates_three_pngs()
         side_decoded.width == width * 2 &&
         side_decoded.height == height,
         "side_by_side.png is 320x96");
+    expect(diff_decoded.width == width && diff_decoded.height == height,
+           "diff.png is 160x96");
 
     expect(
         all_pixels_equal(input_decoded, 13),
@@ -402,6 +409,8 @@ void test_success_generates_three_pngs()
     expect(
         region_matches_value(side_decoded, width, width, height, 77),
         "side_by_side right half is 77");
+    expect(all_pixels_equal(diff_decoded, 255),
+           "diff.png is amplified absolute RGB difference");
 
     expect(
         !any_pending_or_tmp_left(task_root),
@@ -782,7 +791,7 @@ void test_png_staging_failure_cleans_up()
 
 int main()
 {
-    test_success_generates_three_pngs();
+    test_success_generates_four_pngs();
     test_second_tile_failure_generates_no_pngs();
     test_cancellation_generates_no_pngs();
     test_corrupted_output_full_rgb_fails();
