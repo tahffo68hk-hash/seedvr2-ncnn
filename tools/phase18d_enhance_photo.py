@@ -50,6 +50,13 @@ def atomic_write(path: Path, data: bytes) -> None:
     temporary.replace(path)
 
 
+def read_log_tail(path: Path, limit: int = 65536) -> str:
+    with path.open("rb") as stream:
+        stream.seek(0, os.SEEK_END); size = stream.tell()
+        stream.seek(max(0, size - limit))
+        return stream.read().decode("utf-8", errors="replace")
+
+
 def parser() -> argparse.ArgumentParser:
     result = argparse.ArgumentParser(description="Enhance one photo with the real SeedVR2 ncnn Host runtime")
     result.add_argument("--input"); result.add_argument("--output")
@@ -65,7 +72,9 @@ def parser() -> argparse.ArgumentParser:
     return result
 
 
-def estimate_resources(width: int, height: int, runtime_mode: str, cohort_size: int) -> dict:
+def estimate_resources(width: int, height: int, runtime_mode: str, cohort_size: int,
+                       available_disk_bytes: int = (1 << 63) - 1,
+                       resume_enabled: bool = False) -> dict:
     columns = ((max(width - 128, 0) + 95) // 96) + 1
     rows = ((max(height - 128, 0) + 95) // 96) + 1
     tiles = columns * rows
@@ -73,20 +82,36 @@ def estimate_resources(width: int, height: int, runtime_mode: str, cohort_size: 
     selected_k = cohort_size
     reason = "EXPLICIT_RUNTIME_OVERRIDE"
     if runtime_mode == "auto":
-        if tiles <= 2:
+        if resume_enabled:
+            selected, selected_k, reason = "hybrid", min(4, tiles), "RESUME_REQUIRES_DURABLE_HYBRID"
+        elif tiles <= 2:
             selected, selected_k, reason = "tile_major", 0, "MEASURED_SMALL_TASK_TILE_MAJOR"
+        elif tiles <= 25:
+            selected, selected_k, reason = "stage_major", 0, "MEASURED_MEDIUM_TASK_STAGE_MAJOR"
         else:
             selected, selected_k, reason = "hybrid", min(4, tiles), "MEASURED_LONG_TASK_BOUNDED_DISK"
-    live_tiles = tiles if selected == "stage_major" else (selected_k if selected == "hybrid" else 1)
     final_bytes = tiles * 2_114_073
-    peak_bytes = live_tiles * 84_918_726 + final_bytes
+    def storage(mode: str, k: int) -> tuple[int, int]:
+        live_tiles = tiles if mode == "stage_major" else (k if mode == "hybrid" else 1)
+        peak = live_tiles * 84_918_726 + final_bytes
+        return peak, peak + 1_073_741_824
+    peak_bytes, required_bytes = storage(selected, selected_k)
+    if runtime_mode == "auto" and selected == "stage_major" and required_bytes > available_disk_bytes:
+        selected, selected_k, reason = "hybrid", min(4, tiles), "AVAILABLE_DISK_SELECTED_HYBRID"
+        peak_bytes, required_bytes = storage(selected, selected_k)
+    while (runtime_mode == "auto" and selected == "hybrid" and selected_k > 1 and
+           required_bytes > available_disk_bytes):
+        selected_k -= 1
+        peak_bytes, required_bytes = storage(selected, selected_k)
+        if required_bytes <= available_disk_bytes:
+            reason = "AVAILABLE_DISK_REDUCED_HYBRID_COHORT"
     runtime_ms = (15_190.4 * tiles if selected == "tile_major" else
                   41_799.59302326 + 13_743.10465116 * tiles + 8_413.613 *
                   ((((tiles + selected_k - 1) // selected_k) - 1) if selected == "hybrid" else 0))
     return {"tile_count": tiles, "selected_mode": selected, "cohort_size": selected_k,
             "selection_reason": reason, "estimated_peak_task_bytes": peak_bytes,
             "estimated_final_task_bytes": final_bytes,
-            "required_free_bytes": peak_bytes + 1_073_741_824,
+            "required_free_bytes": required_bytes,
             "estimated_runtime_ms": runtime_ms, "estimated_peak_rss_mb": 1480.41,
             "source_label": CALIBRATION_SOURCE}
 
@@ -140,8 +165,9 @@ def main(argv=None) -> int:
     columns = ((max(width - 128, 0) + 95) // 96) + 1
     rows = ((max(height - 128, 0) + 95) // 96) + 1
     tile_count = columns * rows
-    resource = estimate_resources(width, height, args.runtime_mode, args.tile_cohort_size)
     free_bytes = shutil.disk_usage(task_root.parent).free
+    resource = estimate_resources(width, height, args.runtime_mode, args.tile_cohort_size,
+                                  free_bytes, args.resume)
     print(f"Estimate [ESTIMATED from {resource['source_label']}]: "
           f"runtime={resource['estimated_runtime_ms']/1000:.1f}s "
           f"peak_disk={resource['estimated_peak_task_bytes']/1073741824:.2f}GiB "
@@ -166,22 +192,28 @@ def main(argv=None) -> int:
     command = [args.runner, *args.runner_prefix, str(model_root), str(task_root), str(rgb_path),
                str(width), str(height), json.dumps(request, separators=(",", ":"))]
     started = time.monotonic()
-    process = subprocess.Popen(command, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout_path = task_root / "native_stdout.log"
+    stderr_path = task_root / "native_stderr.log"
     progress_path = task_root / "runtime_progress.json"; last_progress = None
-    while process.poll() is None:
-        try:
-            progress = json.loads(progress_path.read_text("utf-8"))
-            signature = (progress.get("phase"), progress.get("stage_name"),
-                         progress.get("dit_block_index"), progress.get("tile_index", progress.get("model_files_done")),
-                         progress.get("tile_count", progress.get("model_files_total")))
-            if progress.get("state") == "running" and signature != last_progress:
-                phase, stage, block, tile, total = signature
-                print(f"Progress: {phase}/{stage} block={block} tile={tile}/{total}", flush=True)
-                last_progress = signature
-        except (OSError, ValueError, json.JSONDecodeError):
-            pass
-        time.sleep(0.1)
-    stdout, stderr = process.communicate()
+    with stdout_path.open("w", encoding="utf-8") as stdout_log, \
+         stderr_path.open("w", encoding="utf-8") as stderr_log:
+        process = subprocess.Popen(command, text=True, stdout=stdout_log, stderr=stderr_log)
+        while process.poll() is None:
+            try:
+                progress = json.loads(progress_path.read_text("utf-8"))
+                signature = (progress.get("phase"), progress.get("stage_name"),
+                             progress.get("dit_block_index"), progress.get("tile_index", progress.get("model_files_done")),
+                             progress.get("tile_count", progress.get("model_files_total")))
+                if progress.get("state") == "running" and signature != last_progress:
+                    phase, stage, block, tile, total = signature
+                    print(f"Progress: {phase}/{stage} block={block} tile={tile}/{total}", flush=True)
+                    last_progress = signature
+            except (OSError, ValueError, json.JSONDecodeError):
+                pass
+            time.sleep(0.1)
+        process.wait()
+    stdout = read_log_tail(stdout_path)
+    stderr = read_log_tail(stderr_path)
     if stdout: print(stdout.strip(), flush=True)
     if process.returncode != 0:
         raise CliError(f"NATIVE_RUN_FAILED: {stderr.strip() or stdout.strip()}")

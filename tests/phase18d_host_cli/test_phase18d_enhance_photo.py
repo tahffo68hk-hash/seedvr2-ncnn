@@ -33,6 +33,15 @@ time.sleep(0.3); shutil.copyfile(rgb,task/"output_full.rgb")
 (task/"task_report.json").write_text(json.dumps({"state":"completed","finite":True,"silent_fallback":False}))
 print('{"state":"completed","artifacts_written":true,"silent_fallback":false}')
 '''
+FAKE_NOISY_RUNNER = r'''
+import json, pathlib, shutil, sys
+model, task, rgb, width, height, request = sys.argv[1:]
+task=pathlib.Path(task); task.mkdir(parents=True,exist_ok=True)
+sys.stderr.write('ncnn warning\n' * 100000); sys.stderr.flush()
+shutil.copyfile(rgb,task/'output_full.rgb')
+(task/'task_report.json').write_text(json.dumps({'state':'completed','finite':True,'silent_fallback':False}))
+print('{"state":"completed","artifacts_written":true,"silent_fallback":false}')
+'''
 
 class EnhancePhotoCliTest(unittest.TestCase):
     def setUp(self):
@@ -118,5 +127,23 @@ class EnhancePhotoCliTest(unittest.TestCase):
         self.assertEqual(request["runtime_mode"], "auto")
         self.assertIn("Estimate [ESTIMATED from HOST_MEASURED_256_512_1024_2026-08-09]", captured.getvalue())
         self.assertIn("Auto plan: hybrid K=4", captured.getvalue())
+
+    def test_auto_estimator_matches_measured_medium_and_disk_fallback_rule(self):
+        latency = cli.estimate_resources(512, 512, "auto", 0, 1 << 62)
+        self.assertEqual(latency["selected_mode"], "stage_major")
+        self.assertEqual(latency["selection_reason"], "MEASURED_MEDIUM_TASK_STAGE_MAJOR")
+        bounded = cli.estimate_resources(512, 512, "auto", 0, 2 * 1024**3)
+        self.assertEqual(bounded["selected_mode"], "hybrid")
+        self.assertEqual(bounded["cohort_size"], 4)
+        self.assertEqual(bounded["selection_reason"], "AVAILABLE_DISK_SELECTED_HYBRID")
+        self.assertLessEqual(bounded["required_free_bytes"], 2 * 1024**3)
+
+    def test_large_native_stderr_never_blocks_long_hybrid_cli(self):
+        source=self.root/'noisy.png'; Image.new('RGB',(5,5),'black').save(source)
+        noisy=self.root/'noisy_runner.py'; noisy.write_text(FAKE_NOISY_RUNNER,encoding='utf-8')
+        self.assertEqual(cli.main(['--input',str(source),'--output',str(self.root/'noisy_out.png'),
+            '--model-root',str(self.model),'--task-root',str(self.root/'noisy_task'),
+            '--runner',sys.executable,'--runner-prefix',str(noisy),
+            '--runtime-mode','hybrid','--tile-cohort-size','1']),0)
 
 if __name__ == "__main__": unittest.main()
