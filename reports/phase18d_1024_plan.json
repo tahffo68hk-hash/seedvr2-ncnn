@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "phase": "18D",
+  "input": "1024x1024",
+  "tile_size": 128,
+  "stride": 96,
+  "planned_columns": 11,
+  "planned_rows": 11,
+  "planned_tiles": 121,
+  "estimated_required_bytes": 12303990784,
+  "estimated_required_gib": 11.459,
+  "estimated_wall_ms_from_9_and_25_tile_linear_fit": 2182012,
+  "estimated_minutes": 36.367,
+  "execution": "PLAN_AND_ESTIMATE_ONLY",
+  "overall_pass": false,
+  "reason": "Not executed; this estimate is not device or host PASS evidence."
+}

@@ -1,0 +1,1 @@
+{"schema_version":1,"phase":"18D","runtime_mode":"tile_major","input":{"width":160,"height":96,"tile_count":2},"wall_ms":{"runs":[30411.2,30350.4],"median":30380.8},"output_sha256":"cb8ca128082adc3a655f3d32993f95d5430466c8f362c0066812d6fba90184dd","finite":true,"silent_fallback":false,"overall_pass":true}

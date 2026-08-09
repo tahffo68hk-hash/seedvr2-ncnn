@@ -1,0 +1,1 @@
+{"schema_version":1,"phase":"18D","tile_major_median_ms":30380.8,"stage_major_ms":45802.7,"stage_major_slowdown_percent":50.761,"bit_exact_output":true,"decision":"tile-major wins two-tile latency; stage-major is the resumable long-task runtime"}

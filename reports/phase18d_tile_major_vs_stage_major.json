@@ -1,36 +1,18 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "phase": "18D",
-  "measured_single_tile": {
-    "core_ms": 15247.398,
-    "model_load_ms": 5198.201,
-    "load_fraction": 0.3409238087705194
-  },
-  "tile_major": {
-    "two_tile_measured_wall_ms": {
-      "runs": [
-        30411.2,
-        30350.4
-      ],
-      "min": 30350.4,
-      "median": 30380.800000000003,
-      "mean": 30380.800000000003,
-      "max": 30411.2
-    },
-    "four_tile_estimated_core_ms": 60989.592
-  },
+  "tile_major": {"two_tile_median_ms": 30380.8, "output_sha256": "cb8ca128082adc3a655f3d32993f95d5430466c8f362c0066812d6fba90184dd"},
   "stage_major": {
-    "prototype_executed": false,
-    "reason": "Cross-tile VAE/32-block/decoder scheduling is a major architecture change after low-risk single-tile optimization.",
-    "two_tile_analytical_core_ms": 25296.595,
-    "four_tile_analytical_core_ms": 45394.989,
-    "assumptions": [
-      "each stage model loads once",
-      "tile forward time remains linear",
-      "one weighted DiT block remains resident",
-      "no extra tensor spill or fusion overhead included"
-    ],
-    "next_gate": "Implement a 2-tile stage-major prototype with checkpoint/resume and measure RSS/parity before scaling to 4 tiles."
+    "prototype_executed": true,
+    "two_tile_ms": 45802.7,
+    "four_tile_ms": 71535.5,
+    "nine_tile_ms": 131796,
+    "twenty_five_tile_ms": 424684,
+    "weighted_model_loads_independent_of_tile_count": 48,
+    "peak_resident_weighted_model_stages": 1,
+    "two_tile_bit_exact_with_tile_major": true,
+    "twenty_five_tile_resume_bit_exact": true
   },
-  "conclusion": "stage-major is preferred for future multi-tile work because measured model load is material"
+  "conclusion": "tile-major is 50.761% faster at two tiles; stage-major is selected for durable long-task pause/resume and fixed model-load count",
+  "xiaomi_pad_7_pro": "READY_FOR_DEVICE_NOT_RUN"
 }
