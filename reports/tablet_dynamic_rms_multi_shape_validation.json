@@ -1,0 +1,427 @@
+{
+  "phase": "9.5",
+  "variant": "dynamic_rms_rope3d_hybrid",
+  "device": {
+    "marketing_name": "Xiaomi Pad 7 Pro",
+    "ro_product_model": "24091RPADC",
+    "ro_board_platform": "pineapple",
+    "ro_soc_model": "SM8635",
+    "android_release": "16",
+    "cpu_abi": "arm64-v8a",
+    "mem_total_kb": 11787108
+  },
+  "runtime": {
+    "backend": "ncnn CPU FP32",
+    "ncnn_source_commit": "a4d2ea1d4422",
+    "ncnn_version": "20261024",
+    "ndk": "26.3.11579264",
+    "android_api": 24,
+    "vulkan": false,
+    "num_threads": 1,
+    "warmups": 3,
+    "measured_iterations": 3,
+    "peak_memory_source": "/proc/self/status VmHWM"
+  },
+  "alignment_gate": {
+    "max_abs_error_less_than": 0.0001,
+    "result": "FAIL",
+    "note": "Measured BTHWC maximum absolute errors exceed the existing 1e-4 gate; raw cosine and maximum-error values are retained."
+  },
+  "cases": [
+    {
+      "name": "dynamic_a",
+      "request": {
+        "input_shape": [
+          1,
+          4,
+          8,
+          8,
+          32
+        ]
+      },
+      "window_metadata": {
+        "window": [
+          4,
+          4,
+          4
+        ],
+        "grid": [
+          1,
+          2,
+          2
+        ]
+      },
+      "accuracy": {
+        "validity": {
+          "element_count": 256,
+          "max_abs_error": 0,
+          "mean_abs_error": 0,
+          "cosine_similarity": 1,
+          "nan_count": 0,
+          "inf_count": 0
+        },
+        "mask": {
+          "element_count": 16384,
+          "max_abs_error": 0,
+          "mean_abs_error": 0,
+          "cosine_similarity": 1,
+          "nan_count": 0,
+          "inf_count": 0
+        },
+        "rope_cos": {
+          "element_count": 256,
+          "max_abs_error": 5.960464478E-08,
+          "mean_abs_error": 3.725290298E-09,
+          "cosine_similarity": 1,
+          "nan_count": 0,
+          "inf_count": 0
+        },
+        "rope_sin": {
+          "element_count": 256,
+          "max_abs_error": 0,
+          "mean_abs_error": 0,
+          "cosine_similarity": 1,
+          "nan_count": 0,
+          "inf_count": 0
+        },
+        "head0": {
+          "element_count": 2048,
+          "max_abs_error": 0.001148581505,
+          "mean_abs_error": 0.0001958226902,
+          "cosine_similarity": 0.9999983596,
+          "nan_count": 0,
+          "inf_count": 0
+        },
+        "head1": {
+          "element_count": 2048,
+          "max_abs_error": 0.001575440168,
+          "mean_abs_error": 0.0002113103561,
+          "cosine_similarity": 0.9999985824,
+          "nan_count": 0,
+          "inf_count": 0
+        },
+        "head2": {
+          "element_count": 2048,
+          "max_abs_error": 0.001494586468,
+          "mean_abs_error": 0.0002180718468,
+          "cosine_similarity": 0.9999988265,
+          "nan_count": 0,
+          "inf_count": 0
+        },
+        "head3": {
+          "element_count": 2048,
+          "max_abs_error": 0.001709729433,
+          "mean_abs_error": 0.0002182290115,
+          "cosine_similarity": 0.9999985194,
+          "nan_count": 0,
+          "inf_count": 0
+        },
+        "merged": {
+          "element_count": 8192,
+          "max_abs_error": 0.001709729433,
+          "mean_abs_error": 0.0002108584762,
+          "cosine_similarity": 0.9999986007,
+          "nan_count": 0,
+          "inf_count": 0
+        },
+        "projection": {
+          "element_count": 8192,
+          "max_abs_error": 0.001141190529,
+          "mean_abs_error": 0.00017138605,
+          "cosine_similarity": 0.9999988949,
+          "nan_count": 0,
+          "inf_count": 0
+        },
+        "windows": {
+          "element_count": 8192,
+          "max_abs_error": 0.001141190529,
+          "mean_abs_error": 0.0001713859886,
+          "cosine_similarity": 0.9999988949,
+          "nan_count": 0,
+          "inf_count": 0
+        },
+        "bthwc": {
+          "element_count": 8192,
+          "max_abs_error": 0.001141190529,
+          "mean_abs_error": 0.0001713859886,
+          "cosine_similarity": 0.9999988949,
+          "nan_count": 0,
+          "inf_count": 0
+        }
+      },
+      "latency_ms": {
+        "warmups": 3,
+        "iterations": 3,
+        "mean": 2.320485667,
+        "min": 2.287239,
+        "max": 2.339062
+      },
+      "peak_vmhwm_kb": 54056,
+      "status": "FAIL"
+    },
+    {
+      "name": "dynamic_b",
+      "request": {
+        "input_shape": [
+          1,
+          4,
+          9,
+          10,
+          32
+        ]
+      },
+      "window_metadata": {
+        "window": [
+          4,
+          4,
+          4
+        ],
+        "grid": [
+          1,
+          3,
+          3
+        ]
+      },
+      "accuracy": {
+        "validity": {
+          "element_count": 576,
+          "max_abs_error": 0,
+          "mean_abs_error": 0,
+          "cosine_similarity": 1,
+          "nan_count": 0,
+          "inf_count": 0
+        },
+        "mask": {
+          "element_count": 36864,
+          "max_abs_error": 0,
+          "mean_abs_error": 0,
+          "cosine_similarity": 1,
+          "nan_count": 0,
+          "inf_count": 0
+        },
+        "rope_cos": {
+          "element_count": 256,
+          "max_abs_error": 5.960464478E-08,
+          "mean_abs_error": 3.725290298E-09,
+          "cosine_similarity": 1,
+          "nan_count": 0,
+          "inf_count": 0
+        },
+        "rope_sin": {
+          "element_count": 256,
+          "max_abs_error": 0,
+          "mean_abs_error": 0,
+          "cosine_similarity": 1,
+          "nan_count": 0,
+          "inf_count": 0
+        },
+        "head0": {
+          "element_count": 4608,
+          "max_abs_error": 0.001343667507,
+          "mean_abs_error": 0.0002324483688,
+          "cosine_similarity": 0.999998429,
+          "nan_count": 0,
+          "inf_count": 0
+        },
+        "head1": {
+          "element_count": 4608,
+          "max_abs_error": 0.001391649246,
+          "mean_abs_error": 0.0002136002013,
+          "cosine_similarity": 0.999998817,
+          "nan_count": 0,
+          "inf_count": 0
+        },
+        "head2": {
+          "element_count": 4608,
+          "max_abs_error": 0.001635909081,
+          "mean_abs_error": 0.0002573009529,
+          "cosine_similarity": 0.9999986703,
+          "nan_count": 0,
+          "inf_count": 0
+        },
+        "head3": {
+          "element_count": 4608,
+          "max_abs_error": 0.001655340195,
+          "mean_abs_error": 0.0002141549372,
+          "cosine_similarity": 0.9999987903,
+          "nan_count": 0,
+          "inf_count": 0
+        },
+        "merged": {
+          "element_count": 18432,
+          "max_abs_error": 0.001655340195,
+          "mean_abs_error": 0.000229376115,
+          "cosine_similarity": 0.9999986755,
+          "nan_count": 0,
+          "inf_count": 0
+        },
+        "projection": {
+          "element_count": 18432,
+          "max_abs_error": 0.001639008522,
+          "mean_abs_error": 0.0001841930046,
+          "cosine_similarity": 0.9999988596,
+          "nan_count": 0,
+          "inf_count": 0
+        },
+        "windows": {
+          "element_count": 18432,
+          "max_abs_error": 0.001639008522,
+          "mean_abs_error": 0.0001841929255,
+          "cosine_similarity": 0.9999988596,
+          "nan_count": 0,
+          "inf_count": 0
+        },
+        "bthwc": {
+          "element_count": 11520,
+          "max_abs_error": 0.001223027706,
+          "mean_abs_error": 0.0001746743075,
+          "cosine_similarity": 0.9999989426,
+          "nan_count": 0,
+          "inf_count": 0
+        }
+      },
+      "latency_ms": {
+        "warmups": 3,
+        "iterations": 3,
+        "mean": 3.413993,
+        "min": 3.408073,
+        "max": 3.423281
+      },
+      "peak_vmhwm_kb": 54680,
+      "status": "FAIL"
+    },
+    {
+      "name": "dynamic_c",
+      "request": {
+        "input_shape": [
+          1,
+          5,
+          9,
+          10,
+          32
+        ]
+      },
+      "window_metadata": {
+        "window": [
+          4,
+          4,
+          4
+        ],
+        "grid": [
+          2,
+          3,
+          3
+        ]
+      },
+      "accuracy": {
+        "validity": {
+          "element_count": 1152,
+          "max_abs_error": 0,
+          "mean_abs_error": 0,
+          "cosine_similarity": 1,
+          "nan_count": 0,
+          "inf_count": 0
+        },
+        "mask": {
+          "element_count": 73728,
+          "max_abs_error": 0,
+          "mean_abs_error": 0,
+          "cosine_similarity": 1,
+          "nan_count": 0,
+          "inf_count": 0
+        },
+        "rope_cos": {
+          "element_count": 256,
+          "max_abs_error": 5.960464478E-08,
+          "mean_abs_error": 3.725290298E-09,
+          "cosine_similarity": 1,
+          "nan_count": 0,
+          "inf_count": 0
+        },
+        "rope_sin": {
+          "element_count": 256,
+          "max_abs_error": 0,
+          "mean_abs_error": 0,
+          "cosine_similarity": 1,
+          "nan_count": 0,
+          "inf_count": 0
+        },
+        "head0": {
+          "element_count": 9216,
+          "max_abs_error": 0.002027273178,
+          "mean_abs_error": 0.0002670212878,
+          "cosine_similarity": 0.999999271,
+          "nan_count": 0,
+          "inf_count": 0
+        },
+        "head1": {
+          "element_count": 9216,
+          "max_abs_error": 0.001895755529,
+          "mean_abs_error": 0.0002445635826,
+          "cosine_similarity": 0.9999992841,
+          "nan_count": 0,
+          "inf_count": 0
+        },
+        "head2": {
+          "element_count": 9216,
+          "max_abs_error": 0.002490758896,
+          "mean_abs_error": 0.0002975483386,
+          "cosine_similarity": 0.9999992206,
+          "nan_count": 0,
+          "inf_count": 0
+        },
+        "head3": {
+          "element_count": 9216,
+          "max_abs_error": 0.002793937922,
+          "mean_abs_error": 0.000242454202,
+          "cosine_similarity": 0.9999992847,
+          "nan_count": 0,
+          "inf_count": 0
+        },
+        "merged": {
+          "element_count": 36864,
+          "max_abs_error": 0.002793937922,
+          "mean_abs_error": 0.0002628968528,
+          "cosine_similarity": 0.9999992595,
+          "nan_count": 0,
+          "inf_count": 0
+        },
+        "projection": {
+          "element_count": 36864,
+          "max_abs_error": 0.001618564129,
+          "mean_abs_error": 0.0002071654181,
+          "cosine_similarity": 0.9999990986,
+          "nan_count": 0,
+          "inf_count": 0
+        },
+        "windows": {
+          "element_count": 36864,
+          "max_abs_error": 0.001618593931,
+          "mean_abs_error": 0.0002071654455,
+          "cosine_similarity": 0.9999990986,
+          "nan_count": 0,
+          "inf_count": 0
+        },
+        "bthwc": {
+          "element_count": 14400,
+          "max_abs_error": 0.001506924629,
+          "mean_abs_error": 0.0001894843333,
+          "cosine_similarity": 0.9999989158,
+          "nan_count": 0,
+          "inf_count": 0
+        }
+      },
+      "latency_ms": {
+        "warmups": 3,
+        "iterations": 3,
+        "mean": 6.554218667,
+        "min": 6.523438,
+        "max": 6.571458
+      },
+      "peak_vmhwm_kb": 54632,
+      "status": "FAIL"
+    }
+  ],
+  "overall_status": "FAIL",
+  "runtime_warning": "WARNING: linker: normalize_path - invalid input: \"D\", the input path should be absolute; WARNING: linker: Warning: unable to normalize \"D\" (ignoring)"
+}

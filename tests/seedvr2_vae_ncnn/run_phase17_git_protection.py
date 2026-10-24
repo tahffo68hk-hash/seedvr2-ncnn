@@ -54,11 +54,24 @@ def main() -> int:
     rec("no_weight_files_tracked",
         not any(t.endswith(WEIGHT_SUFFIXES) for t in tracked))
     # Controlled test .bin fixtures under tests/ are whitelisted (Phase 7.5-13
-    # committed artifacts); every other binary suffix must stay untracked.
+    # committed artifacts). Four fixed Phase 18C frames and four user-requested
+    # portfolio screenshots are explicit evidence allowlists; other blobs stay untracked.
+    allowed_visual_evidence = {
+        "android/app/src/main/assets/phase18c_demo/frame_000.png",
+        "android/app/src/main/assets/phase18c_demo/frame_001.png",
+        "android/app/src/main/assets/phase18c_demo/frame_002.png",
+        "android/app/src/main/assets/phase18c_demo/frame_003.png",
+        "demo-screenshots/01-build.png",
+        "demo-screenshots/02-alignment-result.png",
+        "demo-screenshots/03-desktop-run.png",
+        "demo-screenshots/04-tablet-run.png",
+    }
     bad_blobs = [t for t in tracked
-                 if t.endswith(BLOB_SUFFIXES) and not t.startswith("tests/")]
+                 if t.endswith(BLOB_SUFFIXES)
+                 and not t.startswith("tests/")
+                 and t not in allowed_visual_evidence]
     rec("no_bin_png_video_tracked", bad_blobs == [],
-        "whitelist=tracked .bin under tests/ only")
+        "whitelist=tracked .bin under tests/ plus four fixed Phase 18C frames and four portfolio screenshots")
 
     large = git(["ls-files", "-z"]).stdout.split("\0")
     big = []

@@ -11,7 +11,7 @@
 namespace fs = std::filesystem;
 using namespace attention_dispatcher;
 
-struct ErrorStats { float maximum = 0; double mean = 0; size_t nan = 0, inf = 0; };
+struct ErrorStats { float maximum = 0; double mean = 0, cosine = 1; size_t nan = 0, inf = 0; };
 
 static bool read(const fs::path& path, std::vector<float>& values, size_t count)
 {
@@ -26,21 +26,29 @@ static ErrorStats compare(const std::vector<float>& actual, const fs::path& refe
     std::vector<float> reference;
     ErrorStats stats;
     if (!read(reference_path, reference, actual.size())) { stats.maximum = INFINITY; return stats; }
+    double dot = 0, actual_norm_squared = 0, reference_norm_squared = 0;
     for (size_t i = 0; i < actual.size(); ++i)
     {
         const float difference = std::fabs(actual[i] - reference[i]);
         stats.maximum = std::max(stats.maximum, difference);
         stats.mean += difference;
+        dot += static_cast<double>(actual[i]) * reference[i];
+        actual_norm_squared += static_cast<double>(actual[i]) * actual[i];
+        reference_norm_squared += static_cast<double>(reference[i]) * reference[i];
         stats.nan += std::isnan(actual[i]);
         stats.inf += std::isinf(actual[i]);
     }
     stats.mean /= actual.size();
+    const double norm_product = std::sqrt(actual_norm_squared * reference_norm_squared);
+    stats.cosine = norm_product > 0 ? dot / norm_product
+                                    : (actual_norm_squared == 0 && reference_norm_squared == 0 ? 1 : 0);
     return stats;
 }
 
 static bool emit(const std::string& name, const ErrorStats& stats)
 {
     std::cout << name << " max_abs_error=" << stats.maximum << " mean_abs_error=" << stats.mean
+              << " cosine_similarity=" << stats.cosine
               << " nan_count=" << stats.nan << " inf_count=" << stats.inf << '\n';
     return stats.maximum < 1e-4f && !stats.nan && !stats.inf;
 }
@@ -54,6 +62,7 @@ static void json_stats(std::ostream& output, const ErrorStats& stats, const char
 {
     output << "{\"logical_shape\":" << shape << ",\"element_count\":" << count
            << ",\"max_abs_error\":" << stats.maximum << ",\"mean_abs_error\":" << stats.mean
+           << ",\"cosine_similarity\":" << stats.cosine
            << ",\"nan_count\":" << stats.nan << ",\"inf_count\":" << stats.inf << "}";
 }
 

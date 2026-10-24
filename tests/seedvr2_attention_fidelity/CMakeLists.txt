@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.20)
 project(seedvr2_attention_fidelity LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
-find_package(ncnn CONFIG REQUIRED PATHS "D:/AIProjects/seedvr2-ncnn/build/ncnn-cpu/install/lib/cmake/ncnn" NO_DEFAULT_PATH)
+find_package(ncnn CONFIG REQUIRED)
 add_executable(ncnn_fidelity_runner ncnn_fidelity_runner.cpp)
 target_link_libraries(ncnn_fidelity_runner PRIVATE ncnn)
 target_compile_options(ncnn_fidelity_runner PRIVATE /EHsc)
