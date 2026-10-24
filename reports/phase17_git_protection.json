@@ -15,7 +15,7 @@
     "historical_ready_reports_unchanged": true
   },
   "details": {
-    "no_phase_dirs_tracked": "tracked=1832",
+    "no_phase_dirs_tracked": "tracked=1836",
     "no_bin_png_video_tracked": "whitelist=tracked .bin under tests/ plus four fixed Phase 18C frames and four portfolio screenshots",
     "no_large_binary_tracked": "threshold=10485760"
   },
