@@ -2,10 +2,10 @@
 
 ## Source read
 
-- `D:\AIProjects\third_party\SeedVR2\models\dit_v2\nablocks\attention\mmattn.py`: `NaMMAttention` creates `proj_qkv`, distinct `norm_q` / `norm_k`, `proj_out`, and `get_na_rope`; `NaSwinAttention.forward` partitions the sequence with `window_op`, normalizes Q/K, applies RoPE, then calls `FlashAttentionVarlen`.
-- `D:\AIProjects\third_party\SeedVR2\models\dit_v2\rope.py`: `NaMMRotaryEmbedding3d.forward` changes `[L,h,d] -> [h,L,d]`, calls `apply_rotary_emb(freqs, value.float())`, then restores the original dtype. `get_freqs` calls `get_axial_freqs(1024,128,128)`, slices `(f,h,w)`, then flattens it.
-- `D:\AIProjects\third_party\SeedVR2\models\dit_v2\normalization.py`: `get_norm_layer` can choose LayerNorm, RMSNorm, fused LayerNorm or fused RMSNorm; all are constructed with `dim=head_dim` at the `mmattn.py` call site.
-- `D:\AIProjects\third_party\SeedVR2\models\dit_v2\window.py`: `make_720Pwindows_bysize` returns slices in W/H/T window-enumeration order. Each selected `[t,h,w]` tensor retains normal PyTorch flattening, so W is fastest within one window.
+- `third_party/SeedVR2/models/dit_v2/nablocks/attention/mmattn.py`: `NaMMAttention` creates `proj_qkv`, distinct `norm_q` / `norm_k`, `proj_out`, and `get_na_rope`; `NaSwinAttention.forward` partitions the sequence with `window_op`, normalizes Q/K, applies RoPE, then calls `FlashAttentionVarlen`.
+- `third_party/SeedVR2/models/dit_v2/rope.py`: `NaMMRotaryEmbedding3d.forward` changes `[L,h,d] -> [h,L,d]`, calls `apply_rotary_emb(freqs, value.float())`, then restores the original dtype. `get_freqs` calls `get_axial_freqs(1024,128,128)`, slices `(f,h,w)`, then flattens it.
+- `third_party/SeedVR2/models/dit_v2/normalization.py`: `get_norm_layer` can choose LayerNorm, RMSNorm, fused LayerNorm or fused RMSNorm; all are constructed with `dim=head_dim` at the `mmattn.py` call site.
+- `third_party/SeedVR2/models/dit_v2/window.py`: `make_720Pwindows_bysize` returns slices in W/H/T window-enumeration order. Each selected `[t,h,w]` tensor retains normal PyTorch flattening, so W is fastest within one window.
 
 ## Tensor path
 

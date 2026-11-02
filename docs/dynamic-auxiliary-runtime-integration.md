@@ -22,7 +22,7 @@ PARTIAL until Dynamic B/C are implemented.
 
 Phase 9.5 adds Dynamic B spatial padding and Dynamic C temporal-plus-spatial
 padding using the same typed `padding_validity` and `dynamic_mmrope3d` route;
-see [dynamic-multi-shape-runtime-report.md](D:\AIProjects\seedvr2-ncnn\docs\dynamic-multi-shape-runtime-report.md).
+see [dynamic-multi-shape-runtime-report.md](docs/dynamic-multi-shape-runtime-report.md).
 
 Phase 9.5 is READY for the tested A/B/C fixtures; profile generation beyond
 those shapes remains TODO.

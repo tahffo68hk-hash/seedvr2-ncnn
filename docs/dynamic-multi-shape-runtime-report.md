@@ -13,7 +13,7 @@ C has 450 valid and 702 invalid tokens (44,928 masked entries).
 The validation sequence is A → B → C → A. It recreates dynamic contracts per
 request, verifies the final A is bit-identical, and records path-keyed cache
 growth 5 → 10 → 15. See
-[dynamic_rms_multi_shape_runtime_validation.json](D:\AIProjects\seedvr2-ncnn\reports\dynamic_rms_multi_shape_runtime_validation.json).
+[dynamic_rms_multi_shape_runtime_validation.json](reports/dynamic_rms_multi_shape_runtime_validation.json).
 
 ## Status
 

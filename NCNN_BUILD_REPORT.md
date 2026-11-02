@@ -3,13 +3,13 @@
 ## ncnn source
 
 - URL: https://github.com/Tencent/ncnn.git
-- Path: `D:\AIProjects\third_party\ncnn`
+- Path: `third_party/ncnn`
 - Branch: `master`
-- pnnx is bundled at `tools\pnnx`; no separate pnnx clone was needed.
+- pnnx is bundled at `tools/pnnx`; no separate pnnx clone was needed.
 
 ## pnnx source
 
-- Path: `D:\AIProjects\third_party\ncnn\tools\pnnx`
+- Path: `third_party/ncnn/tools/pnnx`
 - Relationship: ncnn repository subdirectory built through its CMake tree.
 
 ## Commit
@@ -25,7 +25,7 @@
 - MSVC: 19.44.35228 / toolset 14.44.35207
 - Architecture: x64
 - Configuration: Release
-- Python/Torch environment: `D:\AIProjects\seedvr2-ncnn\.conda-cuda`, PyTorch 2.7.0+cu128
+- Python/Torch environment: `.conda-cuda`, PyTorch 2.7.0+cu128
 
 ## CMake options
 
@@ -37,7 +37,7 @@ Actual ncnn options were confirmed in its top-level CMakeLists:
 - `NCNN_BUILD_EXAMPLES=ON`
 - `NCNN_BUILD_TESTS=OFF`
 
-Build directory: `D:\AIProjects\seedvr2-ncnn\build\ncnn-cpu`
+Build directory: `build/ncnn-cpu`
 
 ## Build result
 
@@ -49,11 +49,11 @@ Build directory: `D:\AIProjects\seedvr2-ncnn\build\ncnn-cpu`
 
 ## Generated binaries
 
-- `D:\AIProjects\seedvr2-ncnn\build\ncnn-cpu\src\ncnn.lib`
-- `D:\AIProjects\seedvr2-ncnn\build\ncnn-cpu\tools\ncnnoptimize.exe`
-- `D:\AIProjects\seedvr2-ncnn\build\ncnn-cpu\tools\ncnn2mem.exe`
-- `D:\AIProjects\seedvr2-ncnn\build\ncnn-cpu\tools\quantize\ncnn2int8.exe`
-- `D:\AIProjects\seedvr2-ncnn\build\ncnn-cpu\tools\quantize\ncnn2table.exe`
+- `build/ncnn-cpu/src/ncnn.lib`
+- `build/ncnn-cpu/tools/ncnnoptimize.exe`
+- `build/ncnn-cpu/tools/ncnn2mem.exe`
+- `build/ncnn-cpu/tools/quantize/ncnn2int8.exe`
+- `build/ncnn-cpu/tools/quantize/ncnn2table.exe`
 - `benchncnn.exe` was not generated because `NCNN_BUILD_BENCHMARK=OFF`.
 
 ## Verification

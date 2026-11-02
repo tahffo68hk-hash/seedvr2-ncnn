@@ -7,7 +7,7 @@ Release ncnn CPU FP32 validation of five static profiles.
 ArtifactRegistry â†?dispatcher â†?model cache â†?host partition/mask â†?ncnn â†?reverse/crop.
 
 ## Artifact Registry
-Discovered 5 cores under `D:\AIProjects\seedvr2-ncnn\tests\attention_dispatcher\artifacts\attention_core`.
+Discovered 5 cores under `tests/attention_dispatcher/artifacts/attention_core`.
 
 ## Model Cache
 Loaded 5 models; steady-state benchmark excludes first-load time.

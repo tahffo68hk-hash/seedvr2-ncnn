@@ -9,8 +9,8 @@ def test_inference():
     out = []
 
     with ncnn.Net() as net:
-        net.load_param("D:\AIProjects\seedvr2-ncnn\tests\dynamic_mask_fixture\artifacts\dynamic_mask_core.ncnn.param")
-        net.load_model("D:\AIProjects\seedvr2-ncnn\tests\dynamic_mask_fixture\artifacts\dynamic_mask_core.ncnn.bin")
+        net.load_param("tests/dynamic_mask_fixture/artifacts/dynamic_mask_core.ncnn.param")
+        net.load_model("tests/dynamic_mask_fixture/artifacts/dynamic_mask_core.ncnn.bin")
 
         with net.create_extractor() as ex:
             ex.input("in0", ncnn.Mat(in0.numpy(), batch_index=233).clone())

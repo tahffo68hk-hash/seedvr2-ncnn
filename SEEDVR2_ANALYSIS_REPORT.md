@@ -2,7 +2,7 @@
 
 ## Repository
 
-Official source: `https://github.com/ByteDance-Seed/SeedVR`, local checkout `D:\AIProjects\third_party\SeedVR2`, `main` at commit `e4de8c24441a67e1b7df56abea10645059bb1185`. License: Apache License 2.0. No weights were downloaded or used.
+Official source: `https://github.com/ByteDance-Seed/SeedVR`, local checkout `third_party/SeedVR2`, `main` at commit `e4de8c24441a67e1b7df56abea10645059bb1185`. License: Apache License 2.0. No weights were downloaded or used.
 
 ## Model Architecture
 

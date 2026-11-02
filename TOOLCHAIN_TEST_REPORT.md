@@ -5,16 +5,16 @@
 - Status: READY
 - Product: Visual Studio Build Tools 2022
 - Version: 17.14.37411.7
-- Path: `D:\DevTools\VisualStudio\BuildTools`
+- Path: `Visual Studio Build Tools 2022`
 - Complete and launchable according to `vswhere.exe`.
 
 ## MSVC
 
 - Status: READY
-- Compiler: `D:\DevTools\VisualStudio\BuildTools\VC\Tools\MSVC\14.44.35207\bin\Hostx64\x64\cl.exe`
+- Compiler: `cl.exe (MSVC 14.44.35207 Hostx64/x64)`
 - Version: MSVC 19.44.35228
 - `link.exe`, `lib.exe`, and `nmake.exe` found.
-- `vcvars64.bat` found at `D:\DevTools\VisualStudio\BuildTools\VC\Auxiliary\Build\vcvars64.bat`.
+- `vcvars64.bat` found at `vcvars64.bat`.
 
 ## Windows SDK
 
@@ -25,14 +25,14 @@
 ## CMake
 
 - Status: READY
-- Path: `D:\DevTools\VisualStudio\BuildTools\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe`
+- Path: `cmake.exe (Visual Studio CMake)`
 - Version: `3.31.6-msvc6`
 - Generators confirmed: Ninja, Ninja Multi-Config, Visual Studio 17 2022, NMake Makefiles.
 
 ## Ninja
 
 - Status: READY
-- Path: `D:\DevTools\VisualStudio\BuildTools\Common7\IDE\CommonExtensions\Microsoft\CMake\Ninja\ninja.exe`
+- Path: `ninja.exe`
 - Version: `1.12.1`
 - CMake/Ninja build passed inside a temporary VS developer command session.
 
@@ -52,14 +52,14 @@ size=3
 
 - Ninja: PASS; configured, compiled, linked, and ran successfully.
 - Visual Studio 17 2022: PASS; configured, compiled, linked, and ran successfully.
-- Test source: `D:\AIProjects\seedvr2-ncnn\toolchain-test\main.cpp`
-- Test project: `D:\AIProjects\seedvr2-ncnn\toolchain-test\CMakeLists.txt`
+- Test source: `toolchain-test/main.cpp`
+- Test project: `toolchain-test/CMakeLists.txt`
 
 ## Paths Used
 
-- Test workspace: `D:\AIProjects\seedvr2-ncnn\toolchain-test`
-- Ninja build: `D:\AIProjects\seedvr2-ncnn\toolchain-test\build-ninja`
-- Visual Studio build: `D:\AIProjects\seedvr2-ncnn\toolchain-test\build-vs2022`
+- Test workspace: `toolchain-test`
+- Ninja build: `toolchain-test/build-ninja`
+- Visual Studio build: `toolchain-test/build-vs2022`
 - Existing repository was not modified.
 
 ## Failures and Warnings

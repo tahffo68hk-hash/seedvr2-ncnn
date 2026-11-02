@@ -1,0 +1,68 @@
+name: cpu-fp32
+
+on:
+  push:
+  pull_request:
+
+# Same ncnn commit recorded in NCNN_BUILD_REPORT.md. Weights are not fetched.
+env:
+  NCNN_GIT_SHA: a4d2ea1d4422c9e849f166fd7a4aefb52f942f6a
+
+jobs:
+  host-numeric:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure host tests
+        run: >
+          cmake -S tests/attention_dispatcher -B build/attention-host
+          -DCMAKE_BUILD_TYPE=Debug -DSEEDVR2_REQUIRE_NCNN=OFF
+          -DCMAKE_CXX_COMPILER=g++
+      - name: Build host tests
+        run: >
+          cmake --build build/attention-host --parallel
+          --target dynamic_padding_mask_tests dynamic_rope3d_tests
+          artifact_registry_tests dispatcher_tests hybrid_window_adapter_tests
+      - name: Run host numeric tests
+        run: |
+          ./build/attention-host/dynamic_padding_mask_tests
+          ./build/attention-host/dynamic_rope3d_tests
+          ./build/attention-host/artifact_registry_tests
+          ./build/attention-host/dispatcher_tests
+          ./build/attention-host/hybrid_window_adapter_tests tests/seedvr2_attention_fidelity/artifacts/attention_core_fidelity
+
+  ncnn-cpu:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install build tools
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends build-essential cmake ninja-build git ca-certificates
+      - name: Fetch pinned ncnn
+        run: |
+          git init -b ncnn-pin third_party/ncnn
+          git -C third_party/ncnn remote add origin https://github.com/Tencent/ncnn.git
+          git -C third_party/ncnn fetch --depth 1 origin "$NCNN_GIT_SHA"
+          git -C third_party/ncnn checkout --detach FETCH_HEAD
+          test "$(git -C third_party/ncnn rev-parse HEAD)" = "$NCNN_GIT_SHA"
+      - name: Build and install ncnn CPU
+        run: |
+          cmake -S third_party/ncnn -B build/ncnn-cpu -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_INSTALL_PREFIX="$PWD/build/ncnn-cpu/install" \
+            -DNCNN_VULKAN=OFF \
+            -DNCNN_BUILD_TESTS=OFF \
+            -DNCNN_BUILD_TOOLS=OFF \
+            -DNCNN_BUILD_EXAMPLES=OFF \
+            -DNCNN_BUILD_BENCHMARK=OFF \
+            -DNCNN_SHARED_LIB=OFF
+          cmake --build build/ncnn-cpu --parallel
+          cmake --install build/ncnn-cpu
+      - name: Build ncnn mat contract test
+        run: |
+          cmake -S tests/attention_dispatcher -B build/attention-ncnn -G Ninja \
+            -DCMAKE_BUILD_TYPE=Debug \
+            -DCMAKE_CXX_COMPILER=g++ \
+            -DCMAKE_PREFIX_PATH="$PWD/build/ncnn-cpu/install"
+          cmake --build build/attention-ncnn --parallel --target ncnn_mat_contract_tests
+      - name: Run ncnn mat contract test
+        run: ./build/attention-ncnn/ncnn_mat_contract_tests

@@ -2,7 +2,7 @@
 
 ## Current pnnx version
 
-- Source: `D:\AIProjects\third_party\ncnn\tools\pnnx`
+- Source: `third_party/ncnn/tools/pnnx`
 - ncnn commit: `a4d2ea1d4422c9e849f166fd7a4aefb52f942f6a`
 - The current CMake requires `find_package(Torch REQUIRED)`.
 - Minimum version enforced by CMake: PyTorch `>= 1.8`.
@@ -10,10 +10,10 @@
 
 ## Current PyTorch environment
 
-- Python: `D:\AIProjects\seedvr2-ncnn\.conda-cuda\python.exe`
+- Python: `.conda-cuda/python.exe`
 - PyTorch: `2.7.0+cu128`
 - CUDA runtime: `12.8`
-- Torch CMake path: `D:\AIProjects\seedvr2-ncnn\.conda-cuda\Lib\site-packages\torch\share\cmake`
+- Torch CMake path: `.conda-cuda/Lib/site-packages/torch/share/cmake`
 - The installed Python wheel contains Torch headers, libraries, and CMake files, but its CMake configuration is CUDA-enabled.
 
 ## Required LibTorch
@@ -56,7 +56,7 @@ HEAD-only checks; no files were downloaded:
 
 Recommended target after confirmation:
 
-`V:\AI\LibTorch\2.7.0+cpu`
+`libtorch/2.7.0+cpu`
 
 ## Next action
 
