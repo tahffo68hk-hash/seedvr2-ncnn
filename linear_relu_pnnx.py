@@ -21,7 +21,7 @@ class Model(nn.Module):
 
         self.linear = nn.Linear(bias=True, in_features=10, out_features=4)
 
-        archive = zipfile.ZipFile('D:\AIProjects\seedvr2-ncnn\linear_relu.pnnx.bin', 'r')
+        archive = zipfile.ZipFile('linear_relu.pnnx.bin', 'r')
         self.linear.bias = self.load_pnnx_bin_as_parameter(archive, 'linear.bias', (4), 'float32')
         self.linear.weight = self.load_pnnx_bin_as_parameter(archive, 'linear.weight', (4,10), 'float32')
         archive.close()
@@ -51,7 +51,7 @@ def export_torchscript():
     v_0 = torch.rand(1, 10, dtype=torch.float)
 
     mod = torch.jit.trace(net, v_0)
-    mod.save("D:\AIProjects\seedvr2-ncnn\linear_relu_pnnx.py.pt")
+    mod.save("linear_relu_pnnx.py.pt")
 
 def export_onnx():
     net = Model()
@@ -61,7 +61,7 @@ def export_onnx():
     torch.manual_seed(0)
     v_0 = torch.rand(1, 10, dtype=torch.float)
 
-    torch.onnx.export(net, v_0, "D:\AIProjects\seedvr2-ncnn\linear_relu_pnnx.py.onnx", export_params=True, operator_export_type=torch.onnx.OperatorExportTypes.ONNX_ATEN_FALLBACK, opset_version=13, input_names=['in0'], output_names=['out0'])
+    torch.onnx.export(net, v_0, "linear_relu_pnnx.py.onnx", export_params=True, operator_export_type=torch.onnx.OperatorExportTypes.ONNX_ATEN_FALLBACK, opset_version=13, input_names=['in0'], output_names=['out0'])
 
 def export_pnnx():
     net = Model()
@@ -72,7 +72,7 @@ def export_pnnx():
     v_0 = torch.rand(1, 10, dtype=torch.float)
 
     import pnnx
-    pnnx.export(net, "D:\AIProjects\seedvr2-ncnn\linear_relu_pnnx.py.pt", v_0)
+    pnnx.export(net, "linear_relu_pnnx.py.pt", v_0)
 
 def export_ncnn():
     export_pnnx()

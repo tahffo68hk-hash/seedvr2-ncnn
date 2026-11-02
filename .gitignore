@@ -2,6 +2,7 @@
 .conda/
 .conda-cuda/
 build/
+third_party/
 **/CMakeFiles/
 **/.ninja_*
 *.pdb

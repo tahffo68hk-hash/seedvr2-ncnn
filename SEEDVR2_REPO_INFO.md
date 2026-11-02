@@ -3,7 +3,7 @@
 ## Repository
 
 - Official URL: https://github.com/ByteDance-Seed/SeedVR
-- Local path: `D:\AIProjects\third_party\SeedVR2`
+- Local path: `third_party/SeedVR2`
 - Branch: `main`
 - Commit: `e4de8c24441a67e1b7df56abea10645059bb1185`
 - Commit date: `2026-01-27 14:02:23 +0800`

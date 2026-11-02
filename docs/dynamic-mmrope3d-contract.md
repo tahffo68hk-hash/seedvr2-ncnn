@@ -5,7 +5,7 @@ Status: **READY for the fixed RMS host-compatibility RoPE contract only.** Runti
 ## Source trace and coordinate scope
 
 The real SeedVR2 path is `NaSwinAttention.forward` in
-`D:/AIProjects/third_party/SeedVR2/models/dit_v2/nablocks/attention/mmattn.py`,
+`third_party/SeedVR2/models/dit_v2/nablocks/attention/mmattn.py`,
 which applies the window transform before calling `NaMMRotaryEmbedding3d` in
 `models/dit_v2/rope.py`. `NaMMRotaryEmbedding3d.get_freqs` gets axial frequencies
 and slices each window shape from origin (`[:f, :h, :w]`). Therefore this path

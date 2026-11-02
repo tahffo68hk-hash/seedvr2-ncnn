@@ -8,8 +8,8 @@ def test_inference():
     out = []
 
     with ncnn.Net() as net:
-        net.load_param("D:\AIProjects\seedvr2-ncnn\linear_relu.ncnn.param")
-        net.load_model("D:\AIProjects\seedvr2-ncnn\linear_relu.ncnn.bin")
+        net.load_param("linear_relu.ncnn.param")
+        net.load_model("linear_relu.ncnn.bin")
 
         with net.create_extractor() as ex:
             ex.input("in0", ncnn.Mat(in0.numpy(), batch_index=233).clone())

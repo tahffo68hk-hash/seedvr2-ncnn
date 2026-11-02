@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cctype>
 #include <cerrno>
+#include <climits>
 #include <cmath>
 #include <cstdlib>
 #include <fstream>

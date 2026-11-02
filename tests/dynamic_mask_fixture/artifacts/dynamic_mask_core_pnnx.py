@@ -22,7 +22,7 @@ class Model(nn.Module):
         self.qkv = nn.Linear(bias=True, in_features=32, out_features=96)
         self.output = nn.Linear(bias=True, in_features=32, out_features=32)
 
-        archive = zipfile.ZipFile('D:\AIProjects\seedvr2-ncnn\tests\dynamic_mask_fixture\artifacts\dynamic_mask_core.pnnx.bin', 'r')
+        archive = zipfile.ZipFile('tests/dynamic_mask_fixture/artifacts/dynamic_mask_core.pnnx.bin', 'r')
         self.qkv.bias = self.load_pnnx_bin_as_parameter(archive, 'qkv.bias', (96), 'float32')
         self.qkv.weight = self.load_pnnx_bin_as_parameter(archive, 'qkv.weight', (96,32), 'float32')
         self.output.bias = self.load_pnnx_bin_as_parameter(archive, 'output.bias', (32), 'float32')
@@ -84,7 +84,7 @@ def export_torchscript():
     v_1 = torch.rand(25, 64, 64, dtype=torch.float)
 
     mod = torch.jit.trace(net, (v_0, v_1))
-    mod.save("D:\AIProjects\seedvr2-ncnn\tests\dynamic_mask_fixture\artifacts\dynamic_mask_core_pnnx.py.pt")
+    mod.save("tests/dynamic_mask_fixture/artifacts/dynamic_mask_core_pnnx.py.pt")
 
 def export_onnx():
     net = Model()
@@ -95,7 +95,7 @@ def export_onnx():
     v_0 = torch.rand(25, 64, 32, dtype=torch.float)
     v_1 = torch.rand(25, 64, 64, dtype=torch.float)
 
-    torch.onnx.export(net, (v_0, v_1), "D:\AIProjects\seedvr2-ncnn\tests\dynamic_mask_fixture\artifacts\dynamic_mask_core_pnnx.py.onnx", export_params=True, operator_export_type=torch.onnx.OperatorExportTypes.ONNX_ATEN_FALLBACK, opset_version=13, input_names=['in0', 'in1'], output_names=['out0'])
+    torch.onnx.export(net, (v_0, v_1), "tests/dynamic_mask_fixture/artifacts/dynamic_mask_core_pnnx.py.onnx", export_params=True, operator_export_type=torch.onnx.OperatorExportTypes.ONNX_ATEN_FALLBACK, opset_version=13, input_names=['in0', 'in1'], output_names=['out0'])
 
 def export_pnnx():
     net = Model()
@@ -107,7 +107,7 @@ def export_pnnx():
     v_1 = torch.rand(25, 64, 64, dtype=torch.float)
 
     import pnnx
-    pnnx.export(net, "D:\AIProjects\seedvr2-ncnn\tests\dynamic_mask_fixture\artifacts\dynamic_mask_core_pnnx.py.pt", (v_0, v_1))
+    pnnx.export(net, "tests/dynamic_mask_fixture/artifacts/dynamic_mask_core_pnnx.py.pt", (v_0, v_1))
 
 def export_ncnn():
     export_pnnx()
